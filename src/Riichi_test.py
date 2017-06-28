@@ -56,7 +56,7 @@ def genDrop(screen, _drop):
 
 
 def genDora(screen, _g):
-    font = pygame.font.Font('simsun.ttc', 24)
+    font = pygame.font.Font('../res/simsun.ttc', 24)
     dorahint = font.render(u'Dora指示牌', True, (0, 0, 0))
     screen.blit(dorahint, (80, 50))
     w = dorahint.get_width()
@@ -75,7 +75,7 @@ def genDora(screen, _g):
 def genJiesuan(screen, _g, TAG):
     if TAG == True:
         _x, _y = 500, 50
-        font = pygame.font.Font('simsun.ttc', 24)
+        font = pygame.font.Font('../res/simsun.ttc', 24)
         index = 1
         if _g.yi[1] == 0:
             index = 0
@@ -96,7 +96,7 @@ def genJiesuan(screen, _g, TAG):
 
 
 def genInfo(screen, _g):
-    font = pygame.font.Font('simsun.ttc', 24)
+    font = pygame.font.Font('../res/simsun.ttc', 24)
     ck = ''
     tmp = _g.quan % 4
     if tmp == 0:
@@ -128,7 +128,7 @@ def genCPG(screen, _user):
 tiles = {}
 tilesize = (41, 64)
 tiles[1], tiles[2], tiles[3], tiles[4] = [], [], [], []
-path = './tiles/'
+path = '../res/tiles/'
 for lei in range(1, 5):
     if lei != 4:
         i = 10
@@ -144,7 +144,7 @@ up = 500
 def run():
     pygame.init()
     screen = pygame.display.set_mode((800, 600), 0, 32)
-    font = pygame.font.Font('simsun.ttc', 64)
+    font = pygame.font.Font('../res/simsun.ttc', 64)
     _x, _y, _h = 33, 33, 63
     menu = {}
     menu['rong'] = Button(font.render(u'和', True, (0, 0, 0)), (_x, _y))
