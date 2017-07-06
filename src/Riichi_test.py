@@ -91,7 +91,7 @@ def genJiesuan(screen, _g, TAG):
             _y += h
         screen.blit(fufandian, (_x, _y))
     elif TAG == 2:
-        font = pygame.font.Font('simsun.ttc', 24)
+        font = pygame.font.Font('../res/simsun.ttc', 24)
         screen.blit(font.render(u'流局', True, (0, 0, 0)), (360, 50))
 
 
@@ -171,6 +171,7 @@ def run():
                     _g.newset()
                     _pai = _g.serve()
                     TAG = False
+                    GANGTAG = 0
                 elif TAG == False:
                     if button_pressed == 'rong':
                         TAG = True

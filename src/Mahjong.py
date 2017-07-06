@@ -20,8 +20,8 @@ class game():
             start = 30
             for j in range(start + 1, start + 10):
                 if j % 10 != 0: self.pai.append(j)
-            for k in range(41, 48):
-                self.pai.append(k)
+            #for k in range(41, 48):
+            #    self.pai.append(k)
 
     def newset(self):
         self.oya += 1
@@ -1180,7 +1180,7 @@ def main():
     '''
 
 
-#main()
+main()
 '''
 _game = game()
 _l = [42,42,42,43,43,43,44,44,44,45,45]
