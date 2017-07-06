@@ -17,11 +17,12 @@ class game():
 
     def create(self):
         for i in range(4):
-            start = 30
+            start = 10
+            # start = 30        # Comment the upper line for playing ``only s tiles''
             for j in range(start + 1, start + 10):
                 if j % 10 != 0: self.pai.append(j)
-            #for k in range(41, 48):
-            #    self.pai.append(k)
+            for k in range(41, 48):
+                self.pai.append(k)
 
     def newset(self):
         self.oya += 1
@@ -707,6 +708,7 @@ class player():
         if d > 4 - m:
             d = 4 - m
         yxz = sorted(list(set(yxz)))
+
         return (8 - 2 * m - d - q, yxz)
 
     def countyxz(self, _list, allyxz):
@@ -731,6 +733,11 @@ class player():
             MINexp[key] = sorted(value[0], key=lambda x: x[0])
             allyxz += value[1]
         allyxz = list(set(allyxz))
+
+        for item in allyxz:
+            if _list.count(item) == 4:
+                allyxz.remove(item)
+
         MINexp[len(MINexp) + 1] = sorted(allyxz)
         return (tmp0, MINexp)
 
