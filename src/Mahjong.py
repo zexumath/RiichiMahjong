@@ -17,8 +17,8 @@ class game():
 
     def create(self):
         for i in range(4):
-            start = 10
-            # start = 30        # Comment the upper line for playing ``only s tiles''
+            # start = 10
+            start = 30        # Comment the upper line for playing ``only s tiles''
             for j in range(start + 1, start + 10):
                 if j % 10 != 0: self.pai.append(j)
             for k in range(41, 48):
@@ -75,7 +75,9 @@ class game():
                 tmp.sort()
                 self.user.hand = tmp
                 self.user.agang += [[_gangpai] * 4]
-                self.xun += 0.5
+                self.xun += 0.1
+                # tmpdora = [x-1 for x in self.dora]
+                # self.dora = tmpdora[:]
                 return True
             else:
                 return False
@@ -99,6 +101,11 @@ class game():
                     self.dedian = 32000 * self.yi[1]
             else:
                 tmp = self.user.hand + [self.user.rongpai]
+                for gang in self.user.agang:
+                    tmp = tmp + gang
+                for gang in self.user.mgang:
+                    tmp = tmp + gang
+
                 if self.xun - self.user.riichi == 1 and self.user.riichi > 0:
                     self.yi[0] += 1
                     self.fan[0] += [u'一發']
@@ -1187,7 +1194,7 @@ def main():
     '''
 
 
-main()
+# main()
 '''
 _game = game()
 _l = [42,42,42,43,43,43,44,44,44,45,45]
