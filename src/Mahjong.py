@@ -680,6 +680,7 @@ class player():
                 yxz += self.youxiaozhang(value)
             else:
                 danzhangtmp.append(value)
+        m += len(self.agang) + len(self.mgang) + len(self.chi) + len(self.peng)
         sumup = m + d + q
         if m == 4:
             if q == 1:
