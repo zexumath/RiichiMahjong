@@ -192,6 +192,7 @@ def run():
                 elif TAG == False:
                     if button_pressed == 'rong':
                         TAG = True
+                        AnalysisTag = False
                         _g.jiesuan(_pai)
                         button_pressed = None
                     elif button_pressed == 'riichi' and _g.user.riichi == 0:
@@ -257,7 +258,9 @@ def run():
                             else:
                                 _g.user.drop.append(_pai)
                                 _pai = _g.serve()
-                        if _pai == 0: TAG = 2
+                        if _pai == 0:
+                            TAG = 2
+                            AnalysisTag = False
 
             screen.fill((255, 255, 255))
             genDora(screen, _g)
