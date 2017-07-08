@@ -94,6 +94,21 @@ def genJiesuan(screen, _g, TAG):
         font = pygame.font.Font('../res/simsun.ttc', 24)
         screen.blit(font.render(u'流局', True, (0, 0, 0)), (360, 50))
 
+def genAnalysis(screen, _g, AnalysisTag):
+    if AnalysisTag == True:
+        _x, _y = 500, 50
+        font = pygame.font.Font('../res/simsun.ttc',24)
+        xiangtingshu, MINexp = _g.user.chaifen2(_g.user.hand)
+        yxz = MINexp[len(MINexp)]
+        ptstr = str(xiangtingshu) + u'向听'
+        analysis = font.render(ptstr, True, (0, 0, 0))
+        h = analysis.get_height()
+        screen.blit(analysis, (_x, _y))
+        _y = _y + h
+        for index in range(len(yxz)):
+            m, n = index //6, index % 6
+            screen.blit(tiles[yxz[index] // 10][yxz[index] % 10], (_x + tilesize[0] * n, _y + (tilesize[1] -9) * m))
+
 
 def genInfo(screen, _g):
     font = pygame.font.Font('../res/simsun.ttc', 24)
@@ -147,9 +162,10 @@ def run():
     font = pygame.font.Font('../res/simsun.ttc', 64)
     _x, _y, _h = 33, 33, 63
     menu = {}
-    menu['rong'] = Button(font.render(u'和', True, (0, 0, 0)), (_x, _y))
-    menu['riichi'] = Button(font.render(u'立', True, (0, 0, 0)), (_x, _y + _h))
-    menu['gang'] = Button(font.render(u'杠', True, (0, 0, 0)), (_x, _y + _h * 2))
+    menu['rong']        = Button(font.render(u'和', True, (0, 0, 0)), (_x, _y))
+    menu['riichi']      = Button(font.render(u'立', True, (0, 0, 0)), (_x, _y + _h))
+    menu['gang']        = Button(font.render(u'杠', True, (0, 0, 0)), (_x, _y + _h * 2))
+    menu['analysis']    = Button(font.render(u'理', True, (0, 0, 0)), (_x, _y + _h * 3))
 
     _g = Mahjong.game()
     _g.newset()
@@ -157,6 +173,7 @@ def run():
 
     TAG = False
     GANGTAG = 0
+    AnalysisTag = 0
     while True:
         button_pressed = None
         for event in pygame.event.get():
@@ -185,6 +202,10 @@ def run():
                     elif button_pressed == 'gang':
                         GANGTAG = 1
                         button_pressed = None
+                    elif button_pressed == 'analysis':
+                        AnalysisTag = not AnalysisTag
+                        button_pressed = None
+
                     # 以下讨论出牌问题
                     x, y = event.pos
                     x -= left
@@ -247,6 +268,7 @@ def run():
                 button.render(screen)
             genInfo(screen, _g)
             genJiesuan(screen, _g, TAG)
+            genAnalysis(screen, _g, AnalysisTag)
             pygame.display.set_caption('Mahjong')
             pygame.display.update()
 
