@@ -1,0 +1,14 @@
+Author: Ze Xu
+Date:   07/08/17
+
+1. Change to multiple player.
+
+2. Change the style of showing 'youxiaozhang' to multiple lines like TENHOU.
+
+3. Calculate the exact (remained) 'youxiaozhang'.
+
+4. Build ai.
+
+5. Interface.
+
+6. ...
