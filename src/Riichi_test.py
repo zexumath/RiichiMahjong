@@ -56,7 +56,7 @@ def genDrop(screen, _drop):
 
 
 def genDora(screen, _g):
-    font = pygame.font.Font('simsun.ttc', 24)
+    font = pygame.font.Font('../res/simsun.ttc', 24)
     dorahint = font.render(u'Dora指示牌', True, (0, 0, 0))
     screen.blit(dorahint, (80, 50))
     w = dorahint.get_width()
@@ -75,7 +75,7 @@ def genDora(screen, _g):
 def genJiesuan(screen, _g, TAG):
     if TAG == True:
         _x, _y = 500, 50
-        font = pygame.font.Font('simsun.ttc', 24)
+        font = pygame.font.Font('../res/simsun.ttc', 24)
         index = 1
         if _g.yi[1] == 0:
             index = 0
@@ -91,12 +91,27 @@ def genJiesuan(screen, _g, TAG):
             _y += h
         screen.blit(fufandian, (_x, _y))
     elif TAG == 2:
-        font = pygame.font.Font('simsun.ttc', 24)
+        font = pygame.font.Font('../res/simsun.ttc', 24)
         screen.blit(font.render(u'流局', True, (0, 0, 0)), (360, 50))
+
+def genAnalysis(screen, _g, AnalysisTag):
+    if AnalysisTag == True:
+        _x, _y = 500, 50
+        font = pygame.font.Font('../res/simsun.ttc',24)
+        xiangtingshu, MINexp = _g.user.chaifen2(_g.user.hand)
+        yxz = MINexp[len(MINexp)]
+        ptstr = str(xiangtingshu) + u'向听'
+        analysis = font.render(ptstr, True, (0, 0, 0))
+        h = analysis.get_height()
+        screen.blit(analysis, (_x, _y))
+        _y = _y + h
+        for index in range(len(yxz)):
+            m, n = index //6, index % 6
+            screen.blit(tiles[yxz[index] // 10][yxz[index] % 10], (_x + tilesize[0] * n, _y + (tilesize[1] -9) * m))
 
 
 def genInfo(screen, _g):
-    font = pygame.font.Font('simsun.ttc', 24)
+    font = pygame.font.Font('../res/simsun.ttc', 24)
     ck = ''
     tmp = _g.quan % 4
     if tmp == 0:
@@ -128,7 +143,7 @@ def genCPG(screen, _user):
 tiles = {}
 tilesize = (41, 64)
 tiles[1], tiles[2], tiles[3], tiles[4] = [], [], [], []
-path = './tiles/'
+path = '../res/tiles/'
 for lei in range(1, 5):
     if lei != 4:
         i = 10
@@ -144,12 +159,13 @@ up = 500
 def run():
     pygame.init()
     screen = pygame.display.set_mode((800, 600), 0, 32)
-    font = pygame.font.Font('simsun.ttc', 64)
+    font = pygame.font.Font('../res/simsun.ttc', 64)
     _x, _y, _h = 33, 33, 63
     menu = {}
-    menu['rong'] = Button(font.render(u'和', True, (0, 0, 0)), (_x, _y))
-    menu['riichi'] = Button(font.render(u'立', True, (0, 0, 0)), (_x, _y + _h))
-    menu['gang'] = Button(font.render(u'杠', True, (0, 0, 0)), (_x, _y + _h * 2))
+    menu['rong']        = Button(font.render(u'和', True, (0, 0, 0)), (_x, _y))
+    menu['riichi']      = Button(font.render(u'立', True, (0, 0, 0)), (_x, _y + _h))
+    menu['gang']        = Button(font.render(u'杠', True, (0, 0, 0)), (_x, _y + _h * 2))
+    menu['analysis']    = Button(font.render(u'理', True, (0, 0, 0)), (_x, _y + _h * 3))
 
     _g = Mahjong.game()
     _g.newset()
@@ -157,6 +173,7 @@ def run():
 
     TAG = False
     GANGTAG = 0
+    AnalysisTag = 0
     while True:
         button_pressed = None
         for event in pygame.event.get():
@@ -171,9 +188,11 @@ def run():
                     _g.newset()
                     _pai = _g.serve()
                     TAG = False
+                    GANGTAG = 0
                 elif TAG == False:
                     if button_pressed == 'rong':
                         TAG = True
+                        AnalysisTag = False
                         _g.jiesuan(_pai)
                         button_pressed = None
                     elif button_pressed == 'riichi' and _g.user.riichi == 0:
@@ -184,6 +203,10 @@ def run():
                     elif button_pressed == 'gang':
                         GANGTAG = 1
                         button_pressed = None
+                    elif button_pressed == 'analysis':
+                        AnalysisTag = not AnalysisTag
+                        button_pressed = None
+
                     # 以下讨论出牌问题
                     x, y = event.pos
                     x -= left
@@ -235,7 +258,9 @@ def run():
                             else:
                                 _g.user.drop.append(_pai)
                                 _pai = _g.serve()
-                        if _pai == 0: TAG = 2
+                        if _pai == 0:
+                            TAG = 2
+                            AnalysisTag = False
 
             screen.fill((255, 255, 255))
             genDora(screen, _g)
@@ -246,6 +271,7 @@ def run():
                 button.render(screen)
             genInfo(screen, _g)
             genJiesuan(screen, _g, TAG)
+            genAnalysis(screen, _g, AnalysisTag)
             pygame.display.set_caption('Mahjong')
             pygame.display.update()
 
