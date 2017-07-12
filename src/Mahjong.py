@@ -4,7 +4,7 @@ import math
 import random
 
 
-class game():
+class MahjongGame():
     def __init__(self):
         self.pai = []
         self.create()
@@ -1172,7 +1172,7 @@ def readpai(str="123456789m112p3s"):
 
 
 def main():
-    _game = game()
+    _game = MahjongGame()
     while 1:
         _l = readpai(raw_input('Please enter your pai: '))
         xiangtingshu, MINexp = _game.user.chaifen2(_l)
@@ -1197,7 +1197,7 @@ def main():
 
 # main()
 '''
-_game = game()
+_game = MahjongGame()
 _l = [42,42,42,43,43,43,44,44,44,45,45]
 _game.user.isclose = True
 _game.user.agang = [[41]*4]

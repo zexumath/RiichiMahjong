@@ -1,5 +1,5 @@
 import numpy as np
-from src.Mahjong import player
+from src.mahjong import player
 import abc
 
 
