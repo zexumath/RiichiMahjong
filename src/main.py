@@ -35,7 +35,7 @@ class RiichiMahjong:
         if event.type == MOUSEBUTTONDOWN:
             if self._game.setComplete():
                 self._game.newset()
-                self._pai = self._game.serve()
+                self._game.user._mopai = self._game.serve()
             else:
                 if self._menu.clicked() == True:
                     """ Do something"""

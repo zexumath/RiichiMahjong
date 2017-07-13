@@ -54,6 +54,7 @@ class Screen(object):
         self._game = _game
         self.font = pygame.font.Font('../res/simsun.ttc', 24)
         self.initMenu()
+        self.initTiles()
 
     def show(self):
         self._display_surf.fill(WHITE)
@@ -61,7 +62,7 @@ class Screen(object):
         self.genStat()
         self.genMenu()
         # self.genPaishan()
-        # self.genPlayer()
+        self.genPlayer()
 
         pygame.display.update()
 
@@ -81,17 +82,60 @@ class Screen(object):
 
     def genStat(self):
         MIDDLE_OF_SCREEN = ( 0.5 * self.windowWidth, 0.5 * self.windowHeight )
-        ck = ''
+        changkuang = ''
         tmp = self._game.quan % 4
         if tmp == 0:
-            ck += u'東'
+            changkuang += u'東'
         elif tmp == 1:
-            ck += u'南'
+            changkuang += u'南'
         elif tmp == 2:
-            ck += u'西'
+            changkuang += u'西'
         else:
-            ck += u'北'
-        ck += str(self._game.oya + 1) + u'局0本场\n玩家点数' + str(self._game.user.money)
-        self._display_surf.blit(self.font.render(ck, True, (0, 0, 0)), MIDDLE_OF_SCREEN )
+            changkuang += u'北'
+        changkuang += str(self._game.oya + 1) + u'局0本场'
+        dianshu = u'玩家点数' + str(self._game.user.money)
+        ck = self.font.render(changkuang, True, (0, 0, 0))
+        ds = self.font.render(dianshu   , True, (0, 0, 0))
+        h_ck = ck.get_height()
+        self._display_surf.blit(ck, MIDDLE_OF_SCREEN )
+        self._display_surf.blit(ds, (0.5 * self.windowWidth, 0.5 * self.windowHeight + h_ck) )
 
+    def genPlayer(self):
+        _hand = self._game.user.hand
+        _pai  = self._game.user.mopai
+        left = 50
+        up = 500
+        for p, i in zip(_hand, range(len(_hand))):
+            m, n = p // 10, p % 10
+            x, y = left + i * self.tilesize[0], up
+            self._display_surf.blit(self.tiles[m][n], (x, y))
+
+        self._display_surf.blit(self.tiles[_pai // 10][_pai % 10], (x + 8 + self.tilesize[0], y))
+
+        # show angang
+        # TODO: change to show chi peng gang
+        right = self.windowWidth - self.tilesize[0]
+        for g in self._game.user.agang:
+            self._display_surf.blit(self.tiles[4][0], (right, up + 20))
+            right -= self.tilesize[0]
+            self._display_surf.blit(self.tiles[g[0] // 10][g[0] % 10], (right, up + 20))
+            right -= self.tilesize[0]
+            self._display_surf.blit(self.tiles[g[0] // 10][g[0] % 10], (right, up + 20))
+            right -= self.tilesize[0]
+            self._display_surf.blit(self.tiles[4][0], (right, up + 20))
+            right -= self.tilesize[0]
+
+    def initTiles(self):
+        self.tiles = {}
+        self.tilesize = (41, 64)
+        self.tiles[1], self.tiles[2], self.tiles[3], self.tiles[4] = [], [], [], []
+        path = '../res/tiles/'
+        for lei in range(1, 5):
+            if lei != 4:
+                i = 10
+            else:
+                i = 8
+            for x in range(i):
+                tmp = pygame.image.load(path + str(lei) + str(x) + '.png')
+                self.tiles[lei].append(pygame.transform.scale(tmp.subsurface((23, 0), (82, 128)), self.tilesize))
 

@@ -46,10 +46,10 @@ class MahjongGame():
         if len(self.yama) == 14 or self.xun >= 30:
             return 0
         else:
-            pai = self.yama.pop()
+            self.user.mopai = self.yama.pop()
             self.xun = int(self.xun + 1)
             self.user.lingshang = 0
-            return pai
+            return self.user.mopai
 
     def nextpai(self, _pai):
         m, n = _pai // 10, _pai % 10
@@ -179,6 +179,7 @@ class MahjongGame():
 class player():
     def __init__(self):
         self.hand = []
+        self.mopai = []
         self.drop = []
         self.isclose = True
         self.riichi = 0
