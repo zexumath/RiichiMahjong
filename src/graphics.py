@@ -63,7 +63,7 @@ class Screen(object):
         self.genMenu()
         # self.genPaishan()
         self.genPlayer()
-
+        self.genAnalysis(not self._game.user.analysisTag)
         pygame.display.update()
 
     def initMenu(self):
@@ -76,9 +76,30 @@ class Screen(object):
         self.menu['gang']        = Botton(font.render(u'杠', True, (0, 0, 0)), (_x, _y + _h * 2))
         self.menu['analysis']    = Botton(font.render(u'理', True, (0, 0, 0)), (_x, _y + _h * 3))
 
+    def initTiles(self):
+        self.tiles = {}
+        self.tilesize = (41, 64)
+        self.tiles[1], self.tiles[2], self.tiles[3], self.tiles[4] = [], [], [], []
+        path = '../res/tiles/'
+        for lei in range(1, 5):
+            if lei != 4:
+                i = 10
+            else:
+                i = 8
+            for x in range(i):
+                tmp = pygame.image.load(path + str(lei) + str(x) + '.png')
+                self.tiles[lei].append(pygame.transform.scale(tmp.subsurface((23, 0), (82, 128)), self.tilesize))
+
     def genMenu(self):
         for button in self.menu.values():
             button.render(self._display_surf)
+
+    def buttonPressed(self, event):
+        for button_name, button in self.menu.items():
+            if button.is_over(event.pos):
+                button_pressed = button_name
+                break
+        return button_pressed
 
     def genStat(self):
         MIDDLE_OF_SCREEN = ( 0.5 * self.windowWidth, 0.5 * self.windowHeight )
@@ -125,17 +146,31 @@ class Screen(object):
             self._display_surf.blit(self.tiles[4][0], (right, up + 20))
             right -= self.tilesize[0]
 
-    def initTiles(self):
-        self.tiles = {}
-        self.tilesize = (41, 64)
-        self.tiles[1], self.tiles[2], self.tiles[3], self.tiles[4] = [], [], [], []
-        path = '../res/tiles/'
-        for lei in range(1, 5):
-            if lei != 4:
-                i = 10
-            else:
-                i = 8
-            for x in range(i):
-                tmp = pygame.image.load(path + str(lei) + str(x) + '.png')
-                self.tiles[lei].append(pygame.transform.scale(tmp.subsurface((23, 0), (82, 128)), self.tilesize))
+        # show drops
+        # TODO: move constants to top of file
+        DROP_POSx, DROP_POSy = 80, 180
+
+        for index in range(len(self._game.user.drop) - 1, -1, -1):
+            m, n = index // 6, index % 6
+            tile_tmp = self._game.user.drop[index]
+            self._display_surf.blit( self.tiles[tile_tmp // 10][tile_tmp % 10], \
+                                    (DROP_POSx + self.tilesize[0] * n, \
+                                     DROP_POSy + (self.tilesize[1] -9) * m) )
+
+    def genAnalysis(self, AnalysisTag):
+        if AnalysisTag == True:
+            ANALYSISx, ANALYSISy = 500, 50
+            font = self.font
+            xiangtingshu, MINexp = self._game.user.chaifen2(self._game.user.hand)
+            yxz = MINexp[len(MINexp)]
+            ptstr = str(xiangtingshu) + u'向听'
+            analysis = font.render(ptstr, True, (0, 0, 0))
+            h = analysis.get_height()
+            self._display_surf.blit(analysis, (ANALYSISx, ANALYSISy))
+            ANALYSISy += h
+            for index in range(len(yxz) -1, -1, -1):
+                m, n = index //6, index % 6
+                self._display_surf.blit( self.tiles[yxz[index] // 10][yxz[index] % 10], \
+                                        (ANALYSISx + self.tilesize[0] * n, \
+                                         ANALYSISy + (self.tilesize[1] -9) * m))
 
