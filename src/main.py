@@ -37,10 +37,13 @@ class RiichiMahjong:
                 self._game.newset()
                 self._game.user._mopai = self._game.serve()
             else:
-                if self._menu.clicked() == True:
+                button_pressed = self._screen.buttonPressed(event)
+                tile_pressed   = self._screen.tilePressed(event)
+                if  button_pressed != None:
                     """ Do something"""
-                elif self._menu.select():
-                    pass
+                elif tile_pressed != None:
+                    """tile_pressed is an index for the tile"""
+
 
 
 

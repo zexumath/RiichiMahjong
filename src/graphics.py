@@ -1,5 +1,5 @@
-# -*- coding: utf-8 -*-
 # !/usr/bin/env python
+# -*- coding: utf-8 -*-
 import pygame
 import mahjong
 from pygame.locals import *
@@ -95,11 +95,16 @@ class Screen(object):
             button.render(self._display_surf)
 
     def buttonPressed(self, event):
+        button_pressed = None
         for button_name, button in self.menu.items():
             if button.is_over(event.pos):
                 button_pressed = button_name
                 break
         return button_pressed
+
+    def tilePressed(self,event):
+        tile_pressed = None
+        pass
 
     def genStat(self):
         MIDDLE_OF_SCREEN = ( 0.5 * self.windowWidth, 0.5 * self.windowHeight )
