@@ -14,6 +14,7 @@ class MahjongGame():
         self.xun = 0
         self.benchang = 0
         self.lizhibang = 0
+        self.setTag = 0
 
     def create(self):
         for i in range(4):
@@ -39,6 +40,7 @@ class MahjongGame():
         self.user.hand.sort()
         self.fu, self.yi, self.fan = [0, 0], [0, 0], [0, 0]
         self.dedian = 0
+        self.setTag = 0
 
     def serve(self):
         if len(self.yama) == 14 or self.xun >= 30:
@@ -149,6 +151,30 @@ class MahjongGame():
             self.user.money += int(self.dedian) + self.lizhibang * 1000
             self.lizhibang = 0
 
+    def setComplete(self):
+        return self.setTag !=0
+
+    def menu_rong(self, _pai):
+        self.user.rongTag = True
+        self.user.analysisTag = False
+        self.setTag = 1
+        self.jiesuan(_pai)
+
+    def menu_riichi(self):
+        if self.user.riichi == 0:
+            self.user.riichi = -1
+            self.user.money -= 1000
+            self.lizhibang +=1
+
+    def menu_gang(self):
+        self.user.gangTag = True
+
+    def menu_analysis(self):
+        self.user.analysisTag = not self.user.analysisTag
+
+    def menu_clear(self):
+        self.user.rongTag = False
+        self.user.gangTag = False
 
 class player():
     def __init__(self):
@@ -169,6 +195,9 @@ class player():
         self.exp = {}
         self.rongflag = 0
         self.lingshang = 0
+        self.rongTag = False
+        self.gangTag = False
+        self.analysisTag = False
 
     def keyigang(self, _pai):
         return True

@@ -14,6 +14,7 @@ class RiichiMahjong:
     windowWidth  = 800
     windowHeight = 600
 
+
     def __init__(self):
         self._running   = True
         self._game      = None
@@ -29,7 +30,20 @@ class RiichiMahjong:
         pass
 
     def on_event(self,event):
-        pass
+        if event.type == QUIT:
+            exit()
+        if event.type == MOUSEBUTTONDOWN:
+            if self._game.setComplete():
+                self._game.newset()
+                self._pai = self._game.serve()
+            else:
+                if self._menu.clicked() == True:
+                    """ Do something"""
+                elif self._menu.select():
+                    pass
+
+
+
 
     def on_render(self):
         self._screen.show()
@@ -40,6 +54,10 @@ class RiichiMahjong:
     def on_execute(self):
         if self.on_init() == False:
             self._running = False
+            exit()
+
+        self._game.newset()
+        self._pai = self._game.serve()
 
         while( self._running ):
             for event in pygame.event.get():

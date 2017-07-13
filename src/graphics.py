@@ -9,7 +9,7 @@ WHITE = ( 255, 255, 255 )
 '''----------------------------------'''
 
 
-class Button(object):
+class Botton(object):
     """这个类是一个按钮"""
 
     def __init__(self, image_filename, position):
@@ -53,16 +53,31 @@ class Screen(object):
         self._display_surf = pygame.display.set_mode( self.windowSize, 0, 32 )
         self._game = _game
         self.font = pygame.font.Font('../res/simsun.ttc', 24)
+        self.initMenu()
 
     def show(self):
         self._display_surf.fill(WHITE)
 
         self.genStat()
+        self.genMenu()
         # self.genPaishan()
         # self.genPlayer()
 
         pygame.display.update()
 
+    def initMenu(self):
+        font = pygame.font.Font('../res/simsun.ttc', 32)
+
+        _x,_y,_h = 17,17,31
+        self.menu = {}
+        self.menu['rong']        = Botton(font.render(u'和', True, (0, 0, 0)), (_x, _y))
+        self.menu['riichi']      = Botton(font.render(u'立', True, (0, 0, 0)), (_x, _y + _h))
+        self.menu['gang']        = Botton(font.render(u'杠', True, (0, 0, 0)), (_x, _y + _h * 2))
+        self.menu['analysis']    = Botton(font.render(u'理', True, (0, 0, 0)), (_x, _y + _h * 3))
+
+    def genMenu(self):
+        for button in self.menu.values():
+            button.render(self._display_surf)
 
     def genStat(self):
         MIDDLE_OF_SCREEN = ( 0.5 * self.windowWidth, 0.5 * self.windowHeight )
