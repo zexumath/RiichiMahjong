@@ -40,9 +40,35 @@ class RiichiMahjong:
                 button_pressed = self._screen.buttonPressed(event)
                 tile_pressed   = self._screen.tilePressed(event)
                 if  button_pressed != None:
-                    """ Do something"""
+                    if button_pressed == 'rong':
+                        self._game.menu_rong(self._game.user.mopai)
+                    elif button_pressed == 'riichi':
+                        self._game.menu_riichi()
+                    elif button_pressed == 'gang':
+                        self._game.menu_gang()
+                    elif button_pressed == 'analysis':
+                        self._game.menu_analysis()
                 elif tile_pressed != None:
-                    """tile_pressed is an index for the tile"""
+                    if self._game.user.riichi == -1:
+                        # This is a status of waiting for riichi
+                        droptmp = self._game.user.drop(tile_pressed)
+                        if droptmp:
+                            self._game.user.riichi = self._game.xun
+                            self._game.serve()
+                    elif self._game.user.gangTag == False:
+                        droptmp = self._game.user.drop(tile_pressed)
+                        if droptmp:
+                            self._game.serve()
+                    else:
+                        gangtmp = self._game.user.gang(tile_pressed)
+                        if gangtmp:
+                            self._game.gangserve()
+                        else:
+                            self._game.user.gangTag = False
+                else:
+                    self._game.tagclear()
+
+
 
 
 

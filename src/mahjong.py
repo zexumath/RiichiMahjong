@@ -44,12 +44,19 @@ class MahjongGame():
 
     def serve(self):
         if len(self.yama) == 14 or self.xun >= 30:
+            self.setTag = 2
             return 0
         else:
             self.user.mopai = self.yama.pop()
             self.xun = int(self.xun + 1)
             self.user.lingshang = 0
             return self.user.mopai
+
+    def gangserve(self):
+        self.user.mopai, self.yama = self.yama[0], self.yama[1:]
+        for i in range(len(self.dora)):
+            self.dora[i] -= 1
+        self.user.gangTag = False
 
     def nextpai(self, _pai):
         m, n = _pai // 10, _pai % 10
@@ -167,7 +174,7 @@ class MahjongGame():
             self.lizhibang +=1
 
     def menu_gang(self):
-        self.user.gangTag = True
+        if len(self.yama) >14: self.user.gangTag = True
 
     def menu_analysis(self):
         self.user.analysisTag = not self.user.analysisTag
@@ -176,11 +183,14 @@ class MahjongGame():
         self.user.rongTag = False
         self.user.gangTag = False
 
+    def tagclear(self):
+        self.user.rongTag = False
+        self.user.gangTag = False
 class player():
     def __init__(self):
         self.hand = []
         self.mopai = []
-        self.drop = []
+        self.dropped = []
         self.isclose = True
         self.riichi = 0
         self.zimo = 0
@@ -200,8 +210,68 @@ class player():
         self.gangTag = False
         self.analysisTag = False
 
+    def drop(self,tileindex):
+        if self.riichi >0:
+            if tileindex == len(self.hand) + 1:
+                self.dropped.append(self.mopai)
+                return True
+            else:
+                return False
+        else:
+            if tileindex == len(self.hand) + 1:
+                self.dropped.append(self.mopai)
+                return True
+            else:
+                self.dropped.append(self.hand[tileindex])
+                self.hand[tileindex] = self.mopai
+                self.hand.sort()
+                return True
+
+    def gang(self,tileindex):
+        if self.riichi >0:
+            if tileindex == len(self.hand) + 1:
+                if self.keyigang(self.mopai):
+                    self.agang.append([self.mopai]*4)
+                    self.hand.remove(self.mopai)
+                    self.hand.remove(self.mopai)
+                    self.hand.remove(self.mopai)
+                    return True
+                else:
+                    return False
+            else:
+                #TODO: Here we assume the only clickable tile for gang after
+                #      riichi is called is the new tile.
+                return False
+        else:
+            if tileindex == len(self.hand) + 1:
+                if self.keyigang(self.mopai):
+                    self.agang.append([self.mopai]*4)
+                    self.hand.remove(self.mopai)
+                    self.hand.remove(self.mopai)
+                    self.hand.remove(self.mopai)
+                    return True
+                else:
+                    return False
+            else:
+                if self.keyigang(self.hand[tileindex]):
+                    self.agang.append([self.hand[tileindex]]*4)
+                    gangpai = self.hand[tileindex]
+                    self.hand.append(self.mopai)
+                    self.hand.remove(gangpai)
+                    self.hand.remove(gangpai)
+                    self.hand.remove(gangpai)
+                    self.hand.remove(gangpai)
+                    self.hand.sort()
+                    return True
+                else:
+                    return False
+
     def keyigang(self, _pai):
-        return True
+        tmp = self.hand + [self.mopai]
+        if tmp.count(_pai) ==4:
+            return True
+        else:
+            return False
 
     def calcfu(self, quan, oya):
         (exp, flag) = self.exp, self.rongflag

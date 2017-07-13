@@ -63,7 +63,8 @@ class Screen(object):
         self.genMenu()
         # self.genPaishan()
         self.genPlayer()
-        self.genAnalysis(not self._game.user.analysisTag)
+        self.genAnalysis()
+        self.genJiesuan()
         pygame.display.update()
 
     def initMenu(self):
@@ -104,7 +105,22 @@ class Screen(object):
 
     def tilePressed(self,event):
         tile_pressed = None
-        pass
+        # return the tile index
+        left = 50
+        up = 500
+
+        x, y = event.pos
+        x -= left
+        y -= up
+        if 0 < y and y < self.tilesize[1]:
+            if 0 < x and x < self.tilesize[0] * len(self._game.user.hand):
+                index = x // self.tilesize[0]
+                return index
+            elif (x - 8) // self.tilesize[0] == len(self._game.user.hand):
+                return len(self._game.user.hand) +1
+
+        return tile_pressed
+
 
     def genStat(self):
         MIDDLE_OF_SCREEN = ( 0.5 * self.windowWidth, 0.5 * self.windowHeight )
@@ -155,15 +171,16 @@ class Screen(object):
         # TODO: move constants to top of file
         DROP_POSx, DROP_POSy = 80, 180
 
-        for index in range(len(self._game.user.drop) - 1, -1, -1):
+        for index in range(len(self._game.user.dropped) - 1, -1, -1):
             m, n = index // 6, index % 6
-            tile_tmp = self._game.user.drop[index]
+            tile_tmp = self._game.user.dropped[index]
             self._display_surf.blit( self.tiles[tile_tmp // 10][tile_tmp % 10], \
                                     (DROP_POSx + self.tilesize[0] * n, \
                                      DROP_POSy + (self.tilesize[1] -9) * m) )
 
-    def genAnalysis(self, AnalysisTag):
-        if AnalysisTag == True:
+
+    def genAnalysis(self):
+        if self._game.user.analysisTag == True:
             ANALYSISx, ANALYSISy = 500, 50
             font = self.font
             xiangtingshu, MINexp = self._game.user.chaifen2(self._game.user.hand)
@@ -179,3 +196,24 @@ class Screen(object):
                                         (ANALYSISx + self.tilesize[0] * n, \
                                          ANALYSISy + (self.tilesize[1] -9) * m))
 
+    def genJiesuan(self):
+        if self._game.setTag == True:
+            _x, _y = 500, 50
+            font = pygame.font.Font('../res/simsun.ttc', 24)
+            index = 1
+            if self._game.yi[1] == 0:
+                index = 0
+                ptstr = str(self._game.fu[0]) + u'符' + str(self._game.yi[0]) + u'番' + str(int(self._game.dedian)) + u'点'
+            elif self._game.yi[1] == 1:
+                ptstr = u'役满' + str(int(self._game.dedian)) + u'点'
+            else:
+                ptstr = str(self._game.yi[1]) + u'倍役满' + str(int(self._game.dedian)) + u'点'
+            fufandian = font.render(ptstr, True, (0, 0, 0))
+            h = fufandian.get_height()
+            for s in self._game.fan[index]:
+                self._display_surf.blit(font.render(s, True, (0, 0, 0)), (_x, _y))
+                _y += h
+            self._display_surf.blit(fufandian, (_x, _y))
+        elif self._game.setTag == 2:
+            font = pygame.font.Font('../res/simsun.ttc', 24)
+            self._display_surf.blit(font.render(u'流局', True, (0, 0, 0)), (360, 50))
