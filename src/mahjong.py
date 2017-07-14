@@ -18,7 +18,7 @@ class MahjongGame():
 
     def create(self):
         for i in range(4):
-            for j in range(TILE_START + 1, TILE_RANGE + 10):
+            for j in range(TILE_START + 1, TILE_START + TILE_RANGE):
                 if j % 10 != 0: self.pai.append(j)
             for k in range(41, 48):
                 self.pai.append(k)
