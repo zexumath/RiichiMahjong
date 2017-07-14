@@ -6,14 +6,9 @@ from sys import exit
 from pygame.locals import *
 import mahjong
 import graphics
-
-WHITE = (255, 255, 255)
+from constants import *
 
 class RiichiMahjong:
-
-    windowWidth  = 800
-    windowHeight = 600
-
 
     def __init__(self):
         self._running   = True
@@ -49,7 +44,7 @@ class RiichiMahjong:
                     elif button_pressed == 'analysis':
                         self._game.menu_analysis()
                 elif tile_pressed != None:
-                    if self._game.user.riichi == -1:
+                    if self._game.user.riichi == WAIT_FOR_RIICHI_PAI:
                         # This is a status of waiting for riichi
                         droptmp = self._game.user.drop(tile_pressed)
                         if droptmp:

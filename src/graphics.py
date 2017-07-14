@@ -1,13 +1,8 @@
 # !/usr/bin/env python
 # -*- coding: utf-8 -*-
 import pygame
-import mahjong
+from constants import *
 from pygame.locals import *
-from sys import exit
-
-WHITE = ( 255, 255, 255 )
-'''----------------------------------'''
-
 
 class Botton(object):
     """这个类是一个按钮"""
@@ -45,14 +40,11 @@ class Screen(object):
     """
     This class is totally for graphics. Main usage would be Screen.show().
     """
-    windowWidth = 800
-    windowHeight = 600
-    windowSize = (windowWidth,windowHeight)
 
     def __init__(self, _game):
-        self._display_surf = pygame.display.set_mode( self.windowSize, 0, 32 )
+        self._display_surf = pygame.display.set_mode( WINDOW_SIZE, 0, 32 )
         self._game = _game
-        self.font = pygame.font.Font('../res/simsun.ttc', 24)
+        self.font = pygame.font.Font('../res/simsun.ttc', FONT_SIZE)
         self.initMenu()
         self.initTiles()
 
@@ -68,28 +60,27 @@ class Screen(object):
         pygame.display.update()
 
     def initMenu(self):
-        font = pygame.font.Font('../res/simsun.ttc', 32)
+        font = pygame.font.Font('../res/simsun.ttc', FONT_SIZE_MENU)
 
-        _x,_y,_h = 17,17,31
+        _x,_y,_h = FONT_SIZE_MENU/2+1,FONT_SIZE_MENU/2+1,FONT_SIZE_MENU-1
         self.menu = {}
-        self.menu['rong']        = Botton(font.render(u'和', True, (0, 0, 0)), (_x, _y))
-        self.menu['riichi']      = Botton(font.render(u'立', True, (0, 0, 0)), (_x, _y + _h))
-        self.menu['gang']        = Botton(font.render(u'杠', True, (0, 0, 0)), (_x, _y + _h * 2))
-        self.menu['analysis']    = Botton(font.render(u'理', True, (0, 0, 0)), (_x, _y + _h * 3))
+        self.menu['rong']        = Botton(font.render(u'和', True, BLACK), (_x, _y))
+        self.menu['riichi']      = Botton(font.render(u'立', True, BLACK), (_x, _y + _h))
+        self.menu['gang']        = Botton(font.render(u'杠', True, BLACK), (_x, _y + _h * 2))
+        self.menu['analysis']    = Botton(font.render(u'理', True, BLACK), (_x, _y + _h * 3))
 
     def initTiles(self):
         self.tiles = {}
-        self.tilesize = (41, 64)
         self.tiles[1], self.tiles[2], self.tiles[3], self.tiles[4] = [], [], [], []
         path = '../res/tiles/'
         for lei in range(1, 5):
             if lei != 4:
-                i = 10
+                tilemax = 10
             else:
-                i = 8
-            for x in range(i):
+                tilemax = 8
+            for x in range(tilemax):
                 tmp = pygame.image.load(path + str(lei) + str(x) + '.png')
-                self.tiles[lei].append(pygame.transform.scale(tmp.subsurface((23, 0), (82, 128)), self.tilesize))
+                self.tiles[lei].append(pygame.transform.scale(tmp.subsurface((23, 0), (82, 128)), TILE_SIZE))
 
     def genMenu(self):
         for button in self.menu.values():
@@ -104,28 +95,25 @@ class Screen(object):
         return button_pressed
 
     def tilePressed(self,event):
-        tile_pressed = None
         # return the tile index
-        left = 50
-        up = 500
-
+        tile_pressed = None
         x, y = event.pos
-        x -= left
-        y -= up
-        if 0 < y and y < self.tilesize[1]:
-            if 0 < x and x < self.tilesize[0] * len(self._game.user.hand):
-                index = x // self.tilesize[0]
+        x -= HAND_POSx
+        y -= HAND_POSy
+        if 0 < y and y < TILE_SIZEy:
+            if 0 < x and x < TILE_SIZEx * len(self._game.user.hand):
+                index = x // TILE_SIZEx
                 return index
-            elif (x - 8) // self.tilesize[0] == len(self._game.user.hand):
+            elif (x - HAND_GAP) // TILE_SIZEx == len(self._game.user.hand):
                 return len(self._game.user.hand) +1
 
         return tile_pressed
 
 
     def genStat(self):
-        MIDDLE_OF_SCREEN = ( 0.5 * self.windowWidth, 0.5 * self.windowHeight )
+        MIDDLE_OF_SCREEN = ( 0.5 * WINDOW_WIDTH, 0.5 * WINDOW_HEIGHT )
         changkuang = ''
-        tmp = self._game.quan % 4
+        tmp = self._game.quan % NUM_OF_SET_PER_QUAN
         if tmp == 0:
             changkuang += u'東'
         elif tmp == 1:
@@ -136,70 +124,64 @@ class Screen(object):
             changkuang += u'北'
         changkuang += str(self._game.oya + 1) + u'局0本场'
         dianshu = u'玩家点数' + str(self._game.user.money)
-        ck = self.font.render(changkuang, True, (0, 0, 0))
-        ds = self.font.render(dianshu   , True, (0, 0, 0))
+        ck = self.font.render(changkuang, True, BLACK)
+        ds = self.font.render(dianshu   , True, BLACK)
         h_ck = ck.get_height()
         self._display_surf.blit(ck, MIDDLE_OF_SCREEN )
-        self._display_surf.blit(ds, (0.5 * self.windowWidth, 0.5 * self.windowHeight + h_ck) )
+        self._display_surf.blit(ds, (0.5 * WINDOW_WIDTH, 0.5 * WINDOW_HEIGHT + h_ck) )
 
     def genPlayer(self):
         _hand = self._game.user.hand
         _pai  = self._game.user.mopai
-        left = 50
-        up = 500
         for p, i in zip(_hand, range(len(_hand))):
             m, n = p // 10, p % 10
-            x, y = left + i * self.tilesize[0], up
+            x, y = HAND_POSx + i * TILE_SIZEx, HAND_POSy
             self._display_surf.blit(self.tiles[m][n], (x, y))
 
-        self._display_surf.blit(self.tiles[_pai // 10][_pai % 10], (x + 8 + self.tilesize[0], y))
+        self._display_surf.blit(self.tiles[_pai // 10][_pai % 10], (x + HAND_GAP + TILE_SIZEx, y))
 
         # show angang
         # TODO: change to show chi peng gang
-        right = self.windowWidth - self.tilesize[0]
+        right = WINDOW_WIDTH - TILE_SIZEx
         for g in self._game.user.agang:
-            self._display_surf.blit(self.tiles[4][0], (right, up + 20))
-            right -= self.tilesize[0]
-            self._display_surf.blit(self.tiles[g[0] // 10][g[0] % 10], (right, up + 20))
-            right -= self.tilesize[0]
-            self._display_surf.blit(self.tiles[g[0] // 10][g[0] % 10], (right, up + 20))
-            right -= self.tilesize[0]
-            self._display_surf.blit(self.tiles[4][0], (right, up + 20))
-            right -= self.tilesize[0]
+            self._display_surf.blit(self.tiles[4][0], (right, HAND_POSy + HAND_CHI_PENG_GANG_DIFF))
+            right -= TILE_SIZEx
+            self._display_surf.blit(self.tiles[g[0] // 10][g[0] % 10], (right, HAND_POSy + HAND_CHI_PENG_GANG_DIFF))
+            right -= TILE_SIZEx
+            self._display_surf.blit(self.tiles[g[0] // 10][g[0] % 10], (right, HAND_POSy + HAND_CHI_PENG_GANG_DIFF))
+            right -= TILE_SIZEx
+            self._display_surf.blit(self.tiles[4][0], (right, HAND_POSy + HAND_CHI_PENG_GANG_DIFF))
+            right -= TILE_SIZEx
 
         # show drops
-        # TODO: move constants to top of file
-        DROP_POSx, DROP_POSy = 80, 180
 
         for index in range(len(self._game.user.dropped) - 1, -1, -1):
-            m, n = index // 6, index % 6
+            m, n = index // MAX_DROP_A_LINE, index % MAX_DROP_A_LINE
             tile_tmp = self._game.user.dropped[index]
             self._display_surf.blit( self.tiles[tile_tmp // 10][tile_tmp % 10], \
-                                    (DROP_POSx + self.tilesize[0] * n, \
-                                     DROP_POSy + (self.tilesize[1] -9) * m) )
+                                    (DROP_POSx + TILE_SIZEx * n, \
+                                     DROP_POSy + (TILE_SIZEy - TILE_SIZE_BLANK) * m) )
 
 
     def genAnalysis(self):
         if self._game.user.analysisTag == True:
-            ANALYSISx, ANALYSISy = 500, 50
             font = self.font
             xiangtingshu, MINexp = self._game.user.chaifen2(self._game.user.hand)
             yxz = MINexp[len(MINexp)]
             ptstr = str(xiangtingshu) + u'向听'
-            analysis = font.render(ptstr, True, (0, 0, 0))
+            analysis = font.render(ptstr, True, BLACK)
             h = analysis.get_height()
             self._display_surf.blit(analysis, (ANALYSISx, ANALYSISy))
             ANALYSISy += h
             for index in range(len(yxz) -1, -1, -1):
-                m, n = index //6, index % 6
+                m, n = index //MAX_DROP_A_LINE, index % MAX_DROP_A_LINE
                 self._display_surf.blit( self.tiles[yxz[index] // 10][yxz[index] % 10], \
-                                        (ANALYSISx + self.tilesize[0] * n, \
-                                         ANALYSISy + (self.tilesize[1] -9) * m))
+                                        (ANALYSISx + TILE_SIZEx * n, \
+                                         ANALYSISy + (TILE_SIZEy - TILE_SIZE_BLANK) * m))
 
     def genJiesuan(self):
         if self._game.setTag == True:
-            _x, _y = 500, 50
-            font = pygame.font.Font('../res/simsun.ttc', 24)
+            font = pygame.font.Font('../res/simsun.ttc', JIESUAN_FONT)
             index = 1
             if self._game.yi[1] == 0:
                 index = 0
@@ -208,12 +190,12 @@ class Screen(object):
                 ptstr = u'役满' + str(int(self._game.dedian)) + u'点'
             else:
                 ptstr = str(self._game.yi[1]) + u'倍役满' + str(int(self._game.dedian)) + u'点'
-            fufandian = font.render(ptstr, True, (0, 0, 0))
+            fufandian = font.render(ptstr, True, BLACK)
             h = fufandian.get_height()
             for s in self._game.fan[index]:
-                self._display_surf.blit(font.render(s, True, (0, 0, 0)), (_x, _y))
-                _y += h
-            self._display_surf.blit(fufandian, (_x, _y))
-        elif self._game.setTag == 2:
-            font = pygame.font.Font('../res/simsun.ttc', 24)
-            self._display_surf.blit(font.render(u'流局', True, (0, 0, 0)), (360, 50))
+                self._display_surf.blit(font.render(s, True, BLACK), (JIESUAN_POSx, JIESUAN_POSy))
+                JIESUAN_POSy += h
+            self._display_surf.blit(fufandian, (JIESUAN_POSx, JIESUAN_POSy))
+        elif self._game.setTag == END_LIUJU:
+            font = pygame.font.Font('../res/simsun.ttc', JIESUAN_FONT)
+            self._display_surf.blit(font.render(u'流局', True, BLACK), JIESUAN_POS)

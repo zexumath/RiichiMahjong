@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
+from constants import *
 import math
 import random
-
 
 class MahjongGame():
     def __init__(self):
@@ -18,19 +18,17 @@ class MahjongGame():
 
     def create(self):
         for i in range(4):
-            # start = 10
-            start = 30        # Comment the upper line for playing ``only s tiles''
-            for j in range(start + 1, start + 10):
+            for j in range(TILE_START + 1, TILE_RANGE + 10):
                 if j % 10 != 0: self.pai.append(j)
             for k in range(41, 48):
                 self.pai.append(k)
 
     def newset(self):
         self.oya += 1
-        self.quan, self.oya = self.quan + self.oya // 4, self.oya % 4
+        self.quan, self.oya = self.quan + self.oya // NUM_OF_SET_PER_QUAN, self.oya % NUM_OF_SET_PER_QUAN
         self.yama = self.pai[:]
         random.shuffle(self.yama)
-        self.dora = [5]
+        self.dora = [DORA_DEFAULT]
         self.ura = []
         self.xun = 0
         tmp = self.user.money
@@ -43,22 +41,27 @@ class MahjongGame():
         self.setTag = 0
 
     def serve(self):
-        if len(self.yama) == 14 or self.xun >= 30:
-            self.setTag = 2
+        self.user.lingshang = False
+        if len(self.yama) == MIN_TILES_IN_YAMA or self.xun >= MAX_XUN:
+            self.setTag = END_LIUJU
             return 0
         else:
             self.user.mopai = self.yama.pop()
             self.xun = int(self.xun + 1)
-            self.user.lingshang = 0
+            self.user.lingshang = False
             return self.user.mopai
 
     def gangserve(self):
+        self.user.lingshang = True
         self.user.mopai, self.yama = self.yama[0], self.yama[1:]
         for i in range(len(self.dora)):
             self.dora[i] -= 1
         self.user.gangTag = False
 
     def nextpai(self, _pai):
+        #TODO:  Lots of constants here.
+        #       Currently I guess these are already readable.
+
         m, n = _pai // 10, _pai % 10
         if m == 4:
             if n == 4:
@@ -76,7 +79,7 @@ class MahjongGame():
         if n < 4:
             return False
         else:
-            if len(self.yama) > 14:
+            if len(self.yama) > MIN_TILES_IN_YAMA:
                 tmp.remove(_gangpai)
                 tmp.remove(_gangpai)
                 tmp.remove(_gangpai)
@@ -92,9 +95,10 @@ class MahjongGame():
                 return False
 
     def jiesuan(self, _pai):
+        #TODO: dedian like 8000,12000 etc are readable.
         self.user.zimo = 1
         self.fu, self.yi, self.fan = self.user.rong(_pai, self.quan, self.oya)
-        if len(self.yama) == 14:
+        if len(self.yama) == MIN:
             if self.user.zimo == 1:
                 if u'岭上开花' not in self.fan[0]:
                     self.yi[0] += 1
@@ -164,17 +168,17 @@ class MahjongGame():
     def menu_rong(self, _pai):
         self.user.rongTag = True
         self.user.analysisTag = False
-        self.setTag = 1
+        self.setTag = END_RONG
         self.jiesuan(_pai)
 
     def menu_riichi(self):
         if self.user.riichi == 0:
-            self.user.riichi = -1
+            self.user.riichi = WAIT_FOR_RIICHI_PAI
             self.user.money -= 1000
             self.lizhibang +=1
 
     def menu_gang(self):
-        if len(self.yama) >14: self.user.gangTag = True
+        if len(self.yama) > MIN_TILES_IN_YAMA: self.user.gangTag = True
 
     def menu_analysis(self):
         self.user.analysisTag = not self.user.analysisTag
@@ -194,7 +198,7 @@ class player():
         self.isclose = True
         self.riichi = 0
         self.zimo = 0
-        self.money = 100000
+        self.money = MONEY_START
         self.position = 0
         self.chi = []
         self.peng = []
@@ -205,7 +209,7 @@ class player():
         self.yi = {}
         self.exp = {}
         self.rongflag = 0
-        self.lingshang = 0
+        self.lingshang = False
         self.rongTag = False
         self.gangTag = False
         self.analysisTag = False
@@ -274,6 +278,7 @@ class player():
             return False
 
     def calcfu(self, quan, oya):
+        #TODO: Move all constants into constants.py
         (exp, flag) = self.exp, self.rongflag
         if flag == False:
             self.fu = {1: 0}
@@ -1267,7 +1272,7 @@ def readpai(str="123456789m112p3s"):
 
     if len(list) >= 14:
         list = list[:14]
-    list.sort()
+    # list.sort()
     return list
 
 
