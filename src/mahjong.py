@@ -98,7 +98,7 @@ class MahjongGame():
         #TODO: dedian like 8000,12000 etc are readable.
         self.user.zimo = 1
         self.fu, self.yi, self.fan = self.user.rong(_pai, self.quan, self.oya)
-        if len(self.yama) == MIN:
+        if len(self.yama) == MIN_TILES_IN_YAMA:
             if self.user.zimo == 1:
                 if u'岭上开花' not in self.fan[0]:
                     self.yi[0] += 1
