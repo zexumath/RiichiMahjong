@@ -51,7 +51,7 @@ class MahjongGame():
             self.user.lingshang = False
             return self.user.mopai
 
-    def gangserve(self):
+    def gangserve(self): 
         self.user.lingshang = True
         self.user.mopai, self.yama = self.yama[0], self.yama[1:]
         for i in range(len(self.dora)):
