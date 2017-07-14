@@ -1,4 +1,5 @@
-
+.idea/
+.idea/*
 *.pyc
 tags
 *.DS_Store
