@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 
+from constants import *
 import math
 import random
 
-
-class game():
+class MahjongGame():
     def __init__(self):
         self.pai = []
         self.create()
@@ -14,22 +14,21 @@ class game():
         self.xun = 0
         self.benchang = 0
         self.lizhibang = 0
+        self.setTag = 0
 
     def create(self):
         for i in range(4):
-            # start = 10
-            start = 30        # Comment the upper line for playing ``only s tiles''
-            for j in range(start + 1, start + 10):
+            for j in range(TILE_START + 1, TILE_START + TILE_RANGE):
                 if j % 10 != 0: self.pai.append(j)
             for k in range(41, 48):
                 self.pai.append(k)
 
     def newset(self):
         self.oya += 1
-        self.quan, self.oya = self.quan + self.oya // 4, self.oya % 4
+        self.quan, self.oya = self.quan + self.oya // NUM_OF_SET_PER_QUAN, self.oya % NUM_OF_SET_PER_QUAN
         self.yama = self.pai[:]
         random.shuffle(self.yama)
-        self.dora = [5]
+        self.dora = [DORA_DEFAULT]
         self.ura = []
         self.xun = 0
         tmp = self.user.money
@@ -39,17 +38,30 @@ class game():
         self.user.hand.sort()
         self.fu, self.yi, self.fan = [0, 0], [0, 0], [0, 0]
         self.dedian = 0
+        self.setTag = 0
 
     def serve(self):
-        if len(self.yama) == 14 or self.xun >= 30:
+        self.user.lingshang = False
+        if len(self.yama) == MIN_TILES_IN_YAMA or self.xun >= MAX_XUN:
+            self.setTag = END_LIUJU
             return 0
         else:
-            pai = self.yama.pop()
+            self.user.mopai = self.yama.pop()
             self.xun = int(self.xun + 1)
-            self.user.lingshang = 0
-            return pai
+            self.user.lingshang = False
+            return self.user.mopai
+
+    def gangserve(self):
+        self.user.lingshang = True
+        self.user.mopai, self.yama = self.yama[0], self.yama[1:]
+        for i in range(len(self.dora)):
+            self.dora[i] -= 1
+        self.user.gangTag = False
 
     def nextpai(self, _pai):
+        #TODO:  Lots of constants here.
+        #       Currently I guess these are already readable.
+
         m, n = _pai // 10, _pai % 10
         if m == 4:
             if n == 4:
@@ -67,7 +79,7 @@ class game():
         if n < 4:
             return False
         else:
-            if len(self.yama) > 14:
+            if len(self.yama) > MIN_TILES_IN_YAMA:
                 tmp.remove(_gangpai)
                 tmp.remove(_gangpai)
                 tmp.remove(_gangpai)
@@ -83,9 +95,10 @@ class game():
                 return False
 
     def jiesuan(self, _pai):
+        #TODO: dedian like 8000,12000 etc are readable.
         self.user.zimo = 1
         self.fu, self.yi, self.fan = self.user.rong(_pai, self.quan, self.oya)
-        if len(self.yama) == 14:
+        if len(self.yama) == MIN:
             if self.user.zimo == 1:
                 if u'岭上开花' not in self.fan[0]:
                     self.yi[0] += 1
@@ -149,15 +162,43 @@ class game():
             self.user.money += int(self.dedian) + self.lizhibang * 1000
             self.lizhibang = 0
 
+    def setComplete(self):
+        return self.setTag !=0
 
+    def menu_rong(self, _pai):
+        self.user.rongTag = True
+        self.user.analysisTag = False
+        self.setTag = END_RONG
+        self.jiesuan(_pai)
+
+    def menu_riichi(self):
+        if self.user.riichi == 0:
+            self.user.riichi = WAIT_FOR_RIICHI_PAI
+            self.user.money -= 1000
+            self.lizhibang +=1
+
+    def menu_gang(self):
+        if len(self.yama) > MIN_TILES_IN_YAMA: self.user.gangTag = True
+
+    def menu_analysis(self):
+        self.user.analysisTag = not self.user.analysisTag
+
+    def menu_clear(self):
+        self.user.rongTag = False
+        self.user.gangTag = False
+
+    def tagclear(self):
+        self.user.rongTag = False
+        self.user.gangTag = False
 class player():
     def __init__(self):
         self.hand = []
-        self.drop = []
+        self.mopai = []
+        self.dropped = []
         self.isclose = True
         self.riichi = 0
         self.zimo = 0
-        self.money = 100000
+        self.money = MONEY_START
         self.position = 0
         self.chi = []
         self.peng = []
@@ -168,12 +209,76 @@ class player():
         self.yi = {}
         self.exp = {}
         self.rongflag = 0
-        self.lingshang = 0
+        self.lingshang = False
+        self.rongTag = False
+        self.gangTag = False
+        self.analysisTag = False
+
+    def drop(self,tileindex):
+        if self.riichi >0:
+            if tileindex == len(self.hand) + 1:
+                self.dropped.append(self.mopai)
+                return True
+            else:
+                return False
+        else:
+            if tileindex == len(self.hand) + 1:
+                self.dropped.append(self.mopai)
+                return True
+            else:
+                self.dropped.append(self.hand[tileindex])
+                self.hand[tileindex] = self.mopai
+                self.hand.sort()
+                return True
+
+    def gang(self,tileindex):
+        if self.riichi >0:
+            if tileindex == len(self.hand) + 1:
+                if self.keyigang(self.mopai):
+                    self.agang.append([self.mopai]*4)
+                    self.hand.remove(self.mopai)
+                    self.hand.remove(self.mopai)
+                    self.hand.remove(self.mopai)
+                    return True
+                else:
+                    return False
+            else:
+                #TODO: Here we assume the only clickable tile for gang after
+                #      riichi is called is the new tile.
+                return False
+        else:
+            if tileindex == len(self.hand) + 1:
+                if self.keyigang(self.mopai):
+                    self.agang.append([self.mopai]*4)
+                    self.hand.remove(self.mopai)
+                    self.hand.remove(self.mopai)
+                    self.hand.remove(self.mopai)
+                    return True
+                else:
+                    return False
+            else:
+                if self.keyigang(self.hand[tileindex]):
+                    self.agang.append([self.hand[tileindex]]*4)
+                    gangpai = self.hand[tileindex]
+                    self.hand.append(self.mopai)
+                    self.hand.remove(gangpai)
+                    self.hand.remove(gangpai)
+                    self.hand.remove(gangpai)
+                    self.hand.remove(gangpai)
+                    self.hand.sort()
+                    return True
+                else:
+                    return False
 
     def keyigang(self, _pai):
-        return True
+        tmp = self.hand + [self.mopai]
+        if tmp.count(_pai) ==4:
+            return True
+        else:
+            return False
 
     def calcfu(self, quan, oya):
+        #TODO: Move all constants into constants.py
         (exp, flag) = self.exp, self.rongflag
         if flag == False:
             self.fu = {1: 0}
@@ -1167,12 +1272,12 @@ def readpai(str="123456789m112p3s"):
 
     if len(list) >= 14:
         list = list[:14]
-    list.sort()
+    # list.sort()
     return list
 
 
 def main():
-    _game = game()
+    _game = MahjongGame()
     while 1:
         _l = readpai(raw_input('Please enter your pai: '))
         xiangtingshu, MINexp = _game.user.chaifen2(_l)
@@ -1197,7 +1302,7 @@ def main():
 
 # main()
 '''
-_game = game()
+_game = MahjongGame()
 _l = [42,42,42,43,43,43,44,44,44,45,45]
 _game.user.isclose = True
 _game.user.agang = [[41]*4]

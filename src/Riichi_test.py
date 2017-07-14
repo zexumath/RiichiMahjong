@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # !/usr/bin/env python
 import pygame
-import Mahjong
+import mahjong
 from pygame.locals import *
 from sys import exit
 
@@ -167,7 +167,7 @@ def run():
     menu['gang']        = Button(font.render(u'杠', True, (0, 0, 0)), (_x, _y + _h * 2))
     menu['analysis']    = Button(font.render(u'理', True, (0, 0, 0)), (_x, _y + _h * 3))
 
-    _g = Mahjong.game()
+    _g = mahjong.MahjongGame()
     _g.newset()
     _pai = _g.serve()
 
