@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # MyLibrary.py
 
 import random, math
@@ -13,7 +14,7 @@ class Player(object):
         self.mgang = []
         self.agang = []
         self.ontable = []
-        
+
         self.dropped = []
         self.isclose = True
         self.riichi = False
@@ -28,7 +29,7 @@ class Player(object):
         #以下两个每局不用初始化
         self.money = MONEY_START
         self.position = -1
-        
+
     def newset_init(self):
         #need to be in Hand class
         self.mopai = []
@@ -38,7 +39,7 @@ class Player(object):
         self.mgang = []
         self.agang = []
         self.ontable = []
-        
+
         self.dropped = []
         self.isclose = True
         self.riichi = False
@@ -50,7 +51,7 @@ class Player(object):
         self.rongflag = False
         self.lingshang = False
         self.tingflag = False
-        
+
 class GameTable():
     def __init__(self):
         self.pai = [] #all of the pai
@@ -69,7 +70,7 @@ class GameTable():
         self.lizhibang = 0
         self.liuju = False
         self.lastrongplayer = -2 #没有人胡 return -2
-       
+
     def create(self):
         for i in range(4):
             start = 10
@@ -82,15 +83,15 @@ class GameTable():
         #random.shuffle(self.seats) #judge the seats: east north west north, seats[0] to call the player seating east
         for i in range(4): #seats position set for players
             self.seats[i].position = i
-                
+
     def judge_benchang(self): #判断是否是下一本场, 否则切换亲家
         if self.lastrongplayer == self.oya or (self.liuju and self.seats[self.oya].tingflag):
             self.benchang += 1
         else:
             self.oya += 1
             self.benchang = 0
-            
-    def newset(self): 
+
+    def newset(self):
         self.judge_benchang()
         self.quan, self.oya = self.quan + self.oya // NUM_OF_SET_PER_QUAN, self.oya % NUM_OF_SET_PER_QUAN
         self.ju = self.oya
@@ -99,7 +100,7 @@ class GameTable():
         self.dora = self.yama[DORA_DEFAULT]
         self.ura = []
         self.xun = 0
-        
+
         for i in range(4):
             tmp = (self.oya + i) % NUM_OF_SET_PER_QUAN #摸牌起始位置往下, tmp表示这人的position
             self.seats[tmp].newset_init()
@@ -114,7 +115,7 @@ class GameTable():
             self.seats[tmp].dedian = 0
             self.seats[tmp].setTag = 0
         self.yama = self.yama[:-52]
-        
+
 def main():
     _game = GameTable()
     _game.lastrongplayer = 1
@@ -134,6 +135,6 @@ def main():
     print(_game.player3.hand)
     print(str(_game.player4.position) + ":")
     print(_game.player4.hand)
-    
+
 main()
-    
+
