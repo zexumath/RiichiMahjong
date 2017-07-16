@@ -80,7 +80,9 @@ class Screen(object):
                 tilemax = 8
             for x in range(tilemax):
                 tmp = pygame.image.load(path + str(lei) + str(x) + '.png')
-                self.tiles[lei].append(pygame.transform.scale(tmp.subsurface((23, 0), (82, 128)), TILE_SIZE))
+                self.tiles[lei].append( \
+                    pygame.transform.scale(tmp.subsurface((TILE_FIGURE_BLANK_ON_BOTH_SIDES, 0), \
+                                                         (TILE_FIGURE_SIZEx - 2 * TILE_FIGURE_BLANK_ON_BOTH_SIDES, TILE_FIGURE_SIZEy)), TILE_SIZE))
 
     def genMenu(self):
         for button in self.menu.values():
@@ -111,7 +113,6 @@ class Screen(object):
 
 
     def genStat(self):
-        MIDDLE_OF_SCREEN = ( 0.5 * WINDOW_WIDTH, 0.5 * WINDOW_HEIGHT )
         changkuang = ''
         tmp = self._game.quan % NUM_OF_SET_PER_QUAN
         if tmp == 0:
@@ -127,8 +128,8 @@ class Screen(object):
         ck = self.font.render(changkuang, True, BLACK)
         ds = self.font.render(dianshu   , True, BLACK)
         h_ck = ck.get_height()
-        self._display_surf.blit(ck, MIDDLE_OF_SCREEN )
-        self._display_surf.blit(ds, (0.5 * WINDOW_WIDTH, 0.5 * WINDOW_HEIGHT + h_ck) )
+        self._display_surf.blit(ck, STAT_POS )
+        self._display_surf.blit(ds, (STAT_POS[0], STAT_POS[1] + h_ck) )
 
     def genPlayer(self):
         _hand = self._game.user.hand
@@ -171,13 +172,14 @@ class Screen(object):
             ptstr = str(xiangtingshu) + u'向听'
             analysis = font.render(ptstr, True, BLACK)
             h = analysis.get_height()
-            self._display_surf.blit(analysis, (ANALYSISx, ANALYSISy))
-            ANALYSISy += h
+
+            self._display_surf.blit(analysis, (ANALYSIS_POSx, ANALYSIS_POSy))
+            # ANALYSIS_POSy += h
             for index in range(len(yxz) -1, -1, -1):
-                m, n = index //MAX_DROP_A_LINE, index % MAX_DROP_A_LINE
+                m, n = index // MAX_DROP_A_LINE, index % MAX_DROP_A_LINE
                 self._display_surf.blit( self.tiles[yxz[index] // 10][yxz[index] % 10], \
-                                        (ANALYSISx + TILE_SIZEx * n, \
-                                         ANALYSISy + (TILE_SIZEy - TILE_SIZE_BLANK) * m))
+                                        (ANALYSIS_POSx + TILE_SIZEx * n, \
+                                         ANALYSIS_POSy + h + (TILE_SIZEy - TILE_SIZE_BLANK) * m))
 
     def genJiesuan(self):
         if self._game.setTag == True:
@@ -192,10 +194,11 @@ class Screen(object):
                 ptstr = str(self._game.yi[1]) + u'倍役满' + str(int(self._game.dedian)) + u'点'
             fufandian = font.render(ptstr, True, BLACK)
             h = fufandian.get_height()
+            fanzhongcount = 0
             for s in self._game.fan[index]:
-                self._display_surf.blit(font.render(s, True, BLACK), (JIESUAN_POSx, JIESUAN_POSy))
-                JIESUAN_POSy += h
-            self._display_surf.blit(fufandian, (JIESUAN_POSx, JIESUAN_POSy))
+                self._display_surf.blit(font.render(s, True, BLACK), (JIESUAN_POSx, JIESUAN_POSy + h * fanzhongcount))
+                fanzhongcount += 1
+            self._display_surf.blit(fufandian, (JIESUAN_POSx, JIESUAN_POSy + h * fanzhongcount))
         elif self._game.setTag == END_LIUJU:
             font = pygame.font.Font('../res/simsun.ttc', JIESUAN_FONT)
             self._display_surf.blit(font.render(u'流局', True, BLACK), JIESUAN_POS)
