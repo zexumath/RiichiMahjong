@@ -1,5 +1,6 @@
 import numpy as np
 from src.mahjong import player
+import constants
 import abc
 
 
