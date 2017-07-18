@@ -4,6 +4,7 @@ from constants import *
 import math
 import random
 
+
 class MahjongGame():
     def __init__(self):
         self.pai = []
@@ -51,7 +52,7 @@ class MahjongGame():
             self.user.lingshang = False
             return self.user.mopai
 
-    def gangserve(self): 
+    def gangserve(self):
         self.user.lingshang = True
         self.user.mopai, self.yama = self.yama[0], self.yama[1:]
         for i in range(len(self.dora)):
@@ -59,7 +60,7 @@ class MahjongGame():
         self.user.gangTag = False
 
     def nextpai(self, _pai):
-        #TODO:  Lots of constants here.
+        # TODO:  Lots of constants here.
         #       Currently I guess these are already readable.
 
         m, n = _pai // 10, _pai % 10
@@ -95,7 +96,7 @@ class MahjongGame():
                 return False
 
     def jiesuan(self, _pai):
-        #TODO: dedian like 8000,12000 etc are readable.
+        # TODO: dedian like 8000,12000 etc are readable.
         self.user.zimo = 1
         self.fu, self.yi, self.fan = self.user.rong(_pai, self.quan, self.oya)
         if len(self.yama) == MIN_TILES_IN_YAMA:
@@ -163,7 +164,7 @@ class MahjongGame():
             self.lizhibang = 0
 
     def setComplete(self):
-        return self.setTag !=0
+        return self.setTag != 0
 
     def menu_rong(self, _pai):
         self.user.rongTag = True
@@ -175,7 +176,7 @@ class MahjongGame():
         if self.user.riichi == 0:
             self.user.riichi = WAIT_FOR_RIICHI_PAI
             self.user.money -= 1000
-            self.lizhibang +=1
+            self.lizhibang += 1
 
     def menu_gang(self):
         if len(self.yama) > MIN_TILES_IN_YAMA: self.user.gangTag = True
@@ -190,6 +191,7 @@ class MahjongGame():
     def tagclear(self):
         self.user.rongTag = False
         self.user.gangTag = False
+
 
 class player():
     def __init__(self):
@@ -215,8 +217,8 @@ class player():
         self.gangTag = False
         self.analysisTag = False
 
-    def drop(self,tileindex):
-        if self.riichi >0:
+    def drop(self, tileindex):
+        if self.riichi > 0:
             if tileindex == len(self.hand) + 1:
                 self.dropped.append(self.mopai)
                 return True
@@ -232,11 +234,11 @@ class player():
                 self.hand.sort()
                 return True
 
-    def gang(self,tileindex):
-        if self.riichi >0:
+    def gang(self, tileindex):
+        if self.riichi > 0:
             if tileindex == len(self.hand) + 1:
                 if self.keyigang(self.mopai):
-                    self.agang.append([self.mopai]*4)
+                    self.agang.append([self.mopai] * 4)
                     self.hand.remove(self.mopai)
                     self.hand.remove(self.mopai)
                     self.hand.remove(self.mopai)
@@ -244,13 +246,13 @@ class player():
                 else:
                     return False
             else:
-                #TODO: Here we assume the only clickable tile for gang after
+                # TODO: Here we assume the only clickable tile for gang after
                 #      riichi is called is the new tile.
                 return False
         else:
             if tileindex == len(self.hand) + 1:
                 if self.keyigang(self.mopai):
-                    self.agang.append([self.mopai]*4)
+                    self.agang.append([self.mopai] * 4)
                     self.hand.remove(self.mopai)
                     self.hand.remove(self.mopai)
                     self.hand.remove(self.mopai)
@@ -259,7 +261,7 @@ class player():
                     return False
             else:
                 if self.keyigang(self.hand[tileindex]):
-                    self.agang.append([self.hand[tileindex]]*4)
+                    self.agang.append([self.hand[tileindex]] * 4)
                     gangpai = self.hand[tileindex]
                     self.hand.append(self.mopai)
                     self.hand.remove(gangpai)
@@ -273,13 +275,13 @@ class player():
 
     def keyigang(self, _pai):
         tmp = self.hand + [self.mopai]
-        if tmp.count(_pai) ==4:
+        if tmp.count(_pai) == 4:
             return True
         else:
             return False
 
     def calcfu(self, quan, oya):
-        #TODO: Move all constants into constants.py
+        # TODO: Move all constants into constants.py
         (exp, flag) = self.exp, self.rongflag
         if flag == False:
             self.fu = {1: 0}
@@ -944,16 +946,8 @@ class player():
         if m == 4:
             return danpai
         else:
-            if n == 1:
-                return [danpai[0] + i for i in range(3)]
-            elif n == 2:
-                return [danpai[0] + i - 1 for i in range(4)]
-            elif n == 8:
-                return [danpai[0] + i - 2 for i in range(4)]
-            elif n == 9:
-                return [danpai[0] + i - 2 for i in range(3)]
-            else:
-                return [danpai[0] + i - 2 for i in range(5)]
+            return [danpai[0] + i - 2 for i in range(5) if
+                    (danpai[0] + i - 3) // 10 == danpai[0] // 10 and (danpai[0] + i - 2) // 10 == danpai[0] // 10]
 
     def isqidui(self, _list):
         tmp1 = _list[0]
@@ -1276,15 +1270,14 @@ def readpai(str="123456789m112p3s"):
     # list.sort()
     return list
 
-
-#def main():
-#    _game = MahjongGame()
-#    while 1:
-#        _l = readpai(raw_input('Please enter your pai: '))
-#        xiangtingshu, MINexp = _game.user.chaifen2(_l)
-#        print xiangtingshu
-#        for key, value in MINexp.items():
-#            print value
+    # def main():
+    #    _game = MahjongGame()
+    #    while 1:
+    #        _l = readpai(raw_input('Please enter your pai: '))
+    #        xiangtingshu, MINexp = _game.user.chaifen2(_l)
+    #        print xiangtingshu
+    #        for key, value in MINexp.items():
+    #            print value
     '''
     _game.user.isclose = True
     _game.user.agang = []
