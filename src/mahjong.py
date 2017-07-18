@@ -98,7 +98,7 @@ class MahjongGame():
         #TODO: dedian like 8000,12000 etc are readable.
         self.user.zimo = 1
         self.fu, self.yi, self.fan = self.user.rong(_pai, self.quan, self.oya)
-        if len(self.yama) == MIN:
+        if len(self.yama) == MIN_TILES_IN_YAMA:
             if self.user.zimo == 1:
                 if u'岭上开花' not in self.fan[0]:
                     self.yi[0] += 1
@@ -190,6 +190,7 @@ class MahjongGame():
     def tagclear(self):
         self.user.rongTag = False
         self.user.gangTag = False
+
 class player():
     def __init__(self):
         self.hand = []
@@ -1276,15 +1277,15 @@ def readpai(str="123456789m112p3s"):
     return list
 
 
-def main():
-    _game = MahjongGame()
-    while 1:
-        _l = readpai(raw_input('Please enter your pai: '))
-        xiangtingshu, MINexp = _game.user.chaifen2(_l)
-        print xiangtingshu
-        for key, value in MINexp.items():
-            print value
-        '''
+#def main():
+#    _game = MahjongGame()
+#    while 1:
+#        _l = readpai(raw_input('Please enter your pai: '))
+#        xiangtingshu, MINexp = _game.user.chaifen2(_l)
+#        print xiangtingshu
+#        for key, value in MINexp.items():
+#            print value
+    '''
     _game.user.isclose = True
     _game.user.agang = []
     _game.user.exp, _game.user.rongflag = _game.user.rong2(_l)
