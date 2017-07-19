@@ -71,8 +71,10 @@ class GameTable():
         self.xun = 0
         self.benchang = 0
         self.lizhibang = 0
-        self.liuju = False
+        #self.liuju = False #replaced by self.setTag
         self.lastrongplayer = -2 #没有人胡 return -2
+        self.turn = -1 #0,1,2,3 represent the turn of draw tiles
+        self.setTag = 0
 
     def create(self):
         for i in range(4):
@@ -88,9 +90,9 @@ class GameTable():
             self.seats[i].position = i
 
     def judge_benchang(self): #判断是否是下一本场, 否则切换亲家
-        if self.lastrongplayer == self.oya or (self.liuju and self.seats[self.oya].tingflag):
+        if self.lastrongplayer == self.oya or (self.setTag == END_LIUJU and self.seats[self.oya].tingflag):
             self.benchang += 1
-        elif self.liuju and not self.seats[self.oya].tingflag:
+        elif self.setTag == END_LIUJU and not self.seats[self.oya].tingflag:
             self.oya += 1
             self.benchang += 1
         else:
@@ -104,7 +106,7 @@ class GameTable():
         self.yama = self.pai[:]
         random.shuffle(self.yama)
         print(self.yama)
-        self.dora = self.yama[DORA_DEFAULT]
+        self.dora = [DORA_DEFAULT]
         self.ura = []
         self.xun = 0
 
@@ -125,26 +127,54 @@ class GameTable():
             '''
             self.seats[tmp].hand.new_set_init(self.yama, tmp, self.oya)
         self.yama = self.yama[:-52]
+        self.turn = self.oya #draw tiles from oya
+        
+    def serve(self):
+        #serve tiles for player at position self.turn
+        self.seats[self.turn].lingshang = False
+        if len(self.yama) == MIN_TILES_IN_YAMA or self.xun >= MAX_XUN:
+            self.setTag = END_LIUJU
+            return 0
+        else:
+            self.seats[self.turn].hand.new_tile.append(self.yama.pop())
+            self.xun = int(self.xun + 1)
+            self.seats[self.turn].lingshang = False
+            # return self.user.mopai 不返回
+            
+    def gangserve(self):
+        self.seats[self.turn].lingshang = True
+        self.seats[self.turn].hand.new_tile.append(self.yama[0])
+        self.yama = self.yama[1:]
+        for i in range(len(self.dora)):
+            self.dora[i] -= 1
+        self.seats[self.turn].gangTag = False
 
 def main():
     _game = GameTable()
-    _game.lastrongplayer = 1
-    _game.oya = 3
+    _game.lastrongplayer = 2
+    _game.oya = 2
     _game.newset()
     print(_game.benchang)
     print(_game.oya)
     print(_game.yama)
     print(_game.dora)
+    _game.serve()
     print("East player:")
     print(_game.seats[0].hand.in_hand)
+    print(_game.seats[0].hand.new_tile)
     print(str(_game.player1.position) + ":")
     print(_game.player1.hand.in_hand)
+    print(_game.player1.hand.new_tile)
     print(str(_game.player2.position) + ":")
     print(_game.player2.hand.in_hand)
+    print(_game.player2.hand.new_tile)
     print(str(_game.player3.position) + ":")
     print(_game.player3.hand.in_hand)
+    print(_game.player3.hand.new_tile)
     print(str(_game.player4.position) + ":")
     print(_game.player4.hand.in_hand)
+    print(_game.player4.hand.new_tile)
+    print(_game.yama)
 
 main()
 
