@@ -5,7 +5,6 @@ from constants import *
 from pygame.locals import *
 
 class Botton(object):
-    """这个类是一个按钮"""
 
     def __init__(self, image_filename, position):
 
@@ -50,10 +49,9 @@ class Screen(object):
 
     def show(self):
         self._display_surf.fill(WHITE)
-
         self.genStat()
         self.genMenu()
-        # self.genPaishan()
+        self.genYama14()
         self.genPlayer()
         self.genAnalysis()
         self.genJiesuan()
@@ -62,12 +60,13 @@ class Screen(object):
     def initMenu(self):
         font = pygame.font.Font('../res/simsun.ttc', FONT_SIZE_MENU)
 
-        _x,_y,_h = FONT_SIZE_MENU/2+1,FONT_SIZE_MENU/2+1,FONT_SIZE_MENU-1
+        _h = FONT_SIZE_MENU  + MENU_GAP
+
         self.menu = {}
-        self.menu['rong']        = Botton(font.render(u'和', True, BLACK), (_x, _y))
-        self.menu['riichi']      = Botton(font.render(u'立', True, BLACK), (_x, _y + _h))
-        self.menu['gang']        = Botton(font.render(u'杠', True, BLACK), (_x, _y + _h * 2))
-        self.menu['analysis']    = Botton(font.render(u'理', True, BLACK), (_x, _y + _h * 3))
+        self.menu['rong']        = Botton(font.render(u'和', True, BLACK, GRAY), (MENU_POSx , MENU_POSy ))
+        self.menu['riichi']      = Botton(font.render(u'立', True, BLACK, GRAY), (MENU_POSx + _h, MENU_POSy ))
+        self.menu['gang']        = Botton(font.render(u'杠', True, BLACK, GRAY), (MENU_POSx + _h * 2, MENU_POSy ))
+        self.menu['analysis']    = Botton(font.render(u'理', True, BLACK, GRAY), (MENU_POSx + _h * 3, MENU_POSy ))
 
     def initTiles(self):
         self.tiles = {}
@@ -83,6 +82,19 @@ class Screen(object):
                 self.tiles[lei].append( \
                     pygame.transform.scale(tmp.subsurface((TILE_FIGURE_BLANK_ON_BOTH_SIDES, 0), \
                                                          (TILE_FIGURE_SIZEx - 2 * TILE_FIGURE_BLANK_ON_BOTH_SIDES, TILE_FIGURE_SIZEy)), TILE_SIZE))
+
+    def rotateTile(self, tilefigure, position):
+        if position == 0:
+            return
+        elif position == 1:
+            rotate_angle = 90
+        elif position == 2:
+            rotate_angle = 180
+        elif position == 3:
+            rotate_angle = 270
+        elif position >3:
+            rotate_angle = position
+        return pygame.transform.rotate(tilefigure, rotate_angle)
 
     def genMenu(self):
         for button in self.menu.values():
@@ -111,7 +123,6 @@ class Screen(object):
 
         return tile_pressed
 
-
     def genStat(self):
         changkuang = ''
         tmp = self._game.quan % NUM_OF_SET_PER_QUAN
@@ -130,6 +141,21 @@ class Screen(object):
         h_ck = ck.get_height()
         self._display_surf.blit(ck, STAT_POS )
         self._display_surf.blit(ds, (STAT_POS[0], STAT_POS[1] + h_ck) )
+
+    def genYama14(self):
+        tile_backside = self.rotateTile(self.tiles[4][0], 180)
+        dora_number = len(self._game.dora)
+        for ind in range(6,-1,-1):
+            self._display_surf.blit(tile_backside, \
+                                    ( YAMA_POSx + ind * TILE_SIZEx, YAMA_POSy + TILE_SIZE_BLANK ) )
+            if 5 - dora_number<= ind and ind <=4 :
+                pai_tmp = self._game.yama[self._game.dora[4 - ind]]
+                m, n = pai_tmp //10, pai_tmp % 10
+                self._display_surf.blit( self.rotateTile(self.tiles[m][n],180), \
+                                        ( YAMA_POSx + ind * TILE_SIZEx, YAMA_POSy ) )
+            else:
+                self._display_surf.blit( tile_backside, \
+                                        ( YAMA_POSx + ind * TILE_SIZEx, YAMA_POSy ) )
 
     def genPlayer(self):
         _hand = self._game.user.hand
@@ -162,7 +188,6 @@ class Screen(object):
             self._display_surf.blit( self.tiles[tile_tmp // 10][tile_tmp % 10], \
                                     (DROP_POSx + TILE_SIZEx * n, \
                                      DROP_POSy + (TILE_SIZEy - TILE_SIZE_BLANK) * m) )
-
 
     def genAnalysis(self):
         if self._game.user.analysisTag == True:

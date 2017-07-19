@@ -43,6 +43,10 @@ TILE_SIZE_BLANK = 9
 # Position of the table status
 STAT_POS = (100,50)
 
+# Position of the Yama
+YAMA_POSx = MIDDLE_OF_WINDOW[0] - 4 * TILE_SIZEx
+YAMA_POSy = MIDDLE_OF_WINDOW[1] - TILE_SIZEy//2
+
 # Position of the analysis
 ANALYSIS_POS = (500, 50)
 ANALYSIS_POSx, ANALYSIS_POSy = ANALYSIS_POS
@@ -79,11 +83,11 @@ FONT_SIZE = 24
 FONT_SIZE_MENU = 32
 
 # Menu position is determined by the fontsize of menu now.
-MENU_POS = (FONT_SIZE_MENU/2 +1, FONT_SIZE_MENU/2 +1)
+MENU_POS = (HAND_POSx + FONT_SIZE_MENU/2 , HAND_POSy - FONT_SIZE_MENU + FONT_SIZE_MENU/2 )
 MENU_POSx , MENU_POSy = MENU_POS
+MENU_GAP = 2
 
 # COLOR
 WHITE = ( 255, 255, 255 )
 BLACK = ( 0, 0, 0 )
-
-
+GRAY  = ( 200, 200, 200 )
