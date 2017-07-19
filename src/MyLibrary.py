@@ -3,12 +3,14 @@
 
 import random, math
 from constants import *
+from Hand import *
 
 class Player(object):
     def __init__(self):
         #need to be in Hand class
-        self.mopai = []
-        self.hand = []
+        #self.mopai = []
+        #self.hand = []
+        self.hand = Hand()
         self.chi = []
         self.peng = []
         self.mgang = []
@@ -32,8 +34,9 @@ class Player(object):
 
     def newset_init(self):
         #need to be in Hand class
-        self.mopai = []
-        self.hand = []
+        #self.mopai = []
+        #self.hand = []
+        self.hand = Hand()
         self.chi = []
         self.peng = []
         self.mgang = []
@@ -80,12 +83,15 @@ class GameTable():
             for k in range(41, 48):
                 self.pai.append(k)
         self.seats = [self.player1, self.player2, self.player3, self.player4]
-        #random.shuffle(self.seats) #judge the seats: east north west north, seats[0] to call the player seating east
+        random.shuffle(self.seats) #judge the seats: east north west north, seats[0] to call the player seating east
         for i in range(4): #seats position set for players
             self.seats[i].position = i
 
     def judge_benchang(self): #判断是否是下一本场, 否则切换亲家
         if self.lastrongplayer == self.oya or (self.liuju and self.seats[self.oya].tingflag):
+            self.benchang += 1
+        elif self.liuju and not self.seats[self.oya].tingflag:
+            self.oya += 1
             self.benchang += 1
         else:
             self.oya += 1
@@ -97,6 +103,7 @@ class GameTable():
         self.ju = self.oya
         self.yama = self.pai[:]
         random.shuffle(self.yama)
+        print(self.yama)
         self.dora = self.yama[DORA_DEFAULT]
         self.ura = []
         self.xun = 0
@@ -104,6 +111,7 @@ class GameTable():
         for i in range(4):
             tmp = (self.oya + i) % NUM_OF_SET_PER_QUAN #摸牌起始位置往下, tmp表示这人的position
             self.seats[tmp].newset_init()
+            '''
             if i == 0:
                 self.seats[tmp].hand = self.yama[-4:]+self.yama[-20:-16]+self.yama[-36:-32]+[self.yama[-48]]
             else:
@@ -114,6 +122,8 @@ class GameTable():
             self.seats[tmp].fu, self.seats[tmp].yi, self.seats[tmp].fan = [0, 0], [0, 0], [0, 0]
             self.seats[tmp].dedian = 0
             self.seats[tmp].setTag = 0
+            '''
+            self.seats[tmp].hand.new_set_init(self.yama, tmp, self.oya)
         self.yama = self.yama[:-52]
 
 def main():
@@ -126,15 +136,15 @@ def main():
     print(_game.yama)
     print(_game.dora)
     print("East player:")
-    print(_game.seats[0].hand)
+    print(_game.seats[0].hand.in_hand)
     print(str(_game.player1.position) + ":")
-    print(_game.player1.hand)
+    print(_game.player1.hand.in_hand)
     print(str(_game.player2.position) + ":")
-    print(_game.player2.hand)
+    print(_game.player2.hand.in_hand)
     print(str(_game.player3.position) + ":")
-    print(_game.player3.hand)
+    print(_game.player3.hand.in_hand)
     print(str(_game.player4.position) + ":")
-    print(_game.player4.hand)
+    print(_game.player4.hand.in_hand)
 
 main()
 
