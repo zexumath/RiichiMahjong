@@ -80,7 +80,7 @@ class Screen(object):
             for x in range(tilemax):
                 tmp = pygame.image.load(path + str(lei) + str(x) + '.png')
                 self.tiles[lei].append( \
-                    pygame.transform.scale(tmp.subsurface((TILE_FIGURE_BLANK_ON_BOTH_SIDES, 0), \
+                    pygame.transform.smoothscale(tmp.subsurface((TILE_FIGURE_BLANK_ON_BOTH_SIDES, 0), \
                                                          (TILE_FIGURE_SIZEx - 2 * TILE_FIGURE_BLANK_ON_BOTH_SIDES, TILE_FIGURE_SIZEy)), TILE_SIZE))
 
     def rotateTile(self, tilefigure, position):
