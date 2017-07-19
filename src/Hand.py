@@ -1,10 +1,15 @@
 from constants import *
+from Util import Util
 
 
 class Hand:
     def __init__(self):
+        '''
+        fulu1, ..., fulu4: Name ('Chi', 'Peng', 'Gang'); tile, first tile in the fulu: ([11]); From: (0, 1, 2, 3),
+        0 for your self and 1, 2, 3 represents the player sitting on the right, opposite and left respectively
+        '''
         self.in_hand = []
-        self.new_pai = []
+        self.new_tile = []
         self.fulu1 = None
         self.fulu2 = None
         self.fulu3 = None
@@ -19,10 +24,10 @@ class Hand:
             self.in_hand = [j for i in pais_to_pick for j in i]
             self.in_hand.append(yama[-49 - position_to_oya])
 
+
         self.in_hand.sort()
-        self.new_pai = []
+        self.new_tile = []
         self.fulu1 = None
         self.fulu2 = None
         self.fulu3 = None
         self.fulu4 = None
-
