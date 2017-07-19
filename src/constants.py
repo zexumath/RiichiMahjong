@@ -32,10 +32,13 @@ MIDDLE_OF_WINDOW = (0.5 * WINDOW_WIDTH, 0.5 * WINDOW_HEIGHT)
 TILE_FIGURE_SIZE = (128,128)
 TILE_FIGURE_SIZEx, TILE_FIGURE_SIZEy = TILE_FIGURE_SIZE
 TILE_FIGURE_BLANK_ON_BOTH_SIDES = 23
-TILE_SIZE = (36, 56)
+TILE_SIZE = (41, 64)
 TILE_SIZEx, TILE_SIZEy = TILE_SIZE
 # The blank part of the tile. This is used to make the drop clearer.
-TILE_SIZE_BLANK = 8
+TILE_SIZE_BLANK = 9
+
+# Tile size for dropped tiles, dora, other players hands.
+
 
 # Position of the table status
 STAT_POS = (100,50)

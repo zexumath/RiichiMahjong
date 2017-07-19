@@ -166,6 +166,34 @@ class MahjongGame():
     def setComplete(self):
         return self.setTag != 0
 
+    def menu_respond(self, button_pressed):
+        if button_pressed == 'rong':
+            self.menu_rong(self.user.mopai)
+        elif button_pressed == 'riichi':
+            self.menu_riichi()
+        elif button_pressed == 'gang':
+            self.menu_gang()
+        elif button_pressed == 'analysis':
+            self.menu_analysis()
+
+    def tile_respond(self, tile_pressed):
+        if self.user.riichi == WAIT_FOR_RIICHI_PAI:
+            # This is a status of waiting for riichi
+            droptmp = self.user.drop(tile_pressed)
+            if droptmp:
+                self.user.riichi = self.xun
+                self.serve()
+        elif self.user.gangTag == False:
+            droptmp = self.user.drop(tile_pressed)
+            if droptmp:
+                self.serve()
+        else:
+            gangtmp = self.user.gang(tile_pressed)
+            if gangtmp:
+                self.gangserve()
+            else:
+                self.user.gangTag = False
+
     def menu_rong(self, _pai):
         self.user.rongTag = True
         self.user.analysisTag = False
