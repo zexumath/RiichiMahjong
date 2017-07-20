@@ -335,3 +335,67 @@ class Util:
 
         MINexp[len(MINexp) + 1] = sorted(allyxz)
         return (tmp0, MINexp)
+
+    @classmethod
+    def str2list(cls, str34):
+        """
+         This method change a string like '123456789m123s11z' into list.
+        """
+        list14 = []
+        tmplist = []
+        for pai in str:
+            if pai == 'm':
+                tmplist = [key + 10 for key in tmplist]
+                list14 += tmplist
+                tmplist = []
+            elif pai == 'p':
+                tmplist = [key + 20 for key in tmplist]
+                list14 += tmplist
+                tmplist = []
+            elif pai == 's':
+                tmplist = [key + 30 for key in tmplist]
+                list14 += tmplist
+                tmplist = []
+            elif pai == 'z':
+                tmplist = [key + 40 for key in tmplist]
+                list14 += tmplist
+                tmplist = []
+            else:
+                tmplist += [int(pai)]
+
+        if len(list14) >=14:
+            list14 = list14[:14]
+        return list14
+
+    @classmethod
+    def list2str(cls, list14):
+        """
+         This method change a list of pai into string like '123456789m123s11z'.
+        """
+        str34 = ''
+        tmpstr = ''
+
+        #TODO: Now assume input list is not blank.
+
+        pai = list14[0]
+        m_old, n = pai // 10, pai % 10
+        tmpstr += format(n)
+        for pai in list14[1:]:
+            m, n = pai // 10, pai % 10
+            if m != m_old:
+                str34 += tmpstr
+                tmpstr = ''
+                if   m_old == 1: str34 += 'm'
+                elif m_old == 2: str34 += 'p'
+                elif m_old == 3: str34 += 's'
+                elif m_old == 4: str34 += 'z'
+                m_old = m
+            tmpstr += format(n)
+        str34 += tmpstr
+        tmpstr = ''
+        if   m == 1: str34 += 'm'
+        elif m == 2: str34 += 'p'
+        elif m == 3: str34 += 's'
+        elif m == 4: str34 += 'z'
+        return str34
+
