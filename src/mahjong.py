@@ -4,13 +4,13 @@ from constants import *
 import math
 import random
 from Util import Util
-
+from MyLibrary import Player
 
 class MahjongGame():
     def __init__(self):
         self.pai = []
         self.create()
-        self.user = player()
+        self.user = Player()
         self.quan = 0
         self.oya = -1
         self.xun = 0
@@ -36,8 +36,8 @@ class MahjongGame():
         tmp = self.user.money
         self.user.__init__()
         self.user.money = tmp
-        self.user.hand, self.yama = self.yama[-13:], self.yama[:-13]
-        self.user.hand.sort()
+        self.user.hand.in_hand, self.yama = self.yama[-13:], self.yama[:-13]
+        self.user.hand.in_hand.sort()
         self.fu, self.yi, self.fan = [0, 0], [0, 0], [0, 0]
         self.dedian = 0
         self.setTag = 0
@@ -48,14 +48,14 @@ class MahjongGame():
             self.setTag = END_LIUJU
             return 0
         else:
-            self.user.mopai = self.yama.pop()
+            self.user.hand.new_tile = self.yama.pop()
             self.xun = int(self.xun + 1)
             self.user.lingshang = False
-            return self.user.mopai
+            return self.user.hand.new_tile
 
     def gangserve(self):
         self.user.lingshang = True
-        self.user.mopai, self.yama = self.yama[0], self.yama[1:]
+        self.user.hand.new_tile, self.yama = self.yama[0], self.yama[1:]
         for i in range(len(self.dora)):
             self.dora[i] -= 1
         self.user.gangTag = False
@@ -77,7 +77,8 @@ class MahjongGame():
             # return m * 10 + n % 9 + 1
 
     # def gang(self, _pai, _gangpai):
-        # tmp = self.user.hand + [_pai]
+        # tmp = self.user.hand.in_hand + [_pai]
+    # + [_pai]
         # n = tmp.count(_gangpai)
         # if n < 4:
             # return False
@@ -88,7 +89,7 @@ class MahjongGame():
                 # tmp.remove(_gangpai)
                 # tmp.remove(_gangpai)
                 # tmp.sort()
-                # self.user.hand = tmp
+                # self.user.hand.in_hand = tmp
                 # self.user.agang += [[_gangpai] * 4]
                 # self.xun += 0.1
                 # # tmpdora = [x-1 for x in self.dora]
@@ -116,7 +117,7 @@ class MahjongGame():
                 else:
                     self.dedian = 32000 * self.yi[1]
             else:
-                tmp = self.user.hand + [self.user.rongpai]
+                tmp = self.user.hand.in_hand + [self.user.rongpai]
                 for gang in self.user.agang:
                     tmp = tmp + gang
                 for gang in self.user.mgang:
@@ -170,7 +171,7 @@ class MahjongGame():
 
     def menu_respond(self, button_pressed):
         if button_pressed == 'rong':
-            self.menu_rong(self.user.mopai)
+            self.menu_rong(self.user.hand.new_tile)
         elif button_pressed == 'riichi':
             self.menu_riichi()
         elif button_pressed == 'gang':
@@ -222,11 +223,11 @@ class MahjongGame():
         self.user.rongTag = False
         self.user.gangTag = False
 
-
+'''
 class player():
     def __init__(self):
-        self.hand = []
-        self.mopai = []
+        self.hand.new_tile = []
+        self.hand.new_tile = []
         self.dropped = []
         self.isclose = True
         self.riichi = 0
@@ -249,29 +250,29 @@ class player():
 
     def drop(self, tileindex):
         if self.riichi > 0:
-            if tileindex == len(self.hand) + 1:
-                self.dropped.append(self.mopai)
+                self.dropped.append(self.hand.new_tile)
+                self.dropped.append(self.hand.new_tile)
                 return True
             else:
                 return False
         else:
-            if tileindex == len(self.hand) + 1:
-                self.dropped.append(self.mopai)
+                self.dropped.append(self.hand.new_tile)
+                self.dropped.append(self.hand.new_tile)
                 return True
             else:
-                self.dropped.append(self.hand[tileindex])
-                self.hand[tileindex] = self.mopai
-                self.hand.sort()
+                self.hand.in_hand[tileindex] = self.hand.new_tile
+                self.hand.in_hand[tileindex] = self.hand.new_tile
+                self.hand.in_hand.sort()
                 return True
 
     def gang(self, tileindex):
         if self.riichi > 0:
-            if tileindex == len(self.hand) + 1:
-                if self.keyigang(self.mopai):
-                    self.agang.append([self.mopai] * 4)
-                    self.hand.remove(self.mopai)
-                    self.hand.remove(self.mopai)
-                    self.hand.remove(self.mopai)
+                if self.keyigang(self.hand.new_tile):
+                    self.agang.append([self.hand.new_tile] * 4)
+                    self.hand.in_hand.remove(self.hand.new_tile)
+                    self.hand.in_hand.remove(self.hand.new_tile)
+                    self.hand.in_hand.remove(self.hand.new_tile)
+                    self.hand.in_hand.remove(self.hand.new_tile)
                     return True
                 else:
                     return False
@@ -280,31 +281,31 @@ class player():
                 #      riichi is called is the new tile.
                 return False
         else:
-            if tileindex == len(self.hand) + 1:
-                if self.keyigang(self.mopai):
-                    self.agang.append([self.mopai] * 4)
-                    self.hand.remove(self.mopai)
-                    self.hand.remove(self.mopai)
-                    self.hand.remove(self.mopai)
+                if self.keyigang(self.hand.new_tile):
+                    self.agang.append([self.hand.new_tile] * 4)
+                    self.hand.in_hand.remove(self.hand.new_tile)
+                    self.hand.in_hand.remove(self.hand.new_tile)
+                    self.hand.in_hand.remove(self.hand.new_tile)
+                    self.hand.in_hand.remove(self.hand.new_tile)
                     return True
                 else:
                     return False
             else:
-                if self.keyigang(self.hand[tileindex]):
-                    self.agang.append([self.hand[tileindex]] * 4)
-                    gangpai = self.hand[tileindex]
-                    self.hand.append(self.mopai)
-                    self.hand.remove(gangpai)
-                    self.hand.remove(gangpai)
-                    self.hand.remove(gangpai)
-                    self.hand.remove(gangpai)
-                    self.hand.sort()
+                if self.keyigang(self.hand.in_hand[tileindex]):
+                    self.agang.append([self.hand.in_hand[tileindex]] * 4)
+                    self.hand.in_hand.append(self.hand.new_tile)
+                    self.hand.in_hand.append(self.hand.new_tile)
+                    self.hand.in_hand.remove(gangpai)
+                    self.hand.in_hand.remove(gangpai)
+                    self.hand.in_hand.remove(gangpai)
+                    self.hand.in_hand.remove(gangpai)
+                    self.hand.in_hand.sort()
                     return True
                 else:
                     return False
 
-    def keyigang(self, _pai):
-        tmp = self.hand + [self.mopai]
+        tmp = self.hand.in_hand + [self.hand.new_tile]
+        tmp = self.hand.in_hand + [self.hand.new_tile]
         if tmp.count(_pai) == 4:
             return True
         else:
@@ -635,7 +636,7 @@ class player():
 
     def rong(self, _pai, quan, oya):
         self.rongpai = _pai
-        _hand = self.hand + [_pai]
+        _hand = self.hand.in_hand + [_pai]
         _hand.sort()
         self.exp, self.rongflag = self.rong2(_hand)
         if self.rongflag == False:
@@ -1271,7 +1272,7 @@ class player():
                 return False
         return True
 
-
+'''
 def readpai(str="123456789m112p3s"):
     list = []
     tmplist = []

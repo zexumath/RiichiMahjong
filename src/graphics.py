@@ -3,6 +3,7 @@
 import pygame
 from constants import *
 from pygame.locals import *
+from Util import Util
 
 class Botton(object):
 
@@ -131,11 +132,11 @@ class Screen(object):
         x -= HAND_POSx
         y -= HAND_POSy
         if 0 < y and y < TILE_SIZEy:
-            if 0 < x and x < TILE_SIZEx * len(self._game.user.hand):
+            if 0 < x and x < TILE_SIZEx * len(self._game.user.hand.in_hand):
                 index = x // TILE_SIZEx
                 return index
-            elif (x - HAND_GAP) // TILE_SIZEx == len(self._game.user.hand):
-                return len(self._game.user.hand) +1
+            elif (x - HAND_GAP) // TILE_SIZEx == len(self._game.user.hand.in_hand):
+                return len(self._game.user.hand.in_hand) +1
 
         return tile_pressed
 
@@ -180,8 +181,8 @@ class Screen(object):
                                         ( YAMA_POSx + ind * TILE_SIZE_SMALL[0], YAMA_POSy ) )
 
     def genPlayer(self):
-        _hand = self._game.user.hand
-        _pai  = self._game.user.mopai
+        _hand = self._game.user.hand.in_hand
+        _pai  = self._game.user.hand.new_tile
         for p, i in zip(_hand, range(len(_hand))):
             m, n = p // 10, p % 10
             x, y = HAND_POSx + i * TILE_SIZEx, HAND_POSy
@@ -192,7 +193,7 @@ class Screen(object):
         # show angang
         # TODO: change to show chi peng gang
         right = WINDOW_WIDTH - TILE_SIZEx
-        for g in self._game.user.agang:
+        for g in self._game.user.hand.fulu:
             self._display_surf.blit(self.tiles[4][0], (right, HAND_POSy + HAND_CHI_PENG_GANG_DIFF))
             right -= TILE_SIZEx
             self._display_surf.blit(self.tiles[g[0] // 10][g[0] % 10], (right, HAND_POSy + HAND_CHI_PENG_GANG_DIFF))
@@ -214,7 +215,7 @@ class Screen(object):
     def genAnalysis(self):
         if self._game.user.analysisTag == True:
             font = self.font
-            xiangtingshu, MINexp = self._game.user.chaifen2(self._game.user.hand)
+            xiangtingshu, MINexp = self._game.user.hand.chaifen2(self._game.user.hand.in_hand)
             yxz = MINexp[len(MINexp)]
             ptstr = str(xiangtingshu) + u'向听'
             analysis = font.render(ptstr, True, BLACK)
