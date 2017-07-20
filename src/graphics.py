@@ -71,6 +71,8 @@ class Screen(object):
     def initTiles(self):
         self.tiles = {}
         self.tiles[1], self.tiles[2], self.tiles[3], self.tiles[4] = [], [], [], []
+        self.tiles_small = {}
+        self.tiles_small[1], self.tiles_small[2], self.tiles_small[3], self.tiles_small[4] = [], [], [], []
         path = '../res/tiles/'
         for lei in range(1, 5):
             if lei != 4:
@@ -82,6 +84,9 @@ class Screen(object):
                 self.tiles[lei].append( \
                     pygame.transform.smoothscale(tmp.subsurface((TILE_FIGURE_BLANK_ON_BOTH_SIDES, 0), \
                                                          (TILE_FIGURE_SIZEx - 2 * TILE_FIGURE_BLANK_ON_BOTH_SIDES, TILE_FIGURE_SIZEy)), TILE_SIZE))
+                self.tiles_small[lei].append( \
+                    pygame.transform.smoothscale(tmp.subsurface((TILE_FIGURE_BLANK_ON_BOTH_SIDES, 0), \
+                                                         (TILE_FIGURE_SIZEx - 2 * TILE_FIGURE_BLANK_ON_BOTH_SIDES, TILE_FIGURE_SIZEy)), TILE_SIZE_SMALL))
 
     def rotateTile(self, tilefigure, position):
         if position == 0:
@@ -95,6 +100,17 @@ class Screen(object):
         elif position >3:
             rotate_angle = position
         return pygame.transform.rotate(tilefigure, rotate_angle)
+
+    def rotateTileInside(self, tilefigure):
+        """
+        This function rotates the inside of the tile so that is shows properly on the screen.
+        The default input tilefigure is in the upright position (original file in the /res/tiles/).
+        Currently this function is useless, as the tile figure is not with pure background.
+        """
+        tileinside = tilefigure.subsurface(TILE_INSIDE_POS, TILE_INSIDE_SIZE)
+        tilefigure_out = tilefigure.copy()
+        tilefigure_out.blit(pygame.transform.rotate(tileinside, 180), TILE_INSIDE_POS)
+        return tilefigure_out
 
     def genMenu(self):
         for button in self.menu.values():
@@ -143,19 +159,19 @@ class Screen(object):
         self._display_surf.blit(ds, (STAT_POS[0], STAT_POS[1] + h_ck) )
 
     def genYama14(self):
-        tile_backside = self.rotateTile(self.tiles[4][0], 180)
+        tile_backside = self.rotateTile(self.tiles_small[4][0], 180)
         dora_number = len(self._game.dora)
         for ind in range(6,-1,-1):
             self._display_surf.blit(tile_backside, \
-                                    ( YAMA_POSx + ind * TILE_SIZEx, YAMA_POSy + TILE_SIZE_BLANK ) )
+                                    ( YAMA_POSx + ind * TILE_SIZE_SMALL[0], YAMA_POSy + TILE_SIZE_SMALL_BLANK ) )
             if 5 - dora_number<= ind and ind <=4 :
                 pai_tmp = self._game.yama[self._game.dora[4 - ind]]
                 m, n = pai_tmp //10, pai_tmp % 10
-                self._display_surf.blit( self.rotateTile(self.tiles[m][n],180), \
-                                        ( YAMA_POSx + ind * TILE_SIZEx, YAMA_POSy ) )
+                self._display_surf.blit( self.rotateTile(self.tiles_small[m][n],180), \
+                                        ( YAMA_POSx + ind * TILE_SIZE_SMALL[0], YAMA_POSy ) )
             else:
                 self._display_surf.blit( tile_backside, \
-                                        ( YAMA_POSx + ind * TILE_SIZEx, YAMA_POSy ) )
+                                        ( YAMA_POSx + ind * TILE_SIZE_SMALL[0], YAMA_POSy ) )
 
     def genPlayer(self):
         _hand = self._game.user.hand
@@ -181,13 +197,13 @@ class Screen(object):
             right -= TILE_SIZEx
 
         # show drops
-
+        # Now the drooped tiles are shown using small ones
         for index in range(len(self._game.user.dropped) - 1, -1, -1):
             m, n = index // MAX_DROP_A_LINE, index % MAX_DROP_A_LINE
             tile_tmp = self._game.user.dropped[index]
-            self._display_surf.blit( self.tiles[tile_tmp // 10][tile_tmp % 10], \
-                                    (DROP_POSx + TILE_SIZEx * n, \
-                                     DROP_POSy + (TILE_SIZEy - TILE_SIZE_BLANK) * m) )
+            self._display_surf.blit( self.tiles_small[tile_tmp // 10][tile_tmp % 10], \
+                                    (DROP_POSx + TILE_SIZE_SMALL[0] * n, \
+                                     DROP_POSy + (TILE_SIZE_SMALL[1] - TILE_SIZE_SMALL_BLANK) * m) )
 
     def genAnalysis(self):
         if self._game.user.analysisTag == True:

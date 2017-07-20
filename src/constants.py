@@ -36,16 +36,22 @@ TILE_SIZE = (41, 64)
 TILE_SIZEx, TILE_SIZEy = TILE_SIZE
 # The blank part of the tile. This is used to make the drop clearer.
 TILE_SIZE_BLANK = 9
+TILE_INSIDE_TO_LEFT = 2
+TILE_INSIDE_TO_BOTTOM = 2
+TILE_INSIDE_POS = (TILE_INSIDE_TO_LEFT, TILE_INSIDE_TO_LEFT + TILE_SIZE_BLANK)
+TILE_INSIDE_SIZE = (TILE_SIZEx - 2 * TILE_INSIDE_TO_LEFT, \
+                    TILE_SIZEy - TILE_SIZE_BLANK - 2 * TILE_INSIDE_TO_BOTTOM)
 
 # Tile size for dropped tiles, dora, other players hands.
-
+TILE_SIZE_SMALL = (36, 56)
+TILE_SIZE_SMALL_BLANK = 8
 
 # Position of the table status
 STAT_POS = (100,50)
 
 # Position of the Yama
-YAMA_POSx = MIDDLE_OF_WINDOW[0] - 4 * TILE_SIZEx
-YAMA_POSy = MIDDLE_OF_WINDOW[1] - TILE_SIZEy//2
+YAMA_POSx = MIDDLE_OF_WINDOW[0] - 4 * TILE_SIZE_SMALL[0]
+YAMA_POSy = MIDDLE_OF_WINDOW[1] - TILE_SIZE_SMALL[1]//2
 
 # Position of the analysis
 ANALYSIS_POS = (500, 50)
