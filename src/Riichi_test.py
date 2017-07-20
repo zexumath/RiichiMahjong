@@ -4,6 +4,7 @@ import pygame
 import mahjong
 from pygame.locals import *
 from sys import exit
+from MyLibrary import *
 
 '''----------------------------------'''
 
@@ -40,19 +41,37 @@ class Button(object):
         return in_x and in_y
 
 
-def genHand(screen, _hand, _pai):
+def genHand(screen, _hand, _pai, TAG):
     for p, i in zip(_hand, range(len(_hand))):
         m, n = p // 10, p % 10
         x, y = left + i * tilesize[0], up
         screen.blit(tiles[m][n], (x, y))
-    if _pai != 0: screen.blit(tiles[_pai // 10][_pai % 10], (x + 8 + tilesize[0], y))
-
+    if _pai != 0 and TAG!=3: screen.blit(tiles[_pai // 10][_pai % 10], (x + 8 + tilesize[0], y))
+    
+def genAihand(screen, _hand, _pai, TAG):
+    if TAG == 3:
+        for p,i in zip(_hand[:-1],range(len(_hand))):
+            m, n = p//10, p%10
+            x, y = left + i*tilesize[0], down
+            screen.blit( tiles[m][n], (x, y) )
+        screen.blit( tiles[_pai//10][_pai%10], (x+8+tilesize[0], y) )
+    else:
+        for p,i in zip(_hand,range(len(_hand))):
+            m, n = p//10, p%10
+            x, y = left + i*tilesize[0], down
+            screen.blit( tiles[m][n], (x, y) )
 
 def genDrop(screen, _drop):
     _x, _y = 80, 180
     for index in range(len(_drop) - 1, -1, -1):
         m, n = index // 6, index % 6
         screen.blit(tiles[_drop[index] // 10][_drop[index] % 10], (_x + tilesize[0] * n, _y + (tilesize[1] - 9) * m))
+        
+def genAiDrop(screen, _drop):
+    _x, _y = 100, 280
+    for index in range(len(_drop)-1,-1,-1):
+        m, n = index//8, index %8
+        screen.blit(tiles[_drop[index]//10][_drop[index]%10], (_x+tilesize[0]*n, _y+(tilesize[1]-9)*m) )
 
 
 def genDora(screen, _g):
@@ -137,6 +156,8 @@ def genCPG(screen, _user):
         right -= tilesize[0]
         screen.blit(tiles[4][0], (right, up + 20))
         right -= tilesize[0]
+        
+
 
 
 # 生成tiles图片
@@ -153,12 +174,13 @@ for lei in range(1, 5):
         tmp = pygame.image.load(path + str(lei) + str(x) + '.png')
         tiles[lei].append(pygame.transform.scale(tmp.subsurface((23, 0), (82, 128)), tilesize))
 left = 50
-up = 500
+up = 700
+down = 200
 
 
 def run():
     pygame.init()
-    screen = pygame.display.set_mode((800, 600), 0, 32)
+    screen = pygame.display.set_mode((800, 800), 0, 32)
     font = pygame.font.Font('../res/simsun.ttc', 64)
     _x, _y, _h = 33, 33, 63
     menu = {}
@@ -167,13 +189,21 @@ def run():
     menu['gang']        = Button(font.render(u'杠', True, (0, 0, 0)), (_x, _y + _h * 2))
     menu['analysis']    = Button(font.render(u'理', True, (0, 0, 0)), (_x, _y + _h * 3))
 
-    _g = mahjong.MahjongGame()
+    #_g = mahjong.MahjongGame()
+    _g = GameTable()
     _g.newset()
+    #print(_g.user.hand.in_hand)
+    #print(_g.ai1.hand.in_hand)
+    #print(_g.ai2.hand.in_hand)
+    #print(_g.ai3.hand.in_hand)
+    #print(_g.yama)
     _pai = _g.serve()
+    #print(_pai)
 
     TAG = False
     GANGTAG = 0
     AnalysisTag = 0
+    
     while True:
         button_pressed = None
         for event in pygame.event.get():
@@ -184,7 +214,7 @@ def run():
                     if button.is_over(event.pos):
                         button_pressed = button_name
                         break
-                if TAG == True or TAG == 2:
+                if TAG == True or TAG == 2 or TAG == 3:
                     _g.newset()
                     _pai = _g.serve()
                     TAG = False
@@ -212,19 +242,19 @@ def run():
                     x -= left
                     y -= up
                     if 0 < y and y < tilesize[1]:
-                        if 0 < x and x < tilesize[0] * len(_g.user.hand):
+                        if 0 < x and x < tilesize[0] * len(_g.user.hand.in_hand):
                             if _g.user.riichi > 0:
                                 pass
                             elif _g.user.riichi == -1:
                                 _g.user.riichi = _g.xun
                                 i = x // tilesize[0]
-                                _g.user.drop.append(_g.user.hand[i])
-                                _g.user.hand[i] = _pai
-                                _g.user.hand.sort()
+                                _g.user.dropped.append(_g.user.hand.in_hand[i])
+                                _g.user.hand.in_hand[i] = _pai
+                                _g.user.hand.in_hand.sort()
                                 _pai = _g.serve()
                             elif GANGTAG == 1:
                                 i = x // tilesize[0]
-                                tmp = _g.gang(_pai, _g.user.hand[i])
+                                tmp = _g.gang(_pai, _g.user.hand.in_hand[i])
                                 if tmp:
                                     _pai, _g.yama = _g.yama[0], _g.yama[1:]
                                     for i in range(len(_g.dora)): _g.dora[i] -= 1
@@ -232,18 +262,18 @@ def run():
                                 GANGTAG = 0
                             else:
                                 i = x // tilesize[0]
-                                _g.user.drop.append(_g.user.hand[i])
-                                _g.user.hand[i] = _pai
-                                _g.user.hand.sort()
+                                _g.user.dropped.append(_g.user.hand.in_hand[i])
+                                _g.user.hand.in_hand[i] = _pai
+                                _g.user.hand.in_hand.sort()
                                 _pai = _g.serve()
-                        elif (x - 8) // tilesize[0] - len(_g.user.hand) == 0:
+                        elif (x - 8) // tilesize[0] - len(_g.user.hand.in_hand) == 0:
                             if _g.user.riichi == -1:
                                 _g.user.riichi = _g.xun
-                                _g.user.drop.append(_pai)
+                                _g.user.dropped.append(_pai)
                                 _pai = _g.serve()
                             elif GANGTAG == 1:
                                 if _g.user.riichi > 0 and _g.user.keyigang(_pai):
-                                    _g.gang(_pai, _pai)
+                                    _g.user.gang(_pai, _pai)
                                     _pai, _g.yama = _g.yama[0], _g.yama[1:]
                                     for i in range(len(_g.dora)): _g.dora[i] -= 1
                                     _g.dora += [_g.dora[-1] + 2]
@@ -256,17 +286,53 @@ def run():
                                         _g.dora += [_g.dora[-1] + 2]
                                     GANGTAG = 0
                             else:
-                                _g.user.drop.append(_pai)
+                                _g.user.dropped.append(_pai)
                                 _pai = _g.serve()
+                                
                         if _pai == 0:
                             TAG = 2
                             AnalysisTag = False
+                        elif GANGTAG == 0:
+                            _dropai = _g.ai1.dapai1(_pai)
+                            if _dropai == 0:
+                                TAG = 3
+                            else:
+                                _g.aidropped.append(_dropai)
+                                _g.ai1.hand.in_hand.sort()
+                                _pai = _g.serve()
+                                                       
+                            _dropai = _g.ai2.dapai1(_pai)
+                            if _dropai == 0:
+                                TAG = 3
+                            else:
+                                _g.aidropped.append(_dropai)
+                                _g.ai2.hand.in_hand.sort()
+                                _pai = _g.serve()
+                                
+                            _dropai = _g.ai3.dapai1(_pai)
+                            if _dropai == 0:
+                                TAG = 3
+                            else:
+                                _g.aidropped.append(_dropai)
+                                _g.ai3.hand.in_hand.sort()
+                                _pai = _g.serve()
+                        else:
+                            GANGTAG = 0
+                        
+                        if _pai==0: 
+                            TAG = 2
+                            AnalysisTag = False
+                        #print(_g.yama)
 
             screen.fill((255, 255, 255))
             genDora(screen, _g)
-            genHand(screen, _g.user.hand, _pai)
+            genHand(screen, _g.user.hand.in_hand, _pai, TAG)
+            #genAihand(screen,_g.ai1.hand.in_hand, _pai, TAG) #xin
+            #genAihand(screen,_g.ai2.hand.in_hand, _pai, TAG) #xin
+            #genAihand(screen,_g.ai3.hand.in_hand, _pai, TAG) #xin
             genCPG(screen, _g.user)
-            genDrop(screen, _g.user.drop)
+            genDrop(screen, _g.user.dropped)
+            genAiDrop(screen,_g.aidropped)
             for button in menu.values():
                 button.render(screen)
             genInfo(screen, _g)

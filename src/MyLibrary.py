@@ -11,6 +11,12 @@ class Player(object):
         #self.mopai = []
         #self.hand = []
         self.hand = Hand()
+        self.chi = []
+        self.peng = []
+        self.mgang = []
+        self.agang = []
+        self.hand.fulu = []
+        self.ontable = []
 
         self.dropped = []
         self.is_close = True
@@ -29,6 +35,7 @@ class Player(object):
         self.rongflag = False
         self.lingshang = False
         self.tingflag = False
+        self.isclose = True
 
     def newset_init(self):
         #need to be in Hand class
@@ -38,6 +45,7 @@ class Player(object):
         self.chi = []
         self.peng = []
         self.mgang = []
+        self.agang = []
         self.hand.fulu = []
         self.ontable = []
 
@@ -54,6 +62,7 @@ class Player(object):
         self.tingflag = False
         self.gangTag = False
         self.analysisTag = False
+        self.isclose = True
 
     def drop(self, tileindex):
         if self.riichi > 0:
@@ -868,15 +877,34 @@ class Player(object):
                 return False
         return True
 
+class AiPlayer(Player):
+    def __init__(self):
+        Player.__init__(self)
 
+    #ai策略1：随机打出
+    def dapai1(self,_pai):
+        self.hand.in_hand.append(_pai)
+        random.shuffle(self.hand.in_hand)
+        tmp = self.hand.in_hand[1]
+        self.dropped.append(tmp)
+        self.hand.in_hand.remove(tmp)
+        return tmp
+
+        
 class GameTable():
     def __init__(self):
         self.pai = [] #all of the pai
         self.seats = []
+        '''
         self.player1 = Player()
         self.player2 = Player()
         self.player3 = Player()
         self.player4 = Player()
+        '''
+        self.user = Player()
+        self.ai1 = AiPlayer()
+        self.ai2 = AiPlayer()
+        self.ai3 = AiPlayer()
         self.create()
         self.yama = [] # the remaining pai
         self.quan = 0 #0,1,2,3 represent east, north, west, north quan
@@ -889,6 +917,8 @@ class GameTable():
         self.lastrongplayer = -2 #没有人胡 return -2
         self.turn = -1 #0,1,2,3 represent the turn of draw tiles
         self.setTag = 0
+        
+        self.aidropped = []
 
     def create(self):
         for i in range(4):
@@ -898,8 +928,9 @@ class GameTable():
                 if j % 10 != 0: self.pai.append(j)
             for k in range(41, 48):
                 self.pai.append(k)
-        self.seats = [self.player1, self.player2, self.player3, self.player4]
-        random.shuffle(self.seats) #judge the seats: east north west north, seats[0] to call the player seating east
+        #self.seats = [self.player1, self.player2, self.player3, self.player4]
+        self.seats = [self.user, self.ai1, self.ai2, self.ai3]
+        #random.shuffle(self.seats) #judge the seats: east north west north, seats[0] to call the player seating east
         for i in range(4): #seats position set for players
             self.seats[i].position = i
 
@@ -915,11 +946,12 @@ class GameTable():
 
     def newset(self):
         self.judge_benchang()
+        self.aidropped = []
         self.quan, self.oya = self.quan + self.oya // NUM_OF_SET_PER_QUAN, self.oya % NUM_OF_SET_PER_QUAN
         self.ju = self.oya
         self.yama = self.pai[:]
         random.shuffle(self.yama)
-        print(self.yama)
+        #print(self.yama)
         self.dora = [DORA_DEFAULT]
         self.ura = []
         self.xun = 0
@@ -946,14 +978,16 @@ class GameTable():
     def serve(self):
         #serve tiles for player at position self.turn
         self.seats[self.turn].lingshang = False
-        if len(self.yama) == MIN_TILES_IN_YAMA or self.xun >= MAX_XUN:
+        #if len(self.yama) == MIN_TILES_IN_YAMA or self.xun >= MAX_XUN:
+        if len(self.yama) == MIN_TILES_IN_YAMA:
             self.setTag = END_LIUJU
             return 0
         else:
-            self.seats[self.turn].hand.new_tile.append(self.yama.pop())
+            tmp = self.yama.pop()
+            self.seats[self.turn].hand.new_tile.append(tmp)
             self.xun = int(self.xun + 1)
             self.seats[self.turn].lingshang = False
-            # return self.user.mopai 不返回
+            return tmp
 
     def gangserve(self):
         self.seats[self.turn].lingshang = True
@@ -962,7 +996,133 @@ class GameTable():
         for i in range(len(self.dora)):
             self.dora[i] -= 1
         self.seats[self.turn].gangTag = False
+        
+    def jiesuan(self, _pai):
+        # TODO: dedian like 8000,12000 etc are readable.
+        self.user.zimo = 1
+        self.fu, self.yi, self.fan = self.user.rong(_pai, self.quan, self.oya)
+        if len(self.yama) == MIN_TILES_IN_YAMA:
+            if self.user.zimo == 1:
+                if u'岭上开花' not in self.fan[0]:
+                    self.yi[0] += 1
+                    self.fan[0] += [u'海底捞月']
+            else:
+                self.yi[0] += 1
+                self.fan[0] += [u'河底捞鱼']
+        if self.yi != [0, 0]:
+            if self.yi[1] != 0:
+                if self.user.position == self.oya:
+                    self.dedian = 48000 * self.yi[1]
+                else:
+                    self.dedian = 32000 * self.yi[1]
+            else:
+                tmp = self.user.hand.in_hand + [self.user.rongpai]
+                for gang in self.user.agang:
+                    tmp = tmp + gang
+                for gang in self.user.mgang:
+                    tmp = tmp + gang
 
+                if self.xun - self.user.riichi == 1 and self.user.riichi > 0:
+                    self.yi[0] += 1
+                    self.fan[0] += [u'一發']
+                tmpk = 0
+                numdora = 0
+                for dora in self.dora:
+                    numdora += tmp.count(Util.nextpai(self.yama[dora]))
+                    self.ura.append(dora - 1)
+                    tmpk += 2
+                self.yi[0] += numdora
+                if numdora != 0: self.fan[0] += ['Dora ' + str(numdora)]
+                if self.user.riichi > 0:
+                    numura = 0
+                    for ura in self.ura:
+                        numura += tmp.count(Util.nextpai(self.yama[ura]))
+                    self.yi[0] += numura
+                    if numura != 0: self.fan[0] += ['Ura ' + str(numura)]
+                if self.fu[0] != 25:
+                    self.fu[0] = int(math.ceil(self.fu[0] / 10.) * 10)
+                self.dedian = 0
+                self.jbd = self.fu[0] * 4 * pow(2, self.yi[0])
+                if self.yi[0] == 0:
+                    self.dedian = -8000
+                elif self.jbd < 2000:
+                    if self.user.position == self.oya:
+                        self.dedian = math.ceil(self.jbd * 6 / 100) * 100
+                    else:
+                        self.dedian = math.ceil(self.jbd * 4 / 100) * 100
+                else:
+                    if self.yi[0] <= 5:
+                        self.dedian = 8000
+                    elif self.yi[0] <= 7:
+                        self.dedian = 12000
+                    elif self.yi[0] <= 10:
+                        self.dedian = 16000
+                    elif self.yi[0] <= 12:
+                        self.dedian = 24000
+                    elif self.yi[0] >= 13:
+                        self.dedian = 32000
+                    if self.user.position == self.oya: self.dedian = self.dedian * 1.5
+            self.user.money += int(self.dedian) + self.lizhibang * 1000
+            self.lizhibang = 0
+
+    def setComplete(self):
+        return self.setTag != 0
+
+    def menu_respond(self, button_pressed):
+        if button_pressed == 'rong':
+            self.menu_rong(self.user.hand.new_tile)
+        elif button_pressed == 'riichi':
+            self.menu_riichi()
+        elif button_pressed == 'gang':
+            self.menu_gang()
+        elif button_pressed == 'analysis':
+            self.menu_analysis()
+
+    def tile_respond(self, tile_pressed):
+        if self.user.riichi == WAIT_FOR_RIICHI_PAI:
+            # This is a status of waiting for riichi
+            droptmp = self.user.drop(tile_pressed)
+            if droptmp:
+                self.user.riichi = self.xun
+                self.serve()
+        elif self.user.gangTag == False:
+            droptmp = self.user.drop(tile_pressed)
+            if droptmp:
+                self.serve()
+        else:
+            gangtmp = self.user.gang(tile_pressed)
+            if gangtmp:
+                self.gangserve()
+            else:
+                self.user.gangTag = False
+
+    def menu_rong(self, _pai):
+        self.user.rongTag = True
+        self.user.analysisTag = False
+        self.setTag = END_RONG
+        self.jiesuan(_pai)
+
+    def menu_riichi(self):
+        if self.user.riichi == 0:
+            self.user.riichi = WAIT_FOR_RIICHI_PAI
+            self.user.money -= 1000
+            self.lizhibang += 1
+
+    def menu_gang(self):
+        if len(self.yama) > MIN_TILES_IN_YAMA: self.user.gangTag = True
+
+    def menu_analysis(self):
+        self.user.analysisTag = not self.user.analysisTag
+
+    def menu_clear(self):
+        self.user.rongTag = False
+        self.user.gangTag = False
+
+    def tagclear(self):
+        self.user.rongTag = False
+        self.user.gangTag = False
+        
+'''
 def main():
     _game = GameTable()
     _game.lastrongplayer = 2
@@ -991,4 +1151,5 @@ def main():
     print(_game.yama)
 
 main()
+'''
 
