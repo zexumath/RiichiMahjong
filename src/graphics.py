@@ -169,6 +169,12 @@ class Screen(object):
                 m, n = pai_tmp //10, pai_tmp % 10
                 self._display_surf.blit( self.rotateTile(self.tiles_small[m][n],180), \
                                         ( YAMA_POSx + ind * TILE_SIZE_SMALL[0], YAMA_POSy ) )
+                if self._game.setTag == True:
+                    pai_tmp = self._game.yama[self._game.ura[4 - ind]]
+                    m, n = pai_tmp // 10, pai_tmp % 10
+                    self._display_surf.blit(self.rotateTile(self.tiles_small[m][n],180),
+                                            (YAMA_POSx + ind * TILE_SIZE_SMALL[0], YAMA_POSy + TILE_SIZE_SMALL[1] ) )
+
             else:
                 self._display_surf.blit( tile_backside, \
                                         ( YAMA_POSx + ind * TILE_SIZE_SMALL[0], YAMA_POSy ) )
@@ -241,5 +247,6 @@ class Screen(object):
                 fanzhongcount += 1
             self._display_surf.blit(fufandian, (JIESUAN_POSx, JIESUAN_POSy + h * fanzhongcount))
         elif self._game.setTag == END_LIUJU:
+            self._game.user.analysisTag = False
             font = pygame.font.Font('../res/simsun.ttc', JIESUAN_FONT)
             self._display_surf.blit(font.render(u'流局', True, BLACK), JIESUAN_POS)

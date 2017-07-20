@@ -399,3 +399,20 @@ class Util:
         elif m == 4: str34 += 'z'
         return str34
 
+    @classmethod
+    def nextpai(cls, _pai):
+        # TODO:  Lots of constants here.
+        #       Currently I guess these are already readable.
+
+        m, n = _pai // 10, _pai % 10
+        if m == 4:
+            if n == 4:
+                return 41
+            elif n == 7:
+                return 45
+            else:
+                return _pai + 1
+        else:
+            return m * 10 + n % 9 + 1
+
+

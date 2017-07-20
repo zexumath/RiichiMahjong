@@ -3,6 +3,7 @@
 from constants import *
 import math
 import random
+from Util import Util
 
 
 class MahjongGame():
@@ -59,41 +60,42 @@ class MahjongGame():
             self.dora[i] -= 1
         self.user.gangTag = False
 
-    def nextpai(self, _pai):
-        # TODO:  Lots of constants here.
-        #       Currently I guess these are already readable.
+## Already moved to utility.
+#     def nextpai(self, _pai):
+        # # TODO:  Lots of constants here.
+        # #       Currently I guess these are already readable.
 
-        m, n = _pai // 10, _pai % 10
-        if m == 4:
-            if n == 4:
-                return 41
-            elif n == 7:
-                return 45
-            else:
-                return _pai + 1
-        else:
-            return m * 10 + n % 9 + 1
+        # m, n = _pai // 10, _pai % 10
+        # if m == 4:
+            # if n == 4:
+                # return 41
+            # elif n == 7:
+                # return 45
+            # else:
+                # return _pai + 1
+        # else:
+            # return m * 10 + n % 9 + 1
 
-    def gang(self, _pai, _gangpai):
-        tmp = self.user.hand + [_pai]
-        n = tmp.count(_gangpai)
-        if n < 4:
-            return False
-        else:
-            if len(self.yama) > MIN_TILES_IN_YAMA:
-                tmp.remove(_gangpai)
-                tmp.remove(_gangpai)
-                tmp.remove(_gangpai)
-                tmp.remove(_gangpai)
-                tmp.sort()
-                self.user.hand = tmp
-                self.user.agang += [[_gangpai] * 4]
-                self.xun += 0.1
-                # tmpdora = [x-1 for x in self.dora]
-                # self.dora = tmpdora[:]
-                return True
-            else:
-                return False
+    # def gang(self, _pai, _gangpai):
+        # tmp = self.user.hand + [_pai]
+        # n = tmp.count(_gangpai)
+        # if n < 4:
+            # return False
+        # else:
+            # if len(self.yama) > MIN_TILES_IN_YAMA:
+                # tmp.remove(_gangpai)
+                # tmp.remove(_gangpai)
+                # tmp.remove(_gangpai)
+                # tmp.remove(_gangpai)
+                # tmp.sort()
+                # self.user.hand = tmp
+                # self.user.agang += [[_gangpai] * 4]
+                # self.xun += 0.1
+                # # tmpdora = [x-1 for x in self.dora]
+                # # self.dora = tmpdora[:]
+                # return True
+            # else:
+                # return False
 
     def jiesuan(self, _pai):
         # TODO: dedian like 8000,12000 etc are readable.
@@ -126,7 +128,7 @@ class MahjongGame():
                 tmpk = 0
                 numdora = 0
                 for dora in self.dora:
-                    numdora += tmp.count(self.nextpai(self.yama[dora]))
+                    numdora += tmp.count(Util.nextpai(self.yama[dora]))
                     self.ura.append(dora - 1)
                     tmpk += 2
                 self.yi[0] += numdora
@@ -134,7 +136,7 @@ class MahjongGame():
                 if self.user.riichi > 0:
                     numura = 0
                     for ura in self.ura:
-                        numura += tmp.count(self.nextpai(self.yama[ura]))
+                        numura += tmp.count(Util.nextpai(self.yama[ura]))
                     self.yi[0] += numura
                     if numura != 0: self.fan[0] += ['Ura ' + str(numura)]
                 if self.fu[0] != 25:
@@ -319,20 +321,20 @@ class player():
             # mingke
             for kezi in self.peng:
                 tmp = kezi[0]
-                if self.isyao(tmp):
+                if Util.isyao(tmp):
                     res += 4
                 else:
                     res += 2
             # gang
             for a in self.agang:
                 tmp = a[0]
-                if self.isyao(tmp):
+                if Util.isyao(tmp):
                     res += 32
                 else:
                     res += 16
             for a in self.mgang:
                 tmp = a[0]
-                if self.isyao(tmp):
+                if Util.isyao(tmp):
                     res += 16
                 else:
                     res += 8
@@ -356,7 +358,7 @@ class player():
                         continue
                     elif zuhe[1] == zuhe[0]:
                         if self.zimo > 0 or self.rongpai != zuhe[0]:
-                            if self.isyao(zuhe[0]):
+                            if Util.isyao(zuhe[0]):
                                 self.fu[k] += 8
                             else:
                                 self.fu[k] += 4
@@ -367,12 +369,12 @@ class player():
                                     if self.rongpai in tmp and tmp != zuhe:
                                         tag = 1
                             if tag == 0:
-                                if self.isyao(zuhe[0]):
+                                if Util.isyao(zuhe[0]):
                                     self.fu[k] += 4
                                 else:
                                     self.fu[k] += 2
                             else:
-                                if self.isyao(zuhe[0]):
+                                if Util.isyao(zuhe[0]):
                                     self.fu[k] += 8
                                 else:
                                     self.fu[k] += 4
@@ -380,7 +382,7 @@ class player():
                     tag = 0
                     for zuhe in v:
                         if len(zuhe) == 3 and zuhe[0] != zuhe[1] and self.rongpai in zuhe:
-                            if self.isliangmian(zuhe, self.rongpai):
+                            if Util.is_liangmian(zuhe, self.rongpai):
                                 self.fu[k] = 20
                                 tag = 1
                                 break
@@ -399,7 +401,7 @@ class player():
                             self.fu[k] += 2
                             break
                         if len(zuhe) == 3 and zuhe[0] != zuhe[1] and self.rongpai in zuhe:
-                            if self.isliangmian(zuhe, self.rongpai):
+                            if Util.is_liangmian(zuhe, self.rongpai):
                                 continue
                             else:
                                 self.fu[k] += 2
@@ -594,42 +596,42 @@ class player():
                     self.yi[k][0][0] += 1
                     self.yi[k][0].append(u'立直')
 
-    def findSame(self, _list, num):
-        return _list.count(_list[0]) == num
+    # def findSame(self, _list, num):
+        # return _list.count(_list[0]) == num
 
-    def isliangmian(self, mianzi, pai):
-        if pai in mianzi:
-            i = mianzi.index(pai)
-            if i == 0 and pai % 10 < 7: return True
-            if i == 2 and pai % 10 > 3: return True
-            return False
-        else:
-            return False
+    # def isliangmian(self, mianzi, pai):
+        # if pai in mianzi:
+            # i = mianzi.index(pai)
+            # if i == 0 and pai % 10 < 7: return True
+            # if i == 2 and pai % 10 > 3: return True
+            # return False
+        # else:
+            # return False
 
-    def isyao(self, _pai):
-        m, n = _pai // 10, _pai % 10
-        if m == 4:
-            return True
-        elif n == 1 or n == 9:
-            return True
-        else:
-            return False
+   #  def isyao(self, _pai):
+        # m, n = _pai // 10, _pai % 10
+        # if m == 4:
+            # return True
+        # elif n == 1 or n == 9:
+            # return True
+        # else:
+            # return False
 
-    def shunzi(self, _list):
-        _sz = None
-        _rs = None
-        issz = False
-        tmp = _list[0]
-        (m, n) = tmp // 10, tmp % 10
-        if m == 4 or n > 7:
-            pass
-        elif tmp + 1 in _list and tmp + 2 in _list:
-            _rs = _list[:]
-            _sz = [tmp, tmp + 1, tmp + 2]
-            issz = True
-            for value in _sz:
-                _rs.remove(value)
-        return (_sz, _rs, issz)
+    # def shunzi(self, _list):
+        # _sz = None
+        # _rs = None
+        # issz = False
+        # tmp = _list[0]
+        # (m, n) = tmp // 10, tmp % 10
+        # if m == 4 or n > 7:
+            # pass
+        # elif tmp + 1 in _list and tmp + 2 in _list:
+            # _rs = _list[:]
+            # _sz = [tmp, tmp + 1, tmp + 2]
+            # issz = True
+            # for value in _sz:
+                # _rs.remove(value)
+        # return (_sz, _rs, issz)
 
     def rong(self, _pai, quan, oya):
         self.rongpai = _pai
@@ -687,7 +689,7 @@ class player():
                 flagres = False
             for l, _list in zip([a, b, c, d], [wan, bing, tiao, zi]):
                 if l < 8:
-                    (exp, flag) = self.explain(_list)
+                    (exp, flag) = Util.explain(_list)
                     if flag == False:
                         return (expres, flagres)
                     else:
@@ -696,7 +698,7 @@ class player():
             l = max(a, b, c, d)
             if l >= 8:
                 _list = [wan, bing, tiao, zi][[a, b, c, d].index(l)]
-                (exp, flag) = self.explain(_list)
+                (exp, flag) = Util.explain(_list)
                 if flag == False:
                     return (expres, flagres)
                 else:
@@ -723,79 +725,79 @@ class player():
                 return ({1: gs}, True)
             return ({}, False)
 
-    def explain(self, _list):
-        exp = {}
-        flag = False
-        test = len(_list)
-        if test % 3 == 1: return ({}, False)
-        if test == 0:
-            exp[1] = []
-            return (exp, True)
-        if _list[0] // 10 == 4:
-            if test % 3 == 0:
-                num = _list.count(_list[0])
-                if num != 3:
-                    return ({}, False)
-                else:
-                    (exp1, flag1) = self.explain(_list[3:])
-                    if flag1 == False:
-                        return ({}, False)
-                    else:
-                        exp1[1].append(_list[:3])
-                        exp[1] = exp1[1]
-                        return (exp, True)
-            elif test % 3 == 2:
-                num = _list.count(_list[0])
-                if num != 2 and num != 3:
-                    return ({}, False)
-                else:
-                    (exp1, flag1) = self.explain(_list[num:])
-                    if flag1 == False:
-                        return ({}, False)
-                    else:
-                        exp1[1].append(_list[:num])
-                        exp[1] = exp1[1]
-                        return (exp, True)
-        else:
-            if test % 3 == 0:
-                (_sz, _rs, issz) = self.shunzi(_list)
-                if issz:
-                    (exp1, flag1) = self.explain(_rs)
-                    if flag1 == False:
-                        pass
-                    else:
-                        flag = True
-                        for key, value in exp1.items():
-                            value.append(_sz)
-                            exp[key] = value
-                if self.findSame(_list, 3):
-                    (exp1, flag1) = self.explain(_list[3:])
-                    if flag1 == False:
-                        return ({}, False)
-                    else:
-                        flag = True
-                        tmp = len(exp)
-                        for key, value in exp1.items():
-                            value.append(_list[:3])
-                            exp[tmp + key] = value
-                return (exp, flag)
-            elif test % 3 == 2:
-                add = _list[0] // 10
-                ptou = 3 - (sum(_list) - 20 * add) % 3 + 10 * add
-                for tou in [ptou, ptou + 3, ptou + 6]:
-                    num = _list.count(tou)
-                    if num >= 2:
-                        i = _list.index(tou)
-                        (exp1, flag1) = self.explain(_list[:i] + _list[i + 2:])
-                        if flag1 == False:
-                            continue
-                        else:
-                            flag = True
-                            tmp = len(exp)
-                            for key, value in exp1.items():
-                                value.append(_list[i:i + 2])
-                                exp[tmp + key] = value
-                return (exp, flag)
+   #  def explain(self, _list):
+        # exp = {}
+        # flag = False
+        # test = len(_list)
+        # if test % 3 == 1: return ({}, False)
+        # if test == 0:
+            # exp[1] = []
+            # return (exp, True)
+        # if _list[0] // 10 == 4:
+            # if test % 3 == 0:
+                # num = _list.count(_list[0])
+                # if num != 3:
+                    # return ({}, False)
+                # else:
+                    # (exp1, flag1) = Util.explain(_list[3:])
+                    # if flag1 == False:
+                        # return ({}, False)
+                    # else:
+                        # exp1[1].append(_list[:3])
+                        # exp[1] = exp1[1]
+                        # return (exp, True)
+            # elif test % 3 == 2:
+                # num = _list.count(_list[0])
+                # if num != 2 and num != 3:
+                    # return ({}, False)
+                # else:
+                    # (exp1, flag1) = Util.explain(_list[num:])
+                    # if flag1 == False:
+                        # return ({}, False)
+                    # else:
+                        # exp1[1].append(_list[:num])
+                        # exp[1] = exp1[1]
+                        # return (exp, True)
+#         else:
+            # if test % 3 == 0:
+                # (_sz, _rs, issz) = Util.shunzi(_list)
+                # if issz:
+                    # (exp1, flag1) = Util.explain(_rs)
+                    # if flag1 == False:
+                        # pass
+                    # else:
+                        # flag = True
+                        # for key, value in exp1.items():
+                            # value.append(_sz)
+                            # exp[key] = value
+                # if Util.findSame(_list, 3):
+                    # (exp1, flag1) = Util.explain(_list[3:])
+                    # if flag1 == False:
+                        # return ({}, False)
+                    # else:
+                        # flag = True
+                        # tmp = len(exp)
+                        # for key, value in exp1.items():
+                            # value.append(_list[:3])
+                            # exp[tmp + key] = value
+                # return (exp, flag)
+            # elif test % 3 == 2:
+                # add = _list[0] // 10
+                # ptou = 3 - (sum(_list) - 20 * add) % 3 + 10 * add
+                # for tou in [ptou, ptou + 3, ptou + 6]:
+                    # num = _list.count(tou)
+                    # if num >= 2:
+                        # i = _list.index(tou)
+                        # (exp1, flag1) = Util.explain(_list[:i] + _list[i + 2:])
+                        # if flag1 == False:
+                            # continue
+                        # else:
+                            # flag = True
+                            # tmp = len(exp)
+                            # for key, value in exp1.items():
+                                # value.append(_list[i:i + 2])
+                                # exp[tmp + key] = value
+                # return (exp, flag)
 
     def xiangting(self, exp):
         m = 0
@@ -892,7 +894,7 @@ class player():
             return exp
 
         count = _list.count(_list[0])
-        _sz, _rs, issz = self.shunzi(_list)
+        _sz, _rs, issz = Util.shunzi(_list)
 
         if issz:
             if _rs == []:
