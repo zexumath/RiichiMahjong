@@ -194,8 +194,12 @@ class MahjongGame():
             gangtmp = self.user.gang(tile_pressed)
             if gangtmp:
                 self.gangserve()
+                self.add_gang_dora()
             else:
                 self.user.gangTag = False
+
+    def add_gang_dora(self):
+        self.dora.append(self.dora[-1]+2)
 
     def menu_rong(self, _pai):
         self.user.rongTag = True
