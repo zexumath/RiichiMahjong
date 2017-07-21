@@ -5,6 +5,7 @@ import pygame
 from sys import exit
 from pygame.locals import *
 import mahjong
+from MyLibrary import GameTable
 import graphics
 from constants import *
 
@@ -17,7 +18,8 @@ class RiichiMahjong:
 
     def on_init(self):
         pygame.init()
-        self._game = mahjong.MahjongGame()
+        # self._game = mahjong.MahjongGame()
+        self._game = GameTable()
         self._screen = graphics.Screen(self._game)
         self._running = True
 

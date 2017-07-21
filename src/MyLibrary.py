@@ -984,7 +984,9 @@ class GameTable():
             return 0
         else:
             tmp = self.yama.pop()
-            self.seats[self.turn].hand.new_tile.append(tmp)
+            # self.seats[self.turn].hand.new_tile.append(tmp)
+
+            self.seats[self.turn].hand.new_tile = tmp
             self.xun = int(self.xun + 1)
             self.seats[self.turn].lingshang = False
             return tmp
