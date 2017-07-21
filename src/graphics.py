@@ -5,7 +5,6 @@ import numpy as np
 from constants import *
 
 class Botton(object):
-
     def __init__(self, image_filename, position):
 
         self.position = position
@@ -236,8 +235,9 @@ class Screen(object):
             _hand = self._game.seats[ind].hand.in_hand
             _pai  = self._game.seats[ind].hand.new_tile
             for p, i in zip(_hand, range(len(_hand))):
-                print _hand
-                print p, i
+                # print ind
+                # print _hand
+                # print p, i
                 m, n = p // 10, p % 10
                 tilefigure = self.rotateTile(self.tiles_small[m][n], rotate_degree)
                 self._display_surf.blit(tilefigure, (hand_start_pos_x + hand_dx * i,
@@ -280,7 +280,7 @@ class Screen(object):
                                          ANALYSIS_POSy + h + (TILE_SIZEy - TILE_SIZE_BLANK) * m))
 
     def genJiesuan(self):
-        if self._game.setTag == True:
+        if self._game.setTag == END_RONG:
             font = pygame.font.Font('../res/simsun.ttc', JIESUAN_FONT)
             index = 1
             if self._game.yi[1] == 0:

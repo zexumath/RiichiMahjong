@@ -4,6 +4,7 @@
 import random, math
 from constants import *
 from Hand import Hand
+from Util import Util
 import time
 
 class Player(object):
@@ -990,6 +991,7 @@ class GameTable():
             self.seats[self.turn].hand.new_tile = tmp
             self.xun = int(self.xun + 1)
             self.seats[self.turn].lingshang = False
+            if self.turn !=0: self.on_hold()
             return tmp
 
     def gangserve(self):
@@ -1089,19 +1091,19 @@ class GameTable():
                 self.user.riichi = self.xun
                 self.tile_dropped_respond()
                 self.serve()
-                self.tile_ai_drop()
+                # self.tile_ai_drop()
         elif self.user.gangTag == False:
             droptmp = self.user.drop(tile_pressed)
             if droptmp:
                 self.tile_dropped_respond()
                 self.serve()
-                self.tile_ai_drop()
+                # self.tile_ai_drop()
         else:
             gangtmp = self.user.gang(tile_pressed)
             if gangtmp:
                 self.tile_dropped_respond()
                 self.gangserve()
-                self.tile_ai_drop()
+                # self.tile_ai_drop()
             else:
                 self.user.gangTag = False
         #print(self.yama)
@@ -1115,7 +1117,7 @@ class GameTable():
         #TODO: Implement the respond of waiting for chi,peng,gang,rong from other players.
 
     def tile_ai_drop(self):
-        while self.turn != self.user.position:
+        if self.turn != self.user.position:
             self.seats[self.turn].dapai1()
             self.tile_dropped_respond()
             self.serve() #TODO: Poosible for user to mopai twice consecutively.
@@ -1149,5 +1151,9 @@ class GameTable():
     def on_hold(self):
         self.on_hold_flag = True
 
-    def next_step():
+    def next_step(self):
         self.on_hold_flag = False
+        if self.turn != 0 :
+            self.seats[self.turn].dapai1()
+            self.tile_dropped_respond()
+            self.serve()

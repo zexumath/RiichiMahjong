@@ -30,11 +30,13 @@ class RiichiMahjong:
         if event.type == QUIT:
             exit()
         if event.type == MOUSEBUTTONDOWN:
-            if self._game.setComplete():
+            if self._game.on_hold_flag:
+                self._game.next_step()
+            elif self._game.setComplete():
                 self._game.newset()
                 self._game.serve()
-                self._game.tile_ai_drop()
-                #self._game.user._mopai = self._game.serve()
+                # self._game.tile_ai_drop()
+                # self._game.user._mopai = self._game.serve()
             else:
                 button_pressed = self._screen.buttonPressed(event)
                 tile_pressed   = self._screen.tilePressed(event)
@@ -58,8 +60,8 @@ class RiichiMahjong:
 
         self._game.newset()
         self._game.serve()
-        self._game.tile_ai_drop()
-        #self._pai = self._game.serve()
+        # self._game.tile_ai_drop()
+        # self._pai = self._game.serve()
 
         while( self._running ):
             for event in pygame.event.get():
