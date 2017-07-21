@@ -3,7 +3,8 @@
 
 import random, math
 from constants import *
-from Hand import *
+from Hand import Hand
+import time
 
 class Player(object):
     def __init__(self):
@@ -66,19 +67,22 @@ class Player(object):
 
     def drop(self, tileindex):
         if self.riichi > 0:
-            if tileindex == len(self.hand.in_hand) + 1:
+            if tileindex == len(self.hand.in_hand):
                 self.dropped.append(self.hand.new_tile)
+                self.hand.new_tile = None
                 return True
             else:
                 return False
         else:
-            if tileindex == len(self.hand.in_hand) + 1:
+            if tileindex == len(self.hand.in_hand):
                 self.dropped.append(self.hand.new_tile)
+                self.hand.new_tile = None
                 return True
             else:
                 self.dropped.append(self.hand.in_hand[tileindex])
                 self.hand.in_hand[tileindex] = self.hand.new_tile
                 self.hand.in_hand.sort()
+                self.hand.new_tile = None
                 return True
 
     def gang(self, tileindex):
@@ -883,12 +887,7 @@ class AiPlayer(Player):
 
     #ai策略1：随机打出
     def dapai1(self):
-        self.hand.in_hand.append(self.hand.new_tile)
-        random.shuffle(self.hand.in_hand)
-        tmp = self.hand.in_hand[1]
-        self.dropped.append(tmp)
-        self.hand.in_hand.remove(tmp)
-        return tmp
+        return self.drop(random.randint(0,len(self.hand.in_hand)))
 
 
 class GameTable():
@@ -905,7 +904,7 @@ class GameTable():
         self.ai1 = AiPlayer()
         self.ai2 = AiPlayer()
         self.ai3 = AiPlayer()
-        self.create()
+        self.__create__()
         self.yama = [] # the remaining pai
         self.quan = 0 #0,1,2,3 represent east, north, west, north quan
         self.ju = 0 #东风圈二局二本场
@@ -917,10 +916,11 @@ class GameTable():
         self.lastrongplayer = -2 #没有人胡 return -2
         self.turn = -1 #0,1,2,3 represent the turn of draw tiles
         self.setTag = 0
-
         self.aidropped = []
 
-    def create(self):
+        self.on_hold_flag = False
+
+    def __create__(self):
         for i in range(4):
             start = 10
             #for j in range(TILE_START + 1, TILE_START + TILE_RANGE):
@@ -959,7 +959,7 @@ class GameTable():
         for i in range(4):
             tmp = (self.oya + i) % NUM_OF_SET_PER_QUAN #摸牌起始位置往下, tmp表示这人的position
             self.seats[tmp].newset_init()
-            
+
             if i == 0:
                 self.seats[tmp].hand.in_hand = self.yama[-4:]+self.yama[-20:-16]+self.yama[-36:-32]+[self.yama[-49]]
             else:
@@ -969,11 +969,12 @@ class GameTable():
             self.seats[tmp].hand.in_hand.sort()
             self.seats[tmp].fu, self.seats[tmp].yi, self.seats[tmp].fan = [0, 0], [0, 0], [0, 0]
             self.seats[tmp].dedian = 0
-            
+
             #self.seats[tmp].hand.new_set_init(self.yama, tmp, self.oya)
         self.yama = self.yama[:-52]
         self.turn = self.oya #draw tiles from oya
-        self.setTag = 0 #reset setTag 
+        self.setTag = 0 #reset setTag
+        self.on_hold_flag = False
 
     def serve(self):
         #serve tiles for player at position self.turn
@@ -1107,12 +1108,12 @@ class GameTable():
         #print(self.seats[1].hand.new_tile)
         #print(self.seats[2].hand.new_tile)
         #print(self.seats[3].hand.new_tile)
-                
+
     def tile_dropped_respond(self):
         self.turn +=1
         self.turn %=4
         #TODO: Implement the respond of waiting for chi,peng,gang,rong from other players.
-        
+
     def tile_ai_drop(self):
         while self.turn != self.user.position:
             self.seats[self.turn].dapai1()
@@ -1145,3 +1146,8 @@ class GameTable():
         self.user.rongTag = False
         self.user.gangTag = False
 
+    def on_hold(self):
+        self.on_hold_flag = True
+
+    def next_step():
+        self.on_hold_flag = False

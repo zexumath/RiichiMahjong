@@ -1,9 +1,8 @@
 # !/usr/bin/env python
 # -*- coding: utf-8 -*-
 import pygame
+import numpy as np
 from constants import *
-from pygame.locals import *
-from Util import Util
 
 class Botton(object):
 
@@ -54,6 +53,7 @@ class Screen(object):
         self.genMenu()
         self.genYama14()
         self.genPlayer()
+        self.genAI()
         self.genAnalysis()
         self.genJiesuan()
         pygame.display.update()
@@ -136,7 +136,7 @@ class Screen(object):
                 index = x // TILE_SIZEx
                 return index
             elif (x - HAND_GAP) // TILE_SIZEx == len(self._game.user.hand.in_hand):
-                return len(self._game.user.hand.in_hand) +1
+                return len(self._game.user.hand.in_hand)
 
         return tile_pressed
 
@@ -187,7 +187,7 @@ class Screen(object):
             m, n = p // 10, p % 10
             x, y = HAND_POSx + i * TILE_SIZEx, HAND_POSy
             self._display_surf.blit(self.tiles[m][n], (x, y))
-        
+
         if _pai:
             self._display_surf.blit(self.tiles[_pai // 10][_pai % 10], (x + HAND_GAP + TILE_SIZEx, y))
 
@@ -212,6 +212,55 @@ class Screen(object):
             self._display_surf.blit( self.tiles_small[tile_tmp // 10][tile_tmp % 10], \
                                     (DROP_POSx + TILE_SIZE_SMALL[0] * n, \
                                      DROP_POSy + (TILE_SIZE_SMALL[1] - TILE_SIZE_SMALL_BLANK) * m) )
+
+    def genAI(self):
+        for ind in range(1,4):
+            rotate_degree = 90 * ind
+            if ind ==1:
+                hand_start_pos_x,hand_start_pos_y = AI1_HAND_POSx, AI1_HAND_POSy
+                hand_dx, hand_dy = 0, -TILE_SIZE_SMALL[0]
+                drop_start_pos_x,drop_start_pos_y = AI1_DROP_POSx, AI1_DROP_POSy
+                drop_dx, drop_dy = TILE_SIZE_SMALL[1] - TILE_SIZE_SMALL_BLANK, -TILE_SIZE_SMALL[0]
+            elif ind ==2:
+                hand_start_pos_x,hand_start_pos_y = AI2_HAND_POSx, AI2_HAND_POSy
+                hand_dx, hand_dy = -TILE_SIZE_SMALL[0], 0
+                drop_start_pos_x,drop_start_pos_y = AI2_DROP_POSx, AI2_DROP_POSy
+                drop_dx, drop_dy = -TILE_SIZE_SMALL[0], -TILE_SIZE_SMALL[1] + TILE_SIZE_SMALL_BLANK
+            elif ind ==3:
+                hand_start_pos_x,hand_start_pos_y = AI3_HAND_POSx, AI3_HAND_POSy
+                hand_dx, hand_dy = 0, TILE_SIZE_SMALL[0]
+                drop_start_pos_x,drop_start_pos_y = AI3_DROP_POSx, AI3_DROP_POSy
+                drop_dx, drop_dy = -TILE_SIZE_SMALL[1] + TILE_SIZE_SMALL_BLANK, TILE_SIZE_SMALL[0]
+
+            # show hand
+            _hand = self._game.seats[ind].hand.in_hand
+            _pai  = self._game.seats[ind].hand.new_tile
+            for p, i in zip(_hand, range(len(_hand))):
+                print _hand
+                print p, i
+                m, n = p // 10, p % 10
+                tilefigure = self.rotateTile(self.tiles_small[m][n], rotate_degree)
+                self._display_surf.blit(tilefigure, (hand_start_pos_x + hand_dx * i,
+                                                     hand_start_pos_y + hand_dy * i))
+            if _pai:
+                m, n = _pai // 10, _pai % 10
+                tilefigure = self.rotateTile(self.tiles_small[m][n], rotate_degree)
+                self._display_surf.blit(tilefigure, (hand_start_pos_x + hand_dx * (i+1) + np.sign(hand_dx) * HAND_GAP,
+                                                     hand_start_pos_y + hand_dy * (i+1) + np.sign(hand_dy) * HAND_GAP))
+
+            # show drop
+            _dropped = self._game.seats[ind].dropped
+            for index in range(len(_dropped) -1, -1, -1):
+                rr, tt = index // MAX_DROP_A_LINE, index % MAX_DROP_A_LINE
+                _pai = _dropped[index]
+                m, n = _pai // 10, _pai % 10
+                tilefigure = self.rotateTile(self.tiles_small[m][n], rotate_degree)
+                if ind ==2:
+                    self._display_surf.blit(tilefigure, (drop_start_pos_x + drop_dx * tt,
+                                                         drop_start_pos_y + drop_dy * rr))
+                else:
+                    self._display_surf.blit(tilefigure, (drop_start_pos_x + drop_dx * rr,
+                                                         drop_start_pos_y + drop_dy * tt))
 
     def genAnalysis(self):
         if self._game.user.analysisTag == True:
