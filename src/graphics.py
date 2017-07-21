@@ -187,8 +187,9 @@ class Screen(object):
             m, n = p // 10, p % 10
             x, y = HAND_POSx + i * TILE_SIZEx, HAND_POSy
             self._display_surf.blit(self.tiles[m][n], (x, y))
-
-        self._display_surf.blit(self.tiles[_pai // 10][_pai % 10], (x + HAND_GAP + TILE_SIZEx, y))
+        
+        if _pai:
+            self._display_surf.blit(self.tiles[_pai // 10][_pai % 10], (x + HAND_GAP + TILE_SIZEx, y))
 
         # show angang
         # TODO: change to show chi peng gang

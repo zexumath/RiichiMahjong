@@ -5,7 +5,7 @@ import pygame
 from sys import exit
 from pygame.locals import *
 import mahjong
-from MyLibrary import GameTable
+from Game import GameTable
 import graphics
 from constants import *
 
@@ -32,7 +32,9 @@ class RiichiMahjong:
         if event.type == MOUSEBUTTONDOWN:
             if self._game.setComplete():
                 self._game.newset()
-                self._game.user._mopai = self._game.serve()
+                self._game.serve()
+                self._game.tile_ai_drop()
+                #self._game.user._mopai = self._game.serve()
             else:
                 button_pressed = self._screen.buttonPressed(event)
                 tile_pressed   = self._screen.tilePressed(event)
@@ -55,7 +57,9 @@ class RiichiMahjong:
             exit()
 
         self._game.newset()
-        self._pai = self._game.serve()
+        self._game.serve()
+        self._game.tile_ai_drop()
+        #self._pai = self._game.serve()
 
         while( self._running ):
             for event in pygame.event.get():

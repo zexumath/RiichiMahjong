@@ -882,8 +882,8 @@ class AiPlayer(Player):
         Player.__init__(self)
 
     #ai策略1：随机打出
-    def dapai1(self,_pai):
-        self.hand.in_hand.append(_pai)
+    def dapai1(self):
+        self.hand.in_hand.append(self.hand.new_tile)
         random.shuffle(self.hand.in_hand)
         tmp = self.hand.in_hand[1]
         self.dropped.append(tmp)
@@ -959,27 +959,27 @@ class GameTable():
         for i in range(4):
             tmp = (self.oya + i) % NUM_OF_SET_PER_QUAN #摸牌起始位置往下, tmp表示这人的position
             self.seats[tmp].newset_init()
-            '''
+            
             if i == 0:
-                self.seats[tmp].hand = self.yama[-4:]+self.yama[-20:-16]+self.yama[-36:-32]+[self.yama[-48]]
+                self.seats[tmp].hand.in_hand = self.yama[-4:]+self.yama[-20:-16]+self.yama[-36:-32]+[self.yama[-49]]
             else:
                 for j in range(3):
-                    self.seats[tmp].hand += self.yama[-(i+j*4+1)*4:-(i+j*4)*4]
-                self.seats[tmp].hand += [self.yama[-48-i]]
-            self.seats[tmp].hand.sort()
+                    self.seats[tmp].hand.in_hand += self.yama[-(i+j*4+1)*4:-(i+j*4)*4]
+                self.seats[tmp].hand.in_hand += [self.yama[-49-i]]
+            self.seats[tmp].hand.in_hand.sort()
             self.seats[tmp].fu, self.seats[tmp].yi, self.seats[tmp].fan = [0, 0], [0, 0], [0, 0]
             self.seats[tmp].dedian = 0
-            self.seats[tmp].setTag = 0
-            '''
-            self.seats[tmp].hand.new_set_init(self.yama, tmp, self.oya)
+            
+            #self.seats[tmp].hand.new_set_init(self.yama, tmp, self.oya)
         self.yama = self.yama[:-52]
         self.turn = self.oya #draw tiles from oya
+        self.setTag = 0 #reset setTag 
 
     def serve(self):
         #serve tiles for player at position self.turn
         self.seats[self.turn].lingshang = False
         #if len(self.yama) == MIN_TILES_IN_YAMA or self.xun >= MAX_XUN:
-        if len(self.yama) == MIN_TILES_IN_YAMA:
+        if len(self.yama) == MIN_TILES_IN_YAMA: #要考虑ai摸牌时候流局，改成<=
             self.setTag = END_LIUJU
             return 0
         else:
@@ -993,7 +993,7 @@ class GameTable():
 
     def gangserve(self):
         self.seats[self.turn].lingshang = True
-        self.seats[self.turn].hand.new_tile.append(self.yama[0])
+        self.seats[self.turn].hand.new_tile = self.yama[0]
         self.yama = self.yama[1:]
         for i in range(len(self.dora)):
             self.dora[i] -= 1
@@ -1088,22 +1088,36 @@ class GameTable():
                 self.user.riichi = self.xun
                 self.tile_dropped_respond()
                 self.serve()
+                self.tile_ai_drop()
         elif self.user.gangTag == False:
             droptmp = self.user.drop(tile_pressed)
             if droptmp:
                 self.tile_dropped_respond()
                 self.serve()
+                self.tile_ai_drop()
         else:
             gangtmp = self.user.gang(tile_pressed)
             if gangtmp:
+                self.tile_dropped_respond()
                 self.gangserve()
+                self.tile_ai_drop()
             else:
                 self.user.gangTag = False
-
+        #print(self.yama)
+        #print(self.seats[1].hand.new_tile)
+        #print(self.seats[2].hand.new_tile)
+        #print(self.seats[3].hand.new_tile)
+                
     def tile_dropped_respond(self):
         self.turn +=1
         self.turn %=4
         #TODO: Implement the respond of waiting for chi,peng,gang,rong from other players.
+        
+    def tile_ai_drop(self):
+        while self.turn != self.user.position:
+            self.seats[self.turn].dapai1()
+            self.tile_dropped_respond()
+            self.serve() #TODO: Poosible for user to mopai twice consecutively.
 
     def menu_rong(self, _pai):
         self.user.rongTag = True
@@ -1130,35 +1144,4 @@ class GameTable():
     def tagclear(self):
         self.user.rongTag = False
         self.user.gangTag = False
-
-'''
-def main():
-    _game = GameTable()
-    _game.lastrongplayer = 2
-    _game.oya = 2
-    _game.newset()
-    print(_game.benchang)
-    print(_game.oya)
-    print(_game.yama)
-    print(_game.dora)
-    _game.serve()
-    print("East player:")
-    print(_game.seats[0].hand.in_hand)
-    print(_game.seats[0].hand.new_tile)
-    print(str(_game.player1.position) + ":")
-    print(_game.player1.hand.in_hand)
-    print(_game.player1.hand.new_tile)
-    print(str(_game.player2.position) + ":")
-    print(_game.player2.hand.in_hand)
-    print(_game.player2.hand.new_tile)
-    print(str(_game.player3.position) + ":")
-    print(_game.player3.hand.in_hand)
-    print(_game.player3.hand.new_tile)
-    print(str(_game.player4.position) + ":")
-    print(_game.player4.hand.in_hand)
-    print(_game.player4.hand.new_tile)
-    print(_game.yama)
-
-main()
-'''
 

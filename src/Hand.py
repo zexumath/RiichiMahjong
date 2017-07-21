@@ -16,7 +16,7 @@ class Hand:
         self.fulu4 = None
         #TODO: Currently not implementing. Just use a list of fulus showing fulu1, ..., fulu4
         self.fulu  = []
-
+    '''
     def new_set_init(self, yama, position, oya_position):
         if position == oya_position:
             self.in_hand = yama[-4:] + yama[-20:-16] + yama[-36:-32] + [yama[-49]]
@@ -34,6 +34,7 @@ class Hand:
         self.fulu3 = None
         self.fulu4 = None
         self.fulu  = []
+    '''
     def xiangting(self, exp):
         m = 0
         d = 0
