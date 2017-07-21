@@ -4,7 +4,7 @@ from constants import *
 import math
 import random
 from Util import Util
-from MyLibrary import Player
+from Game import Player
 
 class MahjongGame():
     def __init__(self):
