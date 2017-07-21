@@ -890,7 +890,7 @@ class AiPlayer(Player):
         self.hand.in_hand.remove(tmp)
         return tmp
 
-        
+
 class GameTable():
     def __init__(self):
         self.pai = [] #all of the pai
@@ -917,7 +917,7 @@ class GameTable():
         self.lastrongplayer = -2 #没有人胡 return -2
         self.turn = -1 #0,1,2,3 represent the turn of draw tiles
         self.setTag = 0
-        
+
         self.aidropped = []
 
     def create(self):
@@ -984,7 +984,9 @@ class GameTable():
             return 0
         else:
             tmp = self.yama.pop()
-            self.seats[self.turn].hand.new_tile.append(tmp)
+            # self.seats[self.turn].hand.new_tile.append(tmp)
+
+            self.seats[self.turn].hand.new_tile = tmp
             self.xun = int(self.xun + 1)
             self.seats[self.turn].lingshang = False
             return tmp
@@ -996,7 +998,7 @@ class GameTable():
         for i in range(len(self.dora)):
             self.dora[i] -= 1
         self.seats[self.turn].gangTag = False
-        
+
     def jiesuan(self, _pai):
         # TODO: dedian like 8000,12000 etc are readable.
         self.user.zimo = 1
@@ -1084,10 +1086,12 @@ class GameTable():
             droptmp = self.user.drop(tile_pressed)
             if droptmp:
                 self.user.riichi = self.xun
+                self.tile_dropped_respond()
                 self.serve()
         elif self.user.gangTag == False:
             droptmp = self.user.drop(tile_pressed)
             if droptmp:
+                self.tile_dropped_respond()
                 self.serve()
         else:
             gangtmp = self.user.gang(tile_pressed)
@@ -1095,6 +1099,11 @@ class GameTable():
                 self.gangserve()
             else:
                 self.user.gangTag = False
+
+    def tile_dropped_respond(self):
+        self.turn +=1
+        self.turn %=4
+        #TODO: Implement the respond of waiting for chi,peng,gang,rong from other players.
 
     def menu_rong(self, _pai):
         self.user.rongTag = True
@@ -1121,7 +1130,7 @@ class GameTable():
     def tagclear(self):
         self.user.rongTag = False
         self.user.gangTag = False
-        
+
 '''
 def main():
     _game = GameTable()
