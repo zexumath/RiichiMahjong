@@ -954,7 +954,7 @@ class GameTable():
         random.shuffle(self.yama)
         #print(self.yama)
         self.dora = [DORA_DEFAULT]
-        self.ura = []
+        self.ura = [DORA_DEFAULT-1]
         self.xun = 0
 
         for i in range(4):
@@ -998,8 +998,11 @@ class GameTable():
         self.seats[self.turn].lingshang = True
         self.seats[self.turn].hand.new_tile = self.yama[0]
         self.yama = self.yama[1:]
+        self.dora.append(self.dora[-1] + 2)
+        self.ura.append(self.dora[-1] + 2)
         for i in range(len(self.dora)):
             self.dora[i] -= 1
+            self.ura[i]  -= 1
         self.seats[self.turn].gangTag = False
 
     def jiesuan(self, _pai):
