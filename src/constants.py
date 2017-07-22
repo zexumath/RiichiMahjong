@@ -7,6 +7,7 @@ END_LIUJU = 2
 
 MONEY_START = 25000
 
+MAX_WAIT_SEC = 4
 
 SUOZI_NOMI = True
 if SUOZI_NOMI:
@@ -15,7 +16,7 @@ else:
     TILE_START = 10
 TILE_RANGE = 40 - TILE_START
 
-DORA_DEFAULT = 4
+DORA_DEFAULT = 5
 
 MIN_TILES_IN_YAMA = 14
 MAX_XUN = 18
@@ -47,7 +48,7 @@ TILE_SIZE_SMALL = (36, 56)
 TILE_SIZE_SMALL_BLANK = 8
 
 # Position of the table status
-STAT_POS = (100,50)
+STAT_POS = (100,100)
 
 # Position of the Yama
 YAMA_POSx = MIDDLE_OF_WINDOW[0] - 4 * TILE_SIZE_SMALL[0]
@@ -64,7 +65,8 @@ JIESUAN_POSx, JIESUAN_POSy = JIESUAN_POS
 JIESUAN_FONT = 24
 
 # Position of player hand tiles
-HAND_POS_TO_BOTTOM = 40 + TILE_SIZEy
+HAND_DIFF_TO_BOUNDARY = 40
+HAND_POS_TO_BOTTOM = HAND_DIFF_TO_BOUNDARY + TILE_SIZEy
 HAND_POS_TO_LEFT   = (WINDOW_WIDTH - 14* TILE_SIZEx) // 2
 
 HAND_POSx, HAND_POSy = HAND_POS_TO_LEFT, WINDOW_HEIGHT - HAND_POS_TO_BOTTOM
@@ -73,16 +75,46 @@ HAND_POSx, HAND_POSy = HAND_POS_TO_LEFT, WINDOW_HEIGHT - HAND_POS_TO_BOTTOM
 HAND_GAP = 8
 
 # Size of difference in height between hand and chi,peng,gang etc.
-HAND_CHI_PENG_GANG_DIFF = 20
+HAND_CHI_PENG_GANG_DIFF = HAND_DIFF_TO_BOUNDARY //2
+
+# Position used for showing ai hand tiles
+# AI on the right. Position is the upleft corner of the very bottom handtile.
+AI1_HAND_POSx = WINDOW_WIDTH - TILE_SIZE_SMALL[1] - HAND_DIFF_TO_BOUNDARY
+AI1_HAND_POSy = (WINDOW_HEIGHT + 14* TILE_SIZE_SMALL[0]) // 2 - TILE_SIZE_SMALL[0]
+# AI on the top. Position is the upleft corner of the very right handtile.
+AI2_HAND_POSx = (WINDOW_WIDTH + 14 * TILE_SIZE_SMALL[0]) //2 - TILE_SIZE_SMALL[0]
+AI2_HAND_POSy = HAND_DIFF_TO_BOUNDARY
+# AI on the left. Position is the upleft corner of the very top handtile.
+AI3_HAND_POSx = HAND_DIFF_TO_BOUNDARY
+AI3_HAND_POSy = (WINDOW_HEIGHT - 14 * TILE_SIZE_SMALL[0]) //2
 
 
+# Drops
 MAX_DROP_A_LINE = 6
-
+# Position of the dropped tiles of player
 DROP_POS_GAP_TO_HAND = 40
 
 DROP_POS_TO_BOTTOM = 3*(TILE_SIZEy-TILE_SIZE_BLANK) + TILE_SIZE_BLANK + HAND_POS_TO_BOTTOM + DROP_POS_GAP_TO_HAND
 DROP_POS_TO_LEFT   = (WINDOW_WIDTH - MAX_DROP_A_LINE*TILE_SIZEx) //2
 DROP_POSx, DROP_POSy = DROP_POS_TO_LEFT, WINDOW_HEIGHT - DROP_POS_TO_BOTTOM
+# Position of the dropped tiles of AIs
+AI1_DROP_POSx = WINDOW_WIDTH - HAND_DIFF_TO_BOUNDARY \
+                             - TILE_SIZE_SMALL[1] * 4 \
+                             + TILE_SIZE_SMALL_BLANK * 2 \
+                             - DROP_POS_GAP_TO_HAND
+AI1_DROP_POSy = (WINDOW_HEIGHT + MAX_DROP_A_LINE * TILE_SIZE_SMALL[0] )//2
+
+AI2_DROP_POSx = (WINDOW_WIDTH + MAX_DROP_A_LINE * TILE_SIZE_SMALL[0] )//2 - TILE_SIZE_SMALL[0]
+AI2_DROP_POSy =  HAND_DIFF_TO_BOUNDARY \
+                + TILE_SIZE_SMALL[1] * 3 \
+                - TILE_SIZE_SMALL_BLANK * 2 \
+                + DROP_POS_GAP_TO_HAND
+
+AI3_DROP_POSx =  HAND_DIFF_TO_BOUNDARY \
+                + TILE_SIZE_SMALL[1] * 3 \
+                - TILE_SIZE_SMALL_BLANK * 2 \
+                + DROP_POS_GAP_TO_HAND
+AI3_DROP_POSy = (WINDOW_HEIGHT - MAX_DROP_A_LINE * TILE_SIZE_SMALL[0]) //2
 
 # Font sizes
 FONT_SIZE = 24
