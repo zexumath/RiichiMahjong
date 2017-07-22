@@ -283,17 +283,17 @@ class Screen(object):
         if self._game.setTag == END_RONG:
             font = pygame.font.Font('../res/simsun.ttc', JIESUAN_FONT)
             index = 1
-            if self._game.yi[1] == 0:
+            if self._game.user.yi[1] == 0:
                 index = 0
-                ptstr = str(self._game.fu[0]) + u'符' + str(self._game.yi[0]) + u'番' + str(int(self._game.dedian)) + u'点'
-            elif self._game.yi[1] == 1:
-                ptstr = u'役满' + str(int(self._game.dedian)) + u'点'
+                ptstr = str(self._game.user.fu[0]) + u'符' + str(self._game.user.yi[0]) + u'番' + str(int(self._game.user.dedian)) + u'点'
+            elif self._game.user.yi[1] == 1:
+                ptstr = u'役满' + str(int(self._game.user.dedian)) + u'点'
             else:
-                ptstr = str(self._game.yi[1]) + u'倍役满' + str(int(self._game.dedian)) + u'点'
+                ptstr = str(self._game.user.yi[1]) + u'倍役满' + str(int(self._game.user.dedian)) + u'点'
             fufandian = font.render(ptstr, True, BLACK)
             h = fufandian.get_height()
             fanzhongcount = 0
-            for s in self._game.fan[index]:
+            for s in self._game.user.fan[index]:
                 self._display_surf.blit(font.render(s, True, BLACK), (JIESUAN_POSx, JIESUAN_POSy + h * fanzhongcount))
                 fanzhongcount += 1
             self._display_surf.blit(fufandian, (JIESUAN_POSx, JIESUAN_POSy + h * fanzhongcount))

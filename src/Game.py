@@ -28,6 +28,7 @@ class Player(object):
         self.fu = {}
         self.yi = {}
         self.exp = {}
+        self.dedian = 0
         #以下两个每局不用初始化
         self.money = MONEY_START
         self.position = -1
@@ -59,6 +60,7 @@ class Player(object):
         self.fu = {}
         self.yi = {}
         self.exp = {}
+        self.dedian = 0
         self.rongflag = False
         self.lingshang = False
         self.tingflag = False
@@ -1008,21 +1010,21 @@ class GameTable():
     def jiesuan(self, _pai):
         # TODO: dedian like 8000,12000 etc are readable.
         self.user.zimo = 1
-        self.fu, self.yi, self.fan = self.user.rong(_pai, self.quan, self.oya)
+        self.user.fu, self.user.yi, self.user.fan = self.user.rong(_pai, self.quan, self.oya)
         if len(self.yama) == MIN_TILES_IN_YAMA:
             if self.user.zimo == 1:
-                if u'岭上开花' not in self.fan[0]:
-                    self.yi[0] += 1
-                    self.fan[0] += [u'海底捞月']
+                if u'岭上开花' not in self.user.fan[0]:
+                    self.user.yi[0] += 1
+                    self.user.fan[0] += [u'海底捞月']
             else:
-                self.yi[0] += 1
-                self.fan[0] += [u'河底捞鱼']
-        if self.yi != [0, 0]:
-            if self.yi[1] != 0:
+                self.user.yi[0] += 1
+                self.user.fan[0] += [u'河底捞鱼']
+        if self.user.yi != [0, 0]:
+            if self.user.yi[1] != 0:
                 if self.user.position == self.oya:
-                    self.dedian = 48000 * self.yi[1]
+                    self.user.dedian = 48000 * self.user.yi[1]
                 else:
-                    self.dedian = 32000 * self.yi[1]
+                    self.user.dedian = 32000 * self.user.yi[1]
             else:
                 tmp = self.user.hand.in_hand + [self.user.rongpai]
                 for gang in self.user.agang:
@@ -1031,46 +1033,46 @@ class GameTable():
                     tmp = tmp + gang
 
                 if self.xun - self.user.riichi == 1 and self.user.riichi > 0:
-                    self.yi[0] += 1
-                    self.fan[0] += [u'一發']
+                    self.user.yi[0] += 1
+                    self.user.fan[0] += [u'一發']
                 tmpk = 0
                 numdora = 0
                 for dora in self.dora:
                     numdora += tmp.count(Util.nextpai(self.yama[dora]))
                     self.ura.append(dora - 1)
                     tmpk += 2
-                self.yi[0] += numdora
-                if numdora != 0: self.fan[0] += ['Dora ' + str(numdora)]
+                self.user.yi[0] += numdora
+                if numdora != 0: self.user.fan[0] += ['Dora ' + str(numdora)]
                 if self.user.riichi > 0:
                     numura = 0
                     for ura in self.ura:
                         numura += tmp.count(Util.nextpai(self.yama[ura]))
-                    self.yi[0] += numura
-                    if numura != 0: self.fan[0] += ['Ura ' + str(numura)]
-                if self.fu[0] != 25:
-                    self.fu[0] = int(math.ceil(self.fu[0] / 10.) * 10)
-                self.dedian = 0
-                self.jbd = self.fu[0] * 4 * pow(2, self.yi[0])
-                if self.yi[0] == 0:
-                    self.dedian = -8000
-                elif self.jbd < 2000:
+                    self.user.yi[0] += numura
+                    if numura != 0: self.user.fan[0] += ['Ura ' + str(numura)]
+                if self.user.fu[0] != 25:
+                    self.user.fu[0] = int(math.ceil(self.user.fu[0] / 10.) * 10)
+                self.user.dedian = 0
+                jbd = self.user.fu[0] * 4 * pow(2, self.user.yi[0])
+                if self.user.yi[0] == 0:
+                    self.user.dedian = -8000
+                elif jbd < 2000:
                     if self.user.position == self.oya:
-                        self.dedian = math.ceil(self.jbd * 6 / 100) * 100
+                        self.user.dedian = math.ceil(jbd * 6 / 100) * 100
                     else:
-                        self.dedian = math.ceil(self.jbd * 4 / 100) * 100
+                        self.user.dedian = math.ceil(jbd * 4 / 100) * 100
                 else:
-                    if self.yi[0] <= 5:
-                        self.dedian = 8000
-                    elif self.yi[0] <= 7:
-                        self.dedian = 12000
-                    elif self.yi[0] <= 10:
-                        self.dedian = 16000
-                    elif self.yi[0] <= 12:
-                        self.dedian = 24000
-                    elif self.yi[0] >= 13:
-                        self.dedian = 32000
-                    if self.user.position == self.oya: self.dedian = self.dedian * 1.5
-            self.user.money += int(self.dedian) + self.lizhibang * 1000
+                    if self.user.yi[0] <= 5:
+                        self.user.dedian = 8000
+                    elif self.user.yi[0] <= 7:
+                        self.user.dedian = 12000
+                    elif self.user.yi[0] <= 10:
+                        self.user.dedian = 16000
+                    elif self.user.yi[0] <= 12:
+                        self.user.dedian = 24000
+                    elif self.user.yi[0] >= 13:
+                        self.user.dedian = 32000
+                    if self.user.position == self.oya: self.user.dedian = self.user.dedian * 1.5
+            self.user.money += int(self.user.dedian) + self.lizhibang * 1000
             self.lizhibang = 0
 
     def setComplete(self):
