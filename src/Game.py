@@ -911,7 +911,7 @@ class GameTable():
         self.yama = [] # the remaining pai
         self.quan = 0 #0,1,2,3 represent east, north, west, north quan
         self.ju = 0 #东风圈二局二本场
-        self.oya = -1 #0,1,2,3 represent east, north, west, north
+        self.oya = OYA_START-1 % 4#0,1,2,3 represent east, north, west, north
         self.xun = 0
         self.benchang = 0
         self.lizhibang = 0

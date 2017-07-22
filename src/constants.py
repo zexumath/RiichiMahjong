@@ -1,6 +1,8 @@
 
 NUM_OF_SET_PER_QUAN = 4
 
+OYA_START = 1
+
 WAIT_FOR_RIICHI_PAI = -1
 END_RONG  = 1
 END_LIUJU = 2
@@ -19,7 +21,7 @@ TILE_RANGE = 40 - TILE_START
 DORA_DEFAULT = 5
 
 MIN_TILES_IN_YAMA = 14
-MAX_XUN = 18
+MAX_XUN = 19
 
 
 #--------------- Graphics parameters ----------------#
