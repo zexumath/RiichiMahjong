@@ -46,8 +46,9 @@ class Screen(object):
         self.initMenu()
         self.initTiles()
         self.allSprite = pygame.sprite.RenderUpdates()
+
         self.jiesuansprite = Jiesuan()
-        self.jiesuansprite.add( self.allSprite )
+        self.analysissprite = Analysis()
 
     def show(self):
         self._display_surf.fill(WHITE)
@@ -268,21 +269,10 @@ class Screen(object):
 
     def genAnalysis(self):
         if self._game.user.analysisTag == True:
-            font = self.font
-            xiangtingshu, MINexp = self._game.user.hand.chaifen2(self._game.user.hand.in_hand)
-            yxz = MINexp[len(MINexp)]
-            ptstr = str(xiangtingshu) + u'向听'
-            analysis = font.render(ptstr, True, BLACK)
-            h = analysis.get_height()
-
-            self._display_surf.blit(analysis, (ANALYSIS_POSx, ANALYSIS_POSy))
-            # ANALYSIS_POSy += h
-            for index in range(len(yxz) -1, -1, -1):
-                m, n = index // MAX_DROP_A_LINE, index % MAX_DROP_A_LINE
-                self._display_surf.blit( self.tiles[yxz[index] // 10][yxz[index] % 10], \
-                                        (ANALYSIS_POSx + TILE_SIZEx * n, \
-                                         ANALYSIS_POSy + h + (TILE_SIZEy - TILE_SIZE_BLANK) * m))
-
+            self.analysissprite.update( ANALYSIS_SIZE, self._game, self.font, self.tiles_small)
+            self.analysissprite.add(self.allSprite)
+        else:
+            self.analysissprite.remove(self.allSprite)
     # def genJiesuan(self):
         # if self._game.setTag == END_RONG:
             # font = pygame.font.Font('../res/simsun.ttc', JIESUAN_FONT)
@@ -373,29 +363,28 @@ class Analysis(pygame.sprite.DirtySprite):
 
         pygame.sprite.DirtySprite.__init__(self)
         self.image = pygame.Surface(size)
-        self.image.set_alpha( HALF_TRANSPARENT )
+        self.image.set_alpha( ONE_FOURTH_TRANSPARENT )
         self.rect = self.image.get_rect()
         self.rect.x = ANALYSIS_POSx
         self.rect.y = ANALYSIS_POSy
 
-        self.dirty = 1
-        self.visible = 0
-
-        if _game.user.analysisTag:
+        if _game!=None:
             self.update(_game, font)
 
-    def update(self, _game, font):
+    def update(self, size, _game, font, tiles):
+        self.image = pygame.Surface(size)
+        self.image.set_alpha( ONE_FOURTH_TRANSPARENT )
 
-        xiangtingshu, MINexp = _game.user.hand.chaifen2(self._game.user.hand.in_hand)
+        xiangtingshu, MINexp = _game.user.hand.chaifen2(_game.user.hand.in_hand)
         yxz = MINexp[len(MINexp)]
         ptstr = str(xiangtingshu) + u'向听'
-        analysis = font.render(ptstr, True, BLACK)
+        analysis = font.render(ptstr, True, WHITE)
         h = analysis.get_height()
 
         self.image.blit(analysis, (0, 0))
         for index in range(len(yxz) -1, -1, -1):
             m, n = index // MAX_DROP_A_LINE, index % MAX_DROP_A_LINE
-            self.image.blit( self.tiles[yxz[index] // 10][yxz[index] % 10], \
-                                    (TILE_SIZEx * n, \
-                                        h + (TILE_SIZEy - TILE_SIZE_BLANK) * m))
+            self.image.blit( tiles[yxz[index] // 10][yxz[index] % 10], \
+                                    (TILE_SIZE_SMALL[0] * n, \
+                                        h + (TILE_SIZE_SMALL[1] - TILE_SIZE_SMALL_BLANK) * m))
 
