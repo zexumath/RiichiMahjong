@@ -45,6 +45,9 @@ class Screen(object):
         self.font = pygame.font.Font('../res/simsun.ttc', FONT_SIZE)
         self.initMenu()
         self.initTiles()
+        self.allSprite = pygame.sprite.RenderUpdates()
+        self.jiesuansprite = Jiesuan()
+        self.jiesuansprite.add( self.allSprite )
 
     def show(self):
         self._display_surf.fill(WHITE)
@@ -55,7 +58,8 @@ class Screen(object):
         self.genAI()
         self.genAnalysis()
         self.genJiesuan()
-        pygame.display.update()
+        self.allSprite.draw(self._display_surf)
+        pygame.display.flip()
 
     def initMenu(self):
         font = pygame.font.Font('../res/simsun.ttc', FONT_SIZE_MENU)
@@ -279,25 +283,119 @@ class Screen(object):
                                         (ANALYSIS_POSx + TILE_SIZEx * n, \
                                          ANALYSIS_POSy + h + (TILE_SIZEy - TILE_SIZE_BLANK) * m))
 
+    # def genJiesuan(self):
+        # if self._game.setTag == END_RONG:
+            # font = pygame.font.Font('../res/simsun.ttc', JIESUAN_FONT)
+            # index = 1
+            # if self._game.user.yi[1] == 0:
+                # index = 0
+                # ptstr = str(self._game.user.fu[0]) + u'符' + str(self._game.user.yi[0]) + u'番' + str(int(self._game.user.dedian)) + u'点'
+            # elif self._game.user.yi[1] == 1:
+                # ptstr = u'役满' + str(int(self._game.user.dedian)) + u'点'
+            # else:
+                # ptstr = str(self._game.user.yi[1]) + u'倍役满' + str(int(self._game.user.dedian)) + u'点'
+            # fufandian = font.render(ptstr, True, BLACK)
+            # h = fufandian.get_height()
+            # fanzhongcount = 0
+            # for s in self._game.user.fan[index]:
+                # self._display_surf.blit(font.render(s, True, BLACK), (JIESUAN_POSx, JIESUAN_POSy + h * fanzhongcount))
+                # fanzhongcount += 1
+            # self._display_surf.blit(fufandian, (JIESUAN_POSx, JIESUAN_POSy + h * fanzhongcount))
+        # elif self._game.setTag == END_LIUJU:
+            # self._game.user.analysisTag = False
+            # font = pygame.font.Font('../res/simsun.ttc', JIESUAN_FONT)
+            # self._display_surf.blit(font.render(u'流局', True, BLACK), JIESUAN_POS)
+
     def genJiesuan(self):
-        if self._game.setTag == END_RONG:
+        if self._game.setTag==False:
+            # self.jiesuansprite.dirty   = 2
+            # self.jiesuansprite.visible = 0
+            pass
+        else:
+            self.jiesuansprite.update( JIESUAN_SIZE, self._game, 0)
+            self.jiesuansprite.add(self.allSprite)
+
+    def clear(self):
+        self.allSprite.empty()
+
+class Jiesuan(pygame.sprite.DirtySprite):
+
+    def __init__(self, size=(0,0), _game=None, _rong_player=0):
+        """
+         this class generate one single rectangle showing the information of jiesuan.
+         :param size: [width, height] of the rectangle
+         :param _game: instance of a gametable class recording game information
+         :param: _rong_player: the player who calls for a jiesuan. todo: this could be contained in _game.
+        """
+        pygame.sprite.DirtySprite.__init__(self)
+        self.image = pygame.Surface(size)
+        self.image.set_alpha( HALF_TRANSPARENT )
+        self.rect = self.image.get_rect()
+        self.rect.x = JIESUAN_POSx
+        self.rect.y = JIESUAN_POSy
+
+        if _game==None: return
+        else: self.update(_game, _rong_player)
+
+    def update(self, size, _game, _rong_player):
+        self.image = pygame.Surface(size)
+        self.image.set_alpha( HALF_TRANSPARENT )
+        if _game.setTag == END_RONG:
             font = pygame.font.Font('../res/simsun.ttc', JIESUAN_FONT)
             index = 1
-            if self._game.user.yi[1] == 0:
+            if _game.seats[_rong_player].yi[1] == 0:
                 index = 0
-                ptstr = str(self._game.user.fu[0]) + u'符' + str(self._game.user.yi[0]) + u'番' + str(int(self._game.user.dedian)) + u'点'
-            elif self._game.user.yi[1] == 1:
-                ptstr = u'役满' + str(int(self._game.user.dedian)) + u'点'
+                ptstr = str(_game.seats[_rong_player].fu[0]) + u'符' + str(_game.seats[_rong_player].yi[0]) + u'番' + str(int(_game.seats[_rong_player].dedian)) + u'点'
+            elif _game.seats[_rong_player].yi[1] == 1:
+                ptstr = u'役满' + str(int(_game.seats[_rong_player].dedian)) + u'点'
             else:
-                ptstr = str(self._game.user.yi[1]) + u'倍役满' + str(int(self._game.user.dedian)) + u'点'
-            fufandian = font.render(ptstr, True, BLACK)
+                ptstr = str(_game.seats[_rong_player].yi[1]) + u'倍役满' + str(int(_game.seats[_rong_player].dedian)) + u'点'
+            fufandian = font.render(ptstr, True, WHITE)
             h = fufandian.get_height()
             fanzhongcount = 0
-            for s in self._game.user.fan[index]:
-                self._display_surf.blit(font.render(s, True, BLACK), (JIESUAN_POSx, JIESUAN_POSy + h * fanzhongcount))
+            for s in _game.seats[_rong_player].fan[index]:
+                self.image.blit(font.render(s, True, WHITE), (0, 0 + h * fanzhongcount))
                 fanzhongcount += 1
-            self._display_surf.blit(fufandian, (JIESUAN_POSx, JIESUAN_POSy + h * fanzhongcount))
-        elif self._game.setTag == END_LIUJU:
-            self._game.user.analysisTag = False
+            self.image.blit(fufandian, (0, 0 + h * fanzhongcount))
+        elif _game.setTag == END_LIUJU:
+            _game.seats[_rong_player].analysisTag = False
             font = pygame.font.Font('../res/simsun.ttc', JIESUAN_FONT)
-            self._display_surf.blit(font.render(u'流局', True, BLACK), JIESUAN_POS)
+            self.image.blit(font.render(u'流局', True, WHITE), (0,0) )
+
+class Analysis(pygame.sprite.DirtySprite):
+
+    def __init__(self, size=(0,0), _game=None, font=None):
+        """
+         This class generates one single rectangle showing the information of analysis.
+         :param size: [width, height] of the rectangle
+         :param _game: instance of a GameTable class recording game information
+        """
+
+        pygame.sprite.DirtySprite.__init__(self)
+        self.image = pygame.Surface(size)
+        self.image.set_alpha( HALF_TRANSPARENT )
+        self.rect = self.image.get_rect()
+        self.rect.x = ANALYSIS_POSx
+        self.rect.y = ANALYSIS_POSy
+
+        self.dirty = 1
+        self.visible = 0
+
+        if _game.user.analysisTag:
+            self.update(_game, font)
+
+    def update(self, _game, font):
+
+        xiangtingshu, MINexp = _game.user.hand.chaifen2(self._game.user.hand.in_hand)
+        yxz = MINexp[len(MINexp)]
+        ptstr = str(xiangtingshu) + u'向听'
+        analysis = font.render(ptstr, True, BLACK)
+        h = analysis.get_height()
+
+        self.image.blit(analysis, (0, 0))
+        for index in range(len(yxz) -1, -1, -1):
+            m, n = index // MAX_DROP_A_LINE, index % MAX_DROP_A_LINE
+            self.image.blit( self.tiles[yxz[index] // 10][yxz[index] % 10], \
+                                    (TILE_SIZEx * n, \
+                                        h + (TILE_SIZEy - TILE_SIZE_BLANK) * m))
+

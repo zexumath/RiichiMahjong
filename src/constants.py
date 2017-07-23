@@ -23,6 +23,7 @@ DORA_DEFAULT = 5
 MIN_TILES_IN_YAMA = 14
 MAX_XUN = 19
 
+HALF_TRANSPARENT = 128
 
 #--------------- Graphics parameters ----------------#
 
@@ -62,7 +63,8 @@ ANALYSIS_POSx, ANALYSIS_POSy = ANALYSIS_POS
 
 
 # Position of the end-of-game jiesuan
-JIESUAN_POS = (500, 50)
+JIESUAN_SIZE = (400, 500)
+JIESUAN_POS  = ( (WINDOW_WIDTH - JIESUAN_SIZE[0])//2, (WINDOW_HEIGHT - JIESUAN_SIZE[1])//2 )
 JIESUAN_POSx, JIESUAN_POSy = JIESUAN_POS
 JIESUAN_FONT = 24
 
