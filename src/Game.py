@@ -1011,6 +1011,9 @@ class GameTable():
         # TODO: dedian like 8000,12000 etc are readable.
         self.user.zimo = 1
         self.user.fu, self.user.yi, self.user.fan = self.user.rong(_pai, self.quan, self.oya)
+        if self.user.fu == [0, 0]:
+            self.user.dedian = 0
+            return
         if len(self.yama) == MIN_TILES_IN_YAMA:
             if self.user.zimo == 1:
                 if u'岭上开花' not in self.user.fan[0]:
