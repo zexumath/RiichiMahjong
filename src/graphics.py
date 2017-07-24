@@ -155,7 +155,7 @@ class Screen(object):
             changkuang += u'西'
         else:
             changkuang += u'北'
-        changkuang += str(self._game.oya + 1) + u'局0本场'
+        changkuang += str(self._game.ju + 1) + u'局0本场'
         dianshu = u'玩家点数' + str(self._game.user.money)
         ck = self.font.render(changkuang, True, BLACK)
         ds = self.font.render(dianshu   , True, BLACK)

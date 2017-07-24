@@ -909,7 +909,7 @@ class GameTable():
         self.ai3 = AiPlayer()
         self.__create__()
         self.yama = [] # the remaining pai
-        self.quan = 0 #0,1,2,3 represent east, north, west, north quan
+        self.quan = -1 #0,1,2,3 represent east, north, west, north quan
         self.ju = 0 #东风圈二局二本场
         self.oya = OYA_START-1 % 4#0,1,2,3 represent east, north, west, north
         self.xun = 0
@@ -942,16 +942,20 @@ class GameTable():
             self.benchang += 1
         elif self.setTag == END_LIUJU and not self.seats[self.oya].tingflag:
             self.oya += 1
+            self.oya %= 4
             self.benchang += 1
         else:
             self.oya += 1
+            self.oya %= 4
             self.benchang = 0
 
     def newset(self):
         self.judge_benchang()
         self.aidropped = []
-        self.quan, self.oya = self.quan + self.oya // NUM_OF_SET_PER_QUAN, self.oya % NUM_OF_SET_PER_QUAN
-        self.ju = self.oya
+        if self.oya == OYA_START:
+            self.quan += 1
+            self.quan %= 4
+        self.ju = (self.oya - OYA_START) %4
         self.yama = self.pai[:]
         random.shuffle(self.yama)
         #print(self.yama)
