@@ -919,7 +919,7 @@ class GameTable():
         self.lastrongplayer = -2 #没有人胡 return -2
         self.turn = -1 #0,1,2,3 represent the turn of draw tiles
         self.setTag = 0
-        self.aidropped = []
+        # self.aidropped = []
 
         self.on_hold_flag = False
 
@@ -951,7 +951,7 @@ class GameTable():
 
     def newset(self):
         self.judge_benchang()
-        self.aidropped = []
+        # self.aidropped = []
         if self.oya == OYA_START:
             self.quan += 1
             self.quan %= 4
@@ -1005,7 +1005,7 @@ class GameTable():
         self.seats[self.turn].hand.new_tile = self.yama[0]
         self.yama = self.yama[1:]
         self.dora.append(self.dora[-1] + 2)
-        self.ura.append(self.dora[-1] + 2)
+        self.ura.append(self.ura[-1] + 2)
         for i in range(len(self.dora)):
             self.dora[i] -= 1
             self.ura[i]  -= 1
