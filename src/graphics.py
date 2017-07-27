@@ -228,23 +228,23 @@ class Screen(object):
         self.playerdropsprite.add(self.allSprite)
 
     def genAI(self):
-        for ind in range(1,4):
-            rotate_degree = 90 * ind
-            if ind ==1:
-                # hand_start_pos_x,hand_start_pos_y = AI1_HAND_POSx, AI1_HAND_POSy
-                # hand_dx, hand_dy = 0, -TILE_SIZE_SMALL[0]
-                drop_start_pos_x,drop_start_pos_y = AI1_DROP_POSx, AI1_DROP_POSy
-                drop_dx, drop_dy = TILE_SIZE_SMALL[1] - TILE_SIZE_SMALL_BLANK, -TILE_SIZE_SMALL[0]
-            elif ind ==2:
-                # hand_start_pos_x,hand_start_pos_y = AI2_HAND_POSx, AI2_HAND_POSy
-                # hand_dx, hand_dy = -TILE_SIZE_SMALL[0], 0
-                drop_start_pos_x,drop_start_pos_y = AI2_DROP_POSx, AI2_DROP_POSy
-                drop_dx, drop_dy = -TILE_SIZE_SMALL[0], -TILE_SIZE_SMALL[1] + TILE_SIZE_SMALL_BLANK
-            elif ind ==3:
-                # hand_start_pos_x,hand_start_pos_y = AI3_HAND_POSx, AI3_HAND_POSy
-                # hand_dx, hand_dy = 0, TILE_SIZE_SMALL[0]
-                drop_start_pos_x,drop_start_pos_y = AI3_DROP_POSx, AI3_DROP_POSy
-                drop_dx, drop_dy = -TILE_SIZE_SMALL[1] + TILE_SIZE_SMALL_BLANK, TILE_SIZE_SMALL[0]
+        # for ind in range(1,4):
+            # rotate_degree = 90 * ind
+            # if ind ==1:
+                # # hand_start_pos_x,hand_start_pos_y = AI1_HAND_POSx, AI1_HAND_POSy
+                # # hand_dx, hand_dy = 0, -TILE_SIZE_SMALL[0]
+                # drop_start_pos_x,drop_start_pos_y = AI1_DROP_POSx, AI1_DROP_POSy
+                # drop_dx, drop_dy = TILE_SIZE_SMALL[1] - TILE_SIZE_SMALL_BLANK, -TILE_SIZE_SMALL[0]
+            # elif ind ==2:
+                # # hand_start_pos_x,hand_start_pos_y = AI2_HAND_POSx, AI2_HAND_POSy
+                # # hand_dx, hand_dy = -TILE_SIZE_SMALL[0], 0
+                # drop_start_pos_x,drop_start_pos_y = AI2_DROP_POSx, AI2_DROP_POSy
+                # drop_dx, drop_dy = -TILE_SIZE_SMALL[0], -TILE_SIZE_SMALL[1] + TILE_SIZE_SMALL_BLANK
+            # elif ind ==3:
+                # # hand_start_pos_x,hand_start_pos_y = AI3_HAND_POSx, AI3_HAND_POSy
+                # # hand_dx, hand_dy = 0, TILE_SIZE_SMALL[0]
+                # drop_start_pos_x,drop_start_pos_y = AI3_DROP_POSx, AI3_DROP_POSy
+                # drop_dx, drop_dy = -TILE_SIZE_SMALL[1] + TILE_SIZE_SMALL_BLANK, TILE_SIZE_SMALL[0]
 
             if ind % 2 == 0:
                 self.all_hand_sprite[ind].update((HAND_REGION_WIDTH_02, HAND_REGION_HEIGHT),
@@ -288,7 +288,6 @@ class Screen(object):
                 # else:
                     # self._display_surf.blit(tilefigure, (drop_start_pos_x + drop_dx * rr,
                                                          # drop_start_pos_y + drop_dy * tt))
-
 
     def genAnalysis(self):
         if self._game.user.analysisTag == True:
@@ -475,6 +474,7 @@ class DropSprite(pygame.sprite.DirtySprite):
         self.image.fill(WHITE)
 
         self.rect = self.image.get_rect()
+        # pygame.draw.rect(self.image, BLACK, self.rect, 1)
         self.rect.x, self.rect.y = DROP_REGION_POS[_user.position]
 
         _dropped = _user.dropped
