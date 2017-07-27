@@ -5,17 +5,14 @@ from Util import Util
 class Hand:
     def __init__(self):
         '''
-        fulu1, ..., fulu4: Name ('Chi', 'Peng', 'Gang'); tile, first tile in the fulu: ([11]); From: (0, 1, 2, 3),
+        fulu1, ..., fulu4: name ('Chi', 'Peng', 'Ming_Gang'); tile, first tile in the fulu: ([11]); From: (0, 1, 2, 3),
         0 for your self and 1, 2, 3 represents the player sitting on the right, opposite and left respectively
         '''
         self.in_hand = []
         self.new_tile = []
-        self.fulu1 = None
-        self.fulu2 = None
-        self.fulu3 = None
-        self.fulu4 = None
-        #TODO: Currently not implementing. Just use a list of fulus showing fulu1, ..., fulu4
-        self.fulu  = []
+        self.fulu = []
+        self.exp = {}
+
     '''
     def new_set_init(self, yama, position, oya_position):
         if position == oya_position:
@@ -35,6 +32,38 @@ class Hand:
         self.fulu4 = None
         self.fulu  = []
     '''
+
+    def re_organize_expression(self):
+        expressions = {}
+        for k, v in self.exp.items():
+            kezi = []
+            shunzi = []
+            quetou = []
+            for tmp in v:
+                if len(tmp) == 2:
+                    quetou.append(tmp)
+                elif tmp[0] == tmp[1]:
+                    kezi.append(tmp)
+                else:
+                    shunzi.append(tmp)
+
+            for tmp in self.fulu:
+                if tmp.name == 'Chi':
+                    shunzi.append(tmp)
+                elif tmp.name == 'Peng':
+                    kezi.append(tmp)
+                else:
+                    kezi.append(tmp[:-1])
+            expression = {}
+            kezi.sort()
+            shunzi.sort()
+            expression['kezi'] = kezi
+            expression['quetou'] = quetou
+            expression['shunzi'] = shunzi
+            expressions[k] = expression
+
+        return expressions
+
     def xiangting(self, exp):
         m = 0
         d = 0
@@ -191,4 +220,3 @@ class Hand:
             exp1[key].append([_danzhang])
             exp[len(exp) + 1] = exp1[key]
         return exp
-

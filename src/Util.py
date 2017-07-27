@@ -307,5 +307,3 @@ class Util:
                 return _pai + 1
         else:
             return m * 10 + n % 9 + 1
-
-

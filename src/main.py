@@ -35,6 +35,7 @@ class RiichiMahjong:
             elif self._game.setComplete():
                 self._game.newset()
                 self._game.serve()
+                self._screen.clear()
                 # self._game.tile_ai_drop()
                 # self._game.user._mopai = self._game.serve()
             else:
