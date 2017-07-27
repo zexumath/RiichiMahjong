@@ -58,6 +58,9 @@ STAT_POS = (100,100)
 YAMA_POSx = MIDDLE_OF_WINDOW[0] - 4 * TILE_SIZE_SMALL[0]
 YAMA_POSy = MIDDLE_OF_WINDOW[1] - TILE_SIZE_SMALL[1]
 
+STAT_REGION_WIDTH  = 12 * TILE_SIZE_SMALL[0]
+STAT_REGION_HEIGHT = 8 * TILE_SIZE_SMALL[0]
+
 # Position of the analysis
 ANALYSIS_SIZE = (400, 500)
 ANALYSIS_POS  = ( (WINDOW_WIDTH - ANALYSIS_SIZE[0])//2, (WINDOW_HEIGHT - ANALYSIS_SIZE[1])//2 )
@@ -98,24 +101,45 @@ HAND_REGION_3_X, HAND_REGION_3_Y= 0                    , HAND_REGION_HEIGHT
 HAND_REGION_POS = [ [HAND_REGION_0_X, HAND_REGION_0_Y],
                     [HAND_REGION_1_X, HAND_REGION_1_Y],
                     [HAND_REGION_2_X, HAND_REGION_2_Y],
-                    [HAND_REGION_3_X, HAND_REGION_3_Y]]
+                    [HAND_REGION_3_X, HAND_REGION_3_Y] ]
 
-# Position used for showing ai hand tiles
-# AI on the right. Position is the upleft corner of the very bottom handtile.
-AI1_HAND_POSx = WINDOW_WIDTH - TILE_SIZE_SMALL[1] - HAND_DIFF_TO_BOUNDARY
-AI1_HAND_POSy = (WINDOW_HEIGHT + 14* TILE_SIZE_SMALL[0]) // 2 - TILE_SIZE_SMALL[0]
-# AI on the top. Position is the upleft corner of the very right handtile.
-AI2_HAND_POSx = (WINDOW_WIDTH + 14 * TILE_SIZE_SMALL[0]) //2 - TILE_SIZE_SMALL[0]
-AI2_HAND_POSy = HAND_DIFF_TO_BOUNDARY
-# AI on the left. Position is the upleft corner of the very top handtile.
-AI3_HAND_POSx = HAND_DIFF_TO_BOUNDARY
-AI3_HAND_POSy = (WINDOW_HEIGHT - 14 * TILE_SIZE_SMALL[0]) //2
+# # Position used for showing ai hand tiles
+# # AI on the right. Position is the upleft corner of the very bottom handtile.
+# AI1_HAND_POSx = WINDOW_WIDTH - TILE_SIZE_SMALL[1] - HAND_DIFF_TO_BOUNDARY
+# AI1_HAND_POSy = (WINDOW_HEIGHT + 14* TILE_SIZE_SMALL[0]) // 2 - TILE_SIZE_SMALL[0]
+# # AI on the top. Position is the upleft corner of the very right handtile.
+# AI2_HAND_POSx = (WINDOW_WIDTH + 14 * TILE_SIZE_SMALL[0]) //2 - TILE_SIZE_SMALL[0]
+# AI2_HAND_POSy = HAND_DIFF_TO_BOUNDARY
+# # AI on the left. Position is the upleft corner of the very top handtile.
+# AI3_HAND_POSx = HAND_DIFF_TO_BOUNDARY
+# AI3_HAND_POSy = (WINDOW_HEIGHT - 14 * TILE_SIZE_SMALL[0]) //2
 
 
 # Drops
 MAX_DROP_A_LINE = 6
 # Position of the dropped tiles of player
 DROP_POS_GAP_TO_HAND = 40
+
+# New implementation using DropSprite
+DROP_REGION_WIDTH  = 8 * TILE_SIZE_SMALL[0]
+DROP_REGION_HEIGHT = 3 * TILE_SIZE_SMALL[1]
+
+DROP_REGION_0_X = (WINDOW_WIDTH - DROP_REGION_WIDTH ) // 2
+DROP_REGION_0_Y = (WINDOW_HEIGHT+ STAT_REGION_HEIGHT) // 2
+
+DROP_REGION_1_X = (WINDOW_WIDTH + STAT_REGION_WIDTH ) // 2
+DROP_REGION_1_Y = (WINDOW_HEIGHT- DROP_REGION_WIDTH ) // 2
+
+DROP_REGION_2_X = (WINDOW_WIDTH - DROP_REGION_WIDTH ) // 2
+DROP_REGION_2_Y = (WINDOW_HEIGHT- STAT_REGION_HEIGHT) // 2 - DROP_REGION_HEIGHT
+
+DROP_REGION_3_X = (WINDOW_WIDTH - STAT_REGION_WIDTH ) // 2 - DROP_REGION_HEIGHT
+DROP_REGION_3_Y = DROP_REGION_1_Y
+
+DROP_REGION_POS = [ [DROP_REGION_0_X, DROP_REGION_0_Y],
+                    [DROP_REGION_1_X, DROP_REGION_1_Y],
+                    [DROP_REGION_2_X, DROP_REGION_2_Y],
+                    [DROP_REGION_3_X, DROP_REGION_3_Y] ]
 
 DROP_POS_TO_BOTTOM = 3*(TILE_SIZEy-TILE_SIZE_BLANK) + TILE_SIZE_BLANK + HAND_POS_TO_BOTTOM + DROP_POS_GAP_TO_HAND
 DROP_POS_TO_LEFT   = (WINDOW_WIDTH - MAX_DROP_A_LINE*TILE_SIZEx) //2

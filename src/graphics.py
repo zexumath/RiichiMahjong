@@ -45,14 +45,17 @@ class Screen(object):
         self.font = pygame.font.Font('../res/simsun.ttc', FONT_SIZE)
         self.initMenu()
         self.initTiles()
-        self.allSprite = pygame.sprite.RenderUpdates()
+        self.allSprite = pygame.sprite.OrderedUpdates()
 
         self.jiesuansprite = Jiesuan()
         self.analysissprite = Analysis()
         self.playerhandsprite = HandSprite()
+        self.playerdropsprite = DropSprite()
         self.all_hand_sprite = [self.playerhandsprite]
+        self.all_drop_sprite = [self.playerdropsprite]
         for ind in range(1,4):
             self.all_hand_sprite.append(HandSprite())
+            self.all_drop_sprite.append(DropSprite())
 
     def show(self):
         self._display_surf.fill(WHITE)
@@ -215,29 +218,31 @@ class Screen(object):
         self.playerhandsprite.add(self.allSprite)
         # show drops
         # Now the drooped tiles are shown using small ones
-        for index in range(len(self._game.user.dropped) - 1, -1, -1):
-            m, n = index // MAX_DROP_A_LINE, index % MAX_DROP_A_LINE
-            tile_tmp = self._game.user.dropped[index]
-            self._display_surf.blit( self.tiles_small[tile_tmp // 10][tile_tmp % 10], \
-                                    (DROP_POSx + TILE_SIZE_SMALL[0] * n, \
-                                     DROP_POSy + (TILE_SIZE_SMALL[1] - TILE_SIZE_SMALL_BLANK) * m) )
+        # for index in range(len(self._game.user.dropped) - 1, -1, -1):
+            # m, n = index // MAX_DROP_A_LINE, index % MAX_DROP_A_LINE
+            # tile_tmp = self._game.user.dropped[index]
+            # self._display_surf.blit( self.tiles_small[tile_tmp // 10][tile_tmp % 10], \
+                                    # (DROP_POSx + TILE_SIZE_SMALL[0] * n, \
+                                     # DROP_POSy + (TILE_SIZE_SMALL[1] - TILE_SIZE_SMALL_BLANK) * m) )
+        self.playerdropsprite.update((DROP_REGION_WIDTH, DROP_REGION_HEIGHT), self._game.user, self.tiles_small)
+        self.playerdropsprite.add(self.allSprite)
 
     def genAI(self):
         for ind in range(1,4):
             rotate_degree = 90 * ind
             if ind ==1:
-                hand_start_pos_x,hand_start_pos_y = AI1_HAND_POSx, AI1_HAND_POSy
-                hand_dx, hand_dy = 0, -TILE_SIZE_SMALL[0]
+                # hand_start_pos_x,hand_start_pos_y = AI1_HAND_POSx, AI1_HAND_POSy
+                # hand_dx, hand_dy = 0, -TILE_SIZE_SMALL[0]
                 drop_start_pos_x,drop_start_pos_y = AI1_DROP_POSx, AI1_DROP_POSy
                 drop_dx, drop_dy = TILE_SIZE_SMALL[1] - TILE_SIZE_SMALL_BLANK, -TILE_SIZE_SMALL[0]
             elif ind ==2:
-                hand_start_pos_x,hand_start_pos_y = AI2_HAND_POSx, AI2_HAND_POSy
-                hand_dx, hand_dy = -TILE_SIZE_SMALL[0], 0
+                # hand_start_pos_x,hand_start_pos_y = AI2_HAND_POSx, AI2_HAND_POSy
+                # hand_dx, hand_dy = -TILE_SIZE_SMALL[0], 0
                 drop_start_pos_x,drop_start_pos_y = AI2_DROP_POSx, AI2_DROP_POSy
                 drop_dx, drop_dy = -TILE_SIZE_SMALL[0], -TILE_SIZE_SMALL[1] + TILE_SIZE_SMALL_BLANK
             elif ind ==3:
-                hand_start_pos_x,hand_start_pos_y = AI3_HAND_POSx, AI3_HAND_POSy
-                hand_dx, hand_dy = 0, TILE_SIZE_SMALL[0]
+                # hand_start_pos_x,hand_start_pos_y = AI3_HAND_POSx, AI3_HAND_POSy
+                # hand_dx, hand_dy = 0, TILE_SIZE_SMALL[0]
                 drop_start_pos_x,drop_start_pos_y = AI3_DROP_POSx, AI3_DROP_POSy
                 drop_dx, drop_dy = -TILE_SIZE_SMALL[1] + TILE_SIZE_SMALL_BLANK, TILE_SIZE_SMALL[0]
 
@@ -249,6 +254,10 @@ class Screen(object):
                                                 self._game.seats[ind], self.tiles_small)
 
             self.all_hand_sprite[ind].add(self.allSprite)
+
+            self.all_drop_sprite[ind].update((DROP_REGION_WIDTH, DROP_REGION_HEIGHT),
+                                            self._game.seats[ind], self.tiles_small)
+            self.all_drop_sprite[ind].add(self.allSprite)
             # show hand
             # _hand = self._game.seats[ind].hand.in_hand
             # _pai  = self._game.seats[ind].hand.new_tile
@@ -267,18 +276,19 @@ class Screen(object):
                                                      # hand_start_pos_y + hand_dy * (i+1) + np.sign(hand_dy) * HAND_GAP))
 
             # show drop
-            _dropped = self._game.seats[ind].dropped
-            for index in range(len(_dropped) -1, -1, -1):
-                rr, tt = index // MAX_DROP_A_LINE, index % MAX_DROP_A_LINE
-                _pai = _dropped[index]
-                m, n = _pai // 10, _pai % 10
-                tilefigure = self.rotateTile(self.tiles_small[m][n], rotate_degree)
-                if ind ==2:
-                    self._display_surf.blit(tilefigure, (drop_start_pos_x + drop_dx * tt,
-                                                         drop_start_pos_y + drop_dy * rr))
-                else:
-                    self._display_surf.blit(tilefigure, (drop_start_pos_x + drop_dx * rr,
-                                                         drop_start_pos_y + drop_dy * tt))
+            # _dropped = self._game.seats[ind].dropped
+            # for index in range(len(_dropped) -1, -1, -1):
+                # rr, tt = index // MAX_DROP_A_LINE, index % MAX_DROP_A_LINE
+                # _pai = _dropped[index]
+                # m, n = _pai // 10, _pai % 10
+                # tilefigure = self.rotateTile(self.tiles_small[m][n], rotate_degree)
+                # if ind ==2:
+                    # self._display_surf.blit(tilefigure, (drop_start_pos_x + drop_dx * tt,
+                                                         # drop_start_pos_y + drop_dy * rr))
+                # else:
+                    # self._display_surf.blit(tilefigure, (drop_start_pos_x + drop_dx * rr,
+                                                         # drop_start_pos_y + drop_dy * tt))
+
 
     def genAnalysis(self):
         if self._game.user.analysisTag == True:
@@ -405,9 +415,9 @@ class HandSprite(pygame.sprite.DirtySprite):
 
     def __init__(self, size=(0,0), _user=None, tiles=None):
         """
-         This class generates one single rectangle showing the information of analysis.
-         :param size: [width, height] of the rectangle
-         :param _game: instance of a GameTable class recording game information
+         This class generates one single rectangle showing the hand tiles.
+         :param size: [width, height] of the rectangle.
+         :param _user: instance of a Player class recording player information.
         """
 
         pygame.sprite.DirtySprite.__init__(self)
@@ -441,4 +451,50 @@ class HandSprite(pygame.sprite.DirtySprite):
         # print self.rect.x, self.rect.y
         if rotate_angle:
             self.image = pygame.transform.rotate(self.image, rotate_angle)
+
+class DropSprite(pygame.sprite.DirtySprite):
+
+    def __init__(self, size=(0,0), _user=None, tiles=None):
+        """
+         This class generates one single rectangle showing the dropped tiles.
+         :param size: [width, height] of the rectangle.
+         :param _user: instance of a Player class recording player information.
+        """
+
+        pygame.sprite.DirtySprite.__init__(self)
+        self.image = pygame.Surface(size)
+        self.image.set_alpha( ONE_FOURTH_TRANSPARENT )
+        self.rect = self.image.get_rect()
+
+        if _user!=None:
+            self.update(_user, tiles)
+
+    def update(self, size, _user, tiles):
+
+        self.image = pygame.Surface(size)
+        self.image.fill(WHITE)
+
+        self.rect = self.image.get_rect()
+        self.rect.x, self.rect.y = DROP_REGION_POS[_user.position]
+
+        _dropped = _user.dropped
+
+        tile_size_x, tile_size_y = tiles[1][1].get_size()
+
+        x, y = 0, 0
+
+        for index in range(len(_dropped) -1, -1, -1):
+            rr, tt = index // MAX_DROP_A_LINE, index % MAX_DROP_A_LINE
+            if rr>2:
+                rr = 2
+                tt = index - rr * MAX_DROP_A_LINE
+
+            _pai = _dropped[index]
+            m, n = _pai // 10, _pai % 10
+            self.image.blit(tiles[m][n], (x + tt * tile_size_x, y + rr * (tile_size_y-TILE_SIZE_SMALL_BLANK)))
+
+        rotate_angle = 90 * _user.position
+        if rotate_angle:
+            self.image = pygame.transform.rotate(self.image, rotate_angle)
+
 
