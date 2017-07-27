@@ -1,5 +1,5 @@
+# -*- coding: utf-8 -*-
 import numpy as np
-from Game import Player
 import constants
 import abc
 from Hand import Hand
@@ -23,10 +23,12 @@ class FanZhong:
         raise NotImplementedError
 
     @abc.abstractmethod
-    def judge(self, _hand, _expression):
+    def judge(cls, _hand, _expression):
         '''
         Judge whether the provided pai set satisfy the Fanzhong.
         :param _hand: Hand Class Object
+        :param _expression: We assume that the _expression has already been re-formatted as a dictionary with 'kezi',
+        'shunzi' and 'quetou'. Otherwise it will lead to repeat of coding.
         :return:
         '''
 
@@ -49,7 +51,7 @@ class GuoShiShiSanMian(FanZhong):
     chinese_name = u'国士无双十三面待'
 
     @classmethod
-    def judge(self, _hand, _expression):
+    def judge(cls, _hand, _expression):
         if set(_hand.in_hand) == {11, 19, 21, 29, 31, 39, 41, 42, 43, 44, 45, 46, 47} and \
                         _hand.new_tile in [11, 19, 21, 29, 31, 39, 41, 42, 43, 44, 45, 46, 47]:
             return True
@@ -62,7 +64,7 @@ class QiDui(FanZhong):
     chinese_name = u'七对子'
 
     @classmethod
-    def judge(self, _hand, _expression):
+    def judge(cls, _hand, _expression):
         _list_pai = _hand.in_hand + [_hand.new_tile]
         _list_pai.sort()
         if [_list_pai[x] for x in range(0, 13, 2)] == [_list_pai[x] for x in range(1, 14, 2)] and len(
@@ -76,11 +78,14 @@ class SiGangZi(FanZhong):
     fanshu = [[2, 0], [2, 0]]
     chinese_name = u'四杠子'
 
-    def judge(self, _hand, _expression):
+    @classmethod
+    def judge(cls, _hand, _expression):
         if len(_hand.fulu) == 4:
             for i in range(4):
                 if _hand.fulu[i].name != 'Ming_Gang' and _hand.fulu[i].name != 'An_Gang':
                     return False
+
+            return True
 
         return False
 
@@ -106,7 +111,8 @@ class LiangBeiKou(FanZhong):
     fanshu = [[0, 3], [0, 0]]
     chinese_name = u'两盃口'
 
-    def judge(self, _hand, _expression):
+    @classmethod
+    def judge(cls, _hand, _expression):
         '''
         :param _hand:
         :param _expression: We assume that the _expression has already been re-formatted as a dictionary with 'kezi',
@@ -119,4 +125,47 @@ class LiangBeiKou(FanZhong):
                         _expression['shunzi'][3]:
                     return True
 
-            return False
+        return False
+
+
+class PingHe(FanZhong):
+    fanshu = [[0, 1], [0, 0]]
+    chinese_name = u'平和'
+
+    @classmethod
+    def judge(cls, _hand, _expression, is_zimo, fu):
+        if len(_hand.fulu) == 0:
+            if (fu == 20 and is_zimo) or (fu == 30 and not is_zimo):
+                return True
+
+        return False
+
+
+class SanSe(FanZhong):
+    fanshu = [[0, 2], [0, 1]]
+    chinese_name = u'三色同顺'
+
+    @classmethod
+    def judge(cls, _hand, _expression):
+        if len(_expression['shunzi']) >= 3:
+            shunzi_start = [shunzi[0] for shunzi in _expression['shunzi']]
+            if set([shunzi_start[0] + x for x in range(0, 30, 10)]).issubset(shunzi_start) or set(
+                [shunzi_start[1] + x for x in range(0, 30, 10)]).issubset(shunzi_start):
+                return True
+
+        return False
+
+
+class YiQi(FanZhong):
+    fanshu = [[0, 2], [0, 1]]
+    chinese_name = u'一气通贯'
+
+    @classmethod
+    def judge(cls, _hand, _expression):
+        if len(_expression['shunzi']) >= 3:
+            shunzi_start = [shunzi[0] for shunzi in _expression['shunzi']]
+            if set([shunzi_start[0] + x for x in range(0, 9, 3)]).issubset(shunzi_start) or set(
+                [shunzi_start[1] + x for x in range(0, 9, 3)]).issubset(shunzi_start):
+                return True
+
+        return False
