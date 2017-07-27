@@ -228,7 +228,7 @@ class Screen(object):
         self.playerdropsprite.add(self.allSprite)
 
     def genAI(self):
-        # for ind in range(1,4):
+        for ind in range(1,4):
             # rotate_degree = 90 * ind
             # if ind ==1:
                 # # hand_start_pos_x,hand_start_pos_y = AI1_HAND_POSx, AI1_HAND_POSy

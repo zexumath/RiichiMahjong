@@ -6,6 +6,7 @@ from constants import *
 from Hand import Hand
 from Util import Util
 import time
+from Fanzhong import FanZhong, PingHe
 
 class Player(object):
     def __init__(self):
@@ -293,12 +294,15 @@ class Player(object):
                         if shunzi[1] == shunzi[0] and shunzi[3] == shunzi[2]:
                             self.yi[k][0][0] += 3
                             self.yi[k][0].append(u'两盃口')
-                        if self.fu[k] == 20 and self.zimo > 0:
+                        if PingHe.judge(self.hand, v, self.zimo, self.fu[k]):
                             self.yi[k][0][0] += 1
                             self.yi[k][0].append(u'平和')
-                        elif self.fu[k] == 30 and self.zimo == 0:
-                            self.yi[k][0][0] += 1
-                            self.yi[k][0].append(u'平和')
+                        # if self.fu[k] == 20 and self.zimo > 0:
+                        #     self.yi[k][0][0] += 1
+                        #     self.yi[k][0].append(u'平和')
+                        # elif self.fu[k] == 30 and self.zimo == 0:
+                        #     self.yi[k][0][0] += 1
+                        #     self.yi[k][0].append(u'平和')
                 if b >= 3:
                     if self.sanse(shunzi):  ###
                         if self.is_close:
