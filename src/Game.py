@@ -1151,6 +1151,10 @@ class GameTable():
                 self.seats[rong_player].dedian = jbd4 + self.lizhibang * 1000
                 self.seats[rong_player].money += self.seats[rong_player].dedian
 
+        print self.turn
+        print rong_player
+        print self.seats[rong_player].dedian
+        print jibendian
         #TODO: not implementing multiple rongs at the same time.
 
     def setComplete(self):
