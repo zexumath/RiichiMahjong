@@ -1233,6 +1233,7 @@ class GameTable():
         self.user.rongTag = True
         self.user.analysisTag = False
         self.setTag = END_RONG
+        self.lastrongplayer = 0 # currently only allowing player rong.
         self.jiesuan(_pai, turn)
 
     def menu_riichi(self):
