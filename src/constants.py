@@ -1,7 +1,14 @@
 
+import random
+
 NUM_OF_SET_PER_QUAN = 4
 
-OYA_START = 1
+OYA_START = random.randint(0,3)
+
+# Constants for table status
+WAIT_FOR_SERVE = 1
+WAIT_FOR_DROP  = 2
+WAIT_FOR_RESPONSE = 3
 
 WAIT_FOR_RIICHI_PAI = -1
 END_RONG  = 1
