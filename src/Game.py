@@ -1022,6 +1022,7 @@ class GameTable():
             self.dora[i] -= 1
             self.ura[i]  -= 1
         self.seats[self.turn].gangTag = False
+
     def jiesuan(self, _pai, turn):
         # TODO: dedian like 8000,12000 etc are readable.
         # print _pai
@@ -1059,12 +1060,9 @@ class GameTable():
                 if self.xun - self.user.riichi == 1 and self.user.riichi > 0:
                     self.user.yi[0] += 1
                     self.user.fan[0] += [u'一發']
-                tmpk = 0
                 numdora = 0
                 for dora in self.dora:
                     numdora += tmp.count(Util.nextpai(self.yama[dora]))
-                    self.ura.append(dora - 1)
-                    tmpk += 2
                 self.user.yi[0] += numdora
                 if numdora != 0: self.user.fan[0] += ['Dora ' + str(numdora)]
                 if self.user.riichi > 0:
@@ -1077,26 +1075,26 @@ class GameTable():
                     self.user.fu[0] = int(math.ceil(self.user.fu[0] / 10.) * 10)
                 self.user.dedian = 0
                 jbd = self.user.fu[0] * 4 * pow(2, self.user.yi[0])
-                if self.user.yi[0] == 0:
-                    self.user.dedian = -8000
-                elif jbd < 2000:
-                    if self.user.position == self.oya:
-                        self.user.dedian = math.ceil(jbd * 6 / 100) * 100
-                    else:
-                        self.user.dedian = math.ceil(jbd * 4 / 100) * 100
-                else:
-                    if self.user.yi[0] <= 5:
-                        self.user.dedian = 8000
-                    elif self.user.yi[0] <= 7:
-                        self.user.dedian = 12000
-                    elif self.user.yi[0] <= 10:
-                        self.user.dedian = 16000
-                    elif self.user.yi[0] <= 12:
-                        self.user.dedian = 24000
-                    elif self.user.yi[0] >= 13:
-                        self.user.dedian = 32000
-                    if self.user.position == self.oya: self.user.dedian = self.user.dedian * 1.5
-            # self.user.money += int(self.user.dedian) + self.lizhibang * 1000
+            #     if self.user.yi[0] == 0:
+            #         self.user.dedian = -8000
+            #     elif jbd < 2000:
+            #         if self.user.position == self.oya:
+            #             self.user.dedian = math.ceil(jbd * 6 / 100) * 100
+            #         else:
+            #             self.user.dedian = math.ceil(jbd * 4 / 100) * 100
+            #     else:
+            #         if self.user.yi[0] <= 5:
+            #             self.user.dedian = 8000
+            #         elif self.user.yi[0] <= 7:
+            #             self.user.dedian = 12000
+            #         elif self.user.yi[0] <= 10:
+            #             self.user.dedian = 16000
+            #         elif self.user.yi[0] <= 12:
+            #             self.user.dedian = 24000
+            #         elif self.user.yi[0] >= 13:
+            #             self.user.dedian = 32000
+            #         if self.user.position == self.oya: self.user.dedian = self.user.dedian * 1.5
+            # # self.user.money += int(self.user.dedian) + self.lizhibang * 1000
             self.transfer_money(0, jbd)
 
     def transfer_money(self, rong_player, jibendian):
@@ -1255,6 +1253,7 @@ class GameTable():
         if self.turn !=0: return
         xiangtingshu, MINexp = self.user.hand.chaifen2(self.user.hand.in_hand)
         yxz = MINexp[len(MINexp)]
+        random.shuffle(yxz)
         for pai in yxz:
             if pai in self.yama[14:]:
                 self.yama[self.yama.index(pai)] = self.user.hand.new_tile
