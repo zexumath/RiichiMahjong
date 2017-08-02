@@ -9,10 +9,11 @@ import time
 from Fanzhong import FanZhong, PingHe
 
 class Player(object):
-    def __init__(self):
+    def __init__(self, name='AI'):
         #need to be in Hand class
         #self.mopai = []
         #self.hand = []
+        self.name = name
         self.hand = Hand()
         self.chi = []
         self.peng = []
@@ -74,20 +75,20 @@ class Player(object):
             if tileindex == len(self.hand.in_hand):
                 self.dropped.append(self.hand.new_tile)
                 self.hand.new_tile = None
-                return True
+                return self.dropped[-1]
             else:
                 return False
         else:
             if tileindex == len(self.hand.in_hand):
                 self.dropped.append(self.hand.new_tile)
                 self.hand.new_tile = None
-                return True
+                return self.dropped[-1]
             else:
                 self.dropped.append(self.hand.in_hand[tileindex])
                 self.hand.in_hand[tileindex] = self.hand.new_tile
                 self.hand.in_hand.sort()
                 self.hand.new_tile = None
-                return True
+                return self.dropped[-1]
 
     def gang(self, tileindex):
         if self.riichi > 0:
@@ -889,12 +890,15 @@ class Player(object):
         return True
 
 class AiPlayer(Player):
-    def __init__(self):
-        Player.__init__(self)
+    def __init__(self, name):
+        Player.__init__(self, name)
 
     #ai策略1：随机打出
     def dapai1(self):
-        return self.drop(random.randint(0,len(self.hand.in_hand)))
+        # print self.position
+        # return self.drop(random.randint(0,len(self.hand.in_hand)))
+        # for debug
+        return self.drop(len(self.hand.in_hand))
 
 
 class GameTable():
@@ -907,10 +911,10 @@ class GameTable():
         self.player3 = Player()
         self.player4 = Player()
         '''
-        self.user = Player()
-        self.ai1 = AiPlayer()
-        self.ai2 = AiPlayer()
-        self.ai3 = AiPlayer()
+        self.user = Player('Player')
+        self.ai1 = AiPlayer('AI1')
+        self.ai2 = AiPlayer('AI2')
+        self.ai3 = AiPlayer('AI3')
         self.__create__()
         self.yama = [] # the remaining pai
         self.quan = -1 #0,1,2,3 represent east, north, west, north quan
@@ -926,6 +930,8 @@ class GameTable():
         # self.aidropped = []
 
         self.on_hold_flag = False
+        self.new_drop_tile = None
+        self.table_status = WAIT_FOR_SERVE
 
     def __create__(self):
         for i in range(4):
@@ -986,6 +992,7 @@ class GameTable():
         self.turn = self.oya #draw tiles from oya
         self.setTag = 0 #reset setTag
         self.on_hold_flag = False
+        self.table_status = WAIT_FOR_SERVE
 
     def serve(self):
         #serve tiles for player at position self.turn
@@ -993,7 +1000,7 @@ class GameTable():
         #if len(self.yama) == MIN_TILES_IN_YAMA or self.xun >= MAX_XUN:
         if len(self.yama) == MIN_TILES_IN_YAMA: #要考虑ai摸牌时候流局，改成<=
             self.setTag = END_LIUJU
-            return 0
+            # return 0
         else:
             tmp = self.yama.pop()
             # self.seats[self.turn].hand.new_tile.append(tmp)
@@ -1002,7 +1009,8 @@ class GameTable():
             self.xun = int(self.xun + 1)
             self.seats[self.turn].lingshang = False
             if self.turn !=0: self.on_hold()
-            return tmp
+            self.table_status = WAIT_FOR_DROP
+            # return tmp
 
     def gangserve(self):
         self.seats[self.turn].lingshang = True
@@ -1015,9 +1023,15 @@ class GameTable():
             self.ura[i]  -= 1
         self.seats[self.turn].gangTag = False
 
-    def jiesuan(self, _pai):
+    def jiesuan(self, _pai, turn):
         # TODO: dedian like 8000,12000 etc are readable.
-        self.user.zimo = 1
+        # print _pai
+        # print self.user.hand.in_hand
+        # print turn, self.user.position
+        if turn == self.user.position:
+            self.user.zimo = 1
+        else:
+            self.user.zimo = 0
         self.user.fu, self.user.yi, self.user.fan = self.user.rong(_pai, self.quan, self.oya)
         if self.user.fu == [0, 0]:
             self.user.dedian = 0
@@ -1083,41 +1097,110 @@ class GameTable():
                     elif self.user.yi[0] >= 13:
                         self.user.dedian = 32000
                     if self.user.position == self.oya: self.user.dedian = self.user.dedian * 1.5
-            self.user.money += int(self.user.dedian) + self.lizhibang * 1000
-            self.lizhibang = 0
+            # self.user.money += int(self.user.dedian) + self.lizhibang * 1000
+            self.transfer_money(0, jbd)
+
+    def transfer_money(self, rong_player, jibendian):
+        if self.seats[rong_player].yi[1] !=0:
+            jbd1 = 8000  * self.seats[rong_player].yi[1]
+            jbd2 = jbd1 * 2
+            jbd4 = jbd1 * 4
+            jbd6 = jbd1 * 6
+        elif jibendian < 2000:
+            jbd1 = int(math.ceil(jibendian * 1 / 100.0)) * 100
+            jbd2 = int(math.ceil(jibendian * 2 / 100.0)) * 100
+            jbd4 = int(math.ceil(jibendian * 4 / 100.0)) * 100
+            jbd6 = int(math.ceil(jibendian * 6 / 100.0)) * 100
+        else:
+            if self.seats[rong_player].yi[0] <=5:
+                jbd1 = 2000
+            elif self.seats[rong_player].yi[0]<=7:
+                jbd1 = 3000
+            elif self.seats[rong_player].yi[0]<=10:
+                jbd1 = 4000
+            elif self.seats[rong_player].yi[0]<=12:
+                jbd1 = 6000
+            elif self.seats[rong_player].yi[0]>=13:
+                jbd1 = 8000
+            jbd2 = jbd1 * 2
+            jbd4 = jbd1 * 4
+            jbd6 = jbd1 * 6
+        # print self.seats[rong_player].zimo
+        if self.seats[rong_player].zimo:
+            if self.oya == rong_player:
+                for player in self.seats:
+                    if player.position != rong_player:
+                        player.money -= jbd2
+                    else:
+                        player.dedian = jbd2 * 3
+                        player.money += player.dedian
+            else:
+                for player in self.seats:
+                    if player.position != rong_player:
+                        if player.position == rong_player:
+                            player.money -= jbd2
+                        else:
+                            player.money -= jbd1
+                    else:
+                        player.dedian = jbd2 + jbd1*2
+                        player.money += player.dedian
+        else:
+            if rong_player == self.oya:
+                self.seats[self.turn].money -= jbd6
+                self.seats[rong_player].dedian = jbd6
+                self.seats[rong_player].money += self.seats[rong_player].dedian
+            else:
+                self.seats[self.turn].money -= jbd4
+                self.seats[rong_player].dedian = jbd4
+                self.seats[rong_player].money += self.seats[rong_player].dedian
+
+        self.seats[rong_player].money += 1000 * self.lizhibang
+        self.lizhibang = 0
+        # print self.turn
+        # print rong_player
+        # print self.seats[rong_player].dedian
+        # print jibendian
+        #TODO: not implementing multiple rongs at the same time.
 
     def setComplete(self):
         return self.setTag != 0
 
     def menu_respond(self, button_pressed):
         if button_pressed == 'rong':
-            self.menu_rong(self.user.hand.new_tile)
+            if self.turn == 0:
+                self.menu_rong(self.user.hand.new_tile)
+            elif self.table_status == WAIT_FOR_RESPONSE:
+                self.menu_rong(self.new_drop_tile, self.turn)
+        elif self.table_status == WAIT_FOR_RESPONSE:
+            self.next_step()
         elif button_pressed == 'riichi':
             self.menu_riichi()
         elif button_pressed == 'gang':
             self.menu_gang()
         elif button_pressed == 'analysis':
             self.menu_analysis()
+        elif button_pressed == 'cheat':
+            self.menu_cheat()
 
     def tile_respond(self, tile_pressed):
         if self.user.riichi == WAIT_FOR_RIICHI_PAI:
             # This is a status of waiting for riichi
-            droptmp = self.user.drop(tile_pressed)
-            if droptmp:
+            self.new_drop_tile = self.user.drop(tile_pressed)
+            if self.new_drop_tile:
                 self.user.riichi = self.xun
                 self.tile_dropped_respond()
-                self.serve()
+                # self.serve()
                 # self.tile_ai_drop()
         elif self.user.gangTag == False:
-            droptmp = self.user.drop(tile_pressed)
-            if droptmp:
+            self.new_drop_tile = self.user.drop(tile_pressed)
+            if self.new_drop_tile:
                 self.tile_dropped_respond()
-                self.serve()
+                # self.serve()
                 # self.tile_ai_drop()
         else:
             gangtmp = self.user.gang(tile_pressed)
             if gangtmp:
-                self.tile_dropped_respond()
+                self.tile_gang_respond()
                 self.gangserve()
                 # self.tile_ai_drop()
             else:
@@ -1127,22 +1210,31 @@ class GameTable():
         #print(self.seats[2].hand.new_tile)
         #print(self.seats[3].hand.new_tile)
 
+    def tile_gang_respond(self):
+        raise NotImplementedError
+
     def tile_dropped_respond(self):
-        self.turn +=1
-        self.turn %=4
-        #TODO: Implement the respond of waiting for chi,peng,gang,rong from other players.
+        self.table_status = WAIT_FOR_RESPONSE
+        if self.turn == 0:
+            #TODO: Assume now AI cannot respond to tiles
+            self.next_step()
+            # self.next_step()
+        # self.turn +=1
+        # self.turn %=4
+        # #TODO: Implement the respond of waiting for chi,peng,gang,rong from other players.
+        # self.serve()
 
-    def tile_ai_drop(self):
-        if self.turn != self.user.position:
-            self.seats[self.turn].dapai1()
-            self.tile_dropped_respond()
-            self.serve() #TODO: Poosible for user to mopai twice consecutively.
+    # def tile_ai_drop(self):
+        # if self.turn != self.user.position:
+            # self.seats[self.turn].dapai1()
+            # self.tile_dropped_respond()
 
-    def menu_rong(self, _pai):
+    def menu_rong(self, _pai, turn=0):
         self.user.rongTag = True
         self.user.analysisTag = False
         self.setTag = END_RONG
-        self.jiesuan(_pai)
+        self.lastrongplayer = 0 # currently only allowing player rong.
+        self.jiesuan(_pai, turn)
 
     def menu_riichi(self):
         if self.user.riichi == 0:
@@ -1160,6 +1252,16 @@ class GameTable():
         self.user.rongTag = False
         self.user.gangTag = False
 
+    def menu_cheat(self):
+        if self.turn !=0: return
+        xiangtingshu, MINexp = self.user.hand.chaifen2(self.user.hand.in_hand)
+        yxz = MINexp[len(MINexp)]
+        for pai in yxz:
+            if pai in self.yama[14:]:
+                self.yama[self.yama.index(pai)] = self.user.hand.new_tile
+                self.user.hand.new_tile = pai
+                return
+
     def tagclear(self):
         self.user.rongTag = False
         self.user.gangTag = False
@@ -1167,9 +1269,23 @@ class GameTable():
     def on_hold(self):
         self.on_hold_flag = True
 
-    def next_step(self):
+    def off_hold(self):
         self.on_hold_flag = False
-        if self.turn != 0 :
-            self.seats[self.turn].dapai1()
-            self.tile_dropped_respond()
+
+    def next_step(self):
+        if self.table_status == WAIT_FOR_SERVE:
+            self.turn +=1
+            self.turn %=4
             self.serve()
+            self.table_status = WAIT_FOR_DROP
+        elif self.table_status == WAIT_FOR_DROP:
+            if self.turn != 0 :
+                self.new_drop_tile = self.seats[self.turn].dapai1()
+                self.table_status = WAIT_FOR_RESPONSE
+            else:
+                # Wait for player decision. Implemented by using other methods.
+                pass
+        elif self.table_status == WAIT_FOR_RESPONSE:
+            self.table_status = WAIT_FOR_SERVE
+            self.next_step()
+

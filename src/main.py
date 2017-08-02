@@ -29,10 +29,8 @@ class RiichiMahjong:
     def on_event(self,event):
         if event.type == QUIT:
             exit()
-        if event.type == MOUSEBUTTONDOWN:
-            if self._game.on_hold_flag:
-                self._game.next_step()
-            elif self._game.setComplete():
+        elif event.type == MOUSEBUTTONDOWN:
+            if self._game.setComplete():
                 self._game.newset()
                 self._game.serve()
                 self._screen.clear()
@@ -43,10 +41,14 @@ class RiichiMahjong:
                 tile_pressed   = self._screen.tilePressed(event)
                 if  button_pressed != None:
                     self._game.menu_respond(button_pressed)
+                elif self._game.turn!=0:
+                    self._game.next_step()
                 elif tile_pressed != None:
                     self._game.tile_respond(tile_pressed)
                 else:
                     self._game.tagclear()
+        else:
+            pass
 
     def on_render(self):
         self._screen.show()

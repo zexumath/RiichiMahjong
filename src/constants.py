@@ -1,7 +1,14 @@
+# -*- coding: utf-8 -*-
+import random
 
 NUM_OF_SET_PER_QUAN = 4
 
-OYA_START = 1
+OYA_START = random.randint(0,3)
+
+# Constants for table status
+WAIT_FOR_SERVE = 1
+WAIT_FOR_DROP  = 2
+WAIT_FOR_RESPONSE = 3
 
 WAIT_FOR_RIICHI_PAI = -1
 END_RONG  = 1
@@ -25,7 +32,7 @@ MAX_XUN = 19
 
 HALF_TRANSPARENT = 128
 ONE_FOURTH_TRANSPARENT = 192
-
+NO_TRANSPARENT = 255
 #--------------- Graphics parameters ----------------#
 
 WINDOW_WIDTH  = 1000
@@ -52,14 +59,19 @@ TILE_SIZE_SMALL = (36, 56)
 TILE_SIZE_SMALL_BLANK = 8
 
 # Position of the table status
-STAT_POS = (100,100)
+# STAT_POS = (100,100)
 
-# Position of the Yama
-YAMA_POSx = MIDDLE_OF_WINDOW[0] - 4 * TILE_SIZE_SMALL[0]
-YAMA_POSy = MIDDLE_OF_WINDOW[1] - TILE_SIZE_SMALL[1]
-
+# Position of the table status
 STAT_REGION_WIDTH  = 12 * TILE_SIZE_SMALL[0]
 STAT_REGION_HEIGHT = 8 * TILE_SIZE_SMALL[0]
+STAT_REGION_POS = ( (WINDOW_WIDTH  - STAT_REGION_WIDTH)  //2,
+                    (WINDOW_HEIGHT - STAT_REGION_HEIGHT) //2 )
+
+# Position of the Yama
+YAMA_POSx = STAT_REGION_WIDTH //2 - 4 * TILE_SIZE_SMALL[0]
+YAMA_POSy = STAT_REGION_HEIGHT - 2 * TILE_SIZE_SMALL[1]
+YAMA_NUM_LEFT_POS = YAMA_POSx - 30
+
 
 # Position of the analysis
 ANALYSIS_SIZE = (400, 500)
@@ -176,3 +188,7 @@ MENU_GAP = 2
 WHITE = ( 255, 255, 255 )
 BLACK = ( 0, 0, 0 )
 GRAY  = ( 200, 200, 200 )
+
+
+# Mahjong related
+DONG_XI_NAN_BEI = (u'東', u'西', u'南', u'北')
