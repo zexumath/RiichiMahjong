@@ -1022,7 +1022,6 @@ class GameTable():
             self.dora[i] -= 1
             self.ura[i]  -= 1
         self.seats[self.turn].gangTag = False
-
     def jiesuan(self, _pai, turn):
         # TODO: dedian like 8000,12000 etc are readable.
         # print _pai
