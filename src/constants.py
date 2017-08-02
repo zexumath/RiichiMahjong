@@ -180,7 +180,7 @@ FONT_SIZE = 24
 FONT_SIZE_MENU = 32
 
 # Menu position is determined by the fontsize of menu now.
-MENU_POS = (HAND_POSx + FONT_SIZE_MENU/2 , HAND_POSy - FONT_SIZE_MENU + FONT_SIZE_MENU/2 )
+MENU_POS = (HAND_POSx  , HAND_POSy - FONT_SIZE_MENU )
 MENU_POSx , MENU_POSy = MENU_POS
 MENU_GAP = 2
 

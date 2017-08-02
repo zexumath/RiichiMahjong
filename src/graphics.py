@@ -4,35 +4,40 @@ import pygame
 import numpy as np
 from constants import *
 
-class Button(object):
-    def __init__(self, image_filename, position):
+class Button(pygame.sprite.DirtySprite):
 
-        self.position = position
-        self.canpress = True
+    def __init__(self, image_filename, position):
+        """
+        This class generates one single rectangle showing one menu button.
+        :param image_filename: load button image.
+        :param position: the top-left corner of the menu button.
+        """
+
+        pygame.sprite.DirtySprite.__init__(self)
         if type(image_filename) == type(''):
             self.image = pygame.image.load(image_filename)
         else:
             self.image = image_filename
 
-    def render(self, surface):
-        x, y = self.position
-        w, h = self.image.get_size()
-        x -= w / 2
-        y -= h / 2
-        surface.blit(self.image, (x, y))
+        self.rect = self.image.get_rect()
+        self.rect.x, self.rect.y = position
+        self.canpress = True
+
+    # def render(self, surface):
+        # x, y = self.position
+        # w, h = self.image.get_size()
+        # x -= w / 2
+        # y -= h / 2
+        # surface.blit(self.image, (x, y))
 
     def is_over(self, point):
         # 如果point在自身范围内，返回True
         point_x, point_y = point
-        x, y = self.position
+        x, y = self.rect.x, self.rect.y
         w, h = self.image.get_size()
-        x -= w / 2
-        y -= h / 2
-
-        in_x = point_x >= x and point_x < x + w
-        in_y = point_y >= y and point_y < y + h
+        in_x = x <= point_x < x + w
+        in_y = y <= point_y < y + h
         return in_x and in_y
-
 
 class Screen(object):
     """
@@ -45,8 +50,8 @@ class Screen(object):
         self.font = pygame.font.Font('../res/simsun.ttc', FONT_SIZE)
         self.initMenu()
         self.initTiles()
-        self.allSprite = pygame.sprite.OrderedUpdates()
 
+        self.allSprite = pygame.sprite.OrderedUpdates()
         self.statsprite = StatSprite()
         self.jiesuansprite = JiesuanSprite()
         self.analysissprite = AnalysisSprite()
@@ -128,7 +133,7 @@ class Screen(object):
 
     def genMenu(self):
         for button in self.menu.values():
-            button.render(self._display_surf)
+            button.add(self.allSprite)
 
     def buttonPressed(self, event):
         button_pressed = None
