@@ -41,6 +41,7 @@ class Player(object):
         self.lingshang = False
         self.tingflag = False
         self.isclose = True
+        self.kaimen = False
 
     def newset_init(self):
         #need to be in Hand class
@@ -69,6 +70,7 @@ class Player(object):
         self.gangTag = False
         self.analysisTag = False
         self.isclose = True
+        self.kaimen = False
 
     def drop(self, tileindex):
         if self.riichi > 0:
@@ -78,6 +80,12 @@ class Player(object):
                 return self.dropped[-1]
             else:
                 return False
+        elif self.kaimen:
+            self.dropped.append(self.hand.in_hand[tileindex])
+            self.hand.in_hand.remove(self.hand.in_hand[tileindex])
+            self.hand.in_hand.sort()
+            self.kaimen = False
+            return self.dropped[-1]
         else:
             if tileindex == len(self.hand.in_hand):
                 self.dropped.append(self.hand.new_tile)
@@ -136,11 +144,20 @@ class Player(object):
         else:
             return False
 
-    def chi(self, chipai):
+    def chipai(self, chipai):
         raise NotImplementedError
 
-    def peng(self, pengpai):
-        raise NotImplementedError
+    def pengpai(self, pengpai):
+        if self.riichi > 0: 
+            return False
+        else:
+            self.hand.fulu.append([pengpai] * 3)
+            self.hand.in_hand.append(pengpai)
+            self.hand.in_hand.remove(pengpai)
+            self.hand.in_hand.remove(pengpai)
+            self.hand.in_hand.remove(pengpai)
+            self.hand.in_hand.sort()
+            return True
 
     def calcfu(self, quan, oya):
         # TODO: Move all constants into constants.py
@@ -1134,7 +1151,7 @@ class GameTable():
             else:
                 for player in self.seats:
                     if player.position != rong_player:
-                        if player.position == rong_player:
+                        if player.position == self.oya:
                             player.money -= jbd2
                         else:
                             player.money -= jbd1
@@ -1162,13 +1179,27 @@ class GameTable():
     def setComplete(self):
         return self.setTag != 0
 
+    def waitingResponse(self):
+        return self.table_status == WAIT_FOR_RESPONSE
+        
+    def action_respond(self, button_pressed):
+        #TODO: not implementing chi, gang
+        if button_pressed == 'peng':
+            self.menu_peng(self.new_drop_tile) #TODOXU
+            self.table_status = WAIT_FOR_SERVE
+        elif button_pressed == 'cancel':
+            self.table_status = WAIT_FOR_SERVE
+        elif button_pressed == 'rong':
+            self.menu_rong(self.new_drop_tile, self.turn) 
+            #TODO: implement for jiesuan when not closed
+
     def menu_respond(self, button_pressed):
         if button_pressed == 'rong':
             if self.turn == 0:
                 self.menu_rong(self.user.hand.new_tile)
-            elif self.table_status == WAIT_FOR_RESPONSE:
+            elif self.table_status == NO_RESPONSE:
                 self.menu_rong(self.new_drop_tile, self.turn)
-        elif self.table_status == WAIT_FOR_RESPONSE:
+        elif self.table_status == NO_RESPONSE:
             self.next_step()
         elif button_pressed == 'riichi':
             self.menu_riichi()
@@ -1211,7 +1242,10 @@ class GameTable():
         raise NotImplementedError
 
     def tile_dropped_respond(self):
-        self.table_status = WAIT_FOR_RESPONSE
+        if Util.keyipeng(self.user.hand.in_hand, self.new_drop_tile) and self.user.riichi == 0 and self.turn != 0:    
+            self.table_status = WAIT_FOR_RESPONSE
+        else:
+            self.table_status = NO_RESPONSE
         if self.turn == 0:
             #TODO: Assume now AI cannot respond to tiles
             self.next_step()
@@ -1260,6 +1294,12 @@ class GameTable():
                 self.user.hand.new_tile = pai
                 return
 
+    def menu_peng(self, _pai, turn=0): #TODOXU
+        self.user.kaimen = True
+        self.user.pengpai(_pai) # currently only allowing user peng.
+        self.seats[self.turn].dropped.pop()
+        self.turn = 0
+
     def tagclear(self):
         self.user.rongTag = False
         self.user.gangTag = False
@@ -1279,11 +1319,11 @@ class GameTable():
         elif self.table_status == WAIT_FOR_DROP:
             if self.turn != 0 :
                 self.new_drop_tile = self.seats[self.turn].dapai1()
-                self.table_status = WAIT_FOR_RESPONSE
+                self.tile_dropped_respond()
             else:
                 # Wait for player decision. Implemented by using other methods.
                 pass
-        elif self.table_status == WAIT_FOR_RESPONSE:
+        elif self.table_status == NO_RESPONSE:
             self.table_status = WAIT_FOR_SERVE
             self.next_step()
 

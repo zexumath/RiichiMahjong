@@ -86,6 +86,8 @@ class Screen(object):
         self.menu['riichi']      = Button(font.render(u'立', True, BLACK, GRAY), (MENU_POSx + _h, MENU_POSy ))
         self.menu['gang']        = Button(font.render(u'杠', True, BLACK, GRAY), (MENU_POSx + _h * 2, MENU_POSy ))
         self.menu['analysis']    = Button(font.render(u'理', True, BLACK, GRAY), (MENU_POSx + _h * 3, MENU_POSy ))
+        self.menu['peng']        = Button(font.render(u'碰', True, BLACK, GRAY), (MENU_POSx , MENU_POSy - _h))
+        self.menu['cancel']      = Button(font.render(u'消', True, BLACK, GRAY), (MENU_POSx + _h, MENU_POSy - _h))
 
     def initTiles(self):
         self.tiles = {}

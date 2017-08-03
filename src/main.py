@@ -38,7 +38,9 @@ class RiichiMahjong:
             else:
                 button_pressed = self._screen.buttonPressed(event)
                 tile_pressed   = self._screen.tilePressed(event)
-                if  button_pressed != None:
+                if self._game.waitingResponse():
+                    self._game.action_respond(button_pressed)
+                elif button_pressed != None:
                     self._game.menu_respond(button_pressed)
                 elif self._game.turn!=0:
                     self._game.next_step()
