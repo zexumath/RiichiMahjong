@@ -148,7 +148,7 @@ class Player(object):
         raise NotImplementedError
 
     def pengpai(self, pengpai):
-        if self.riichi > 0: 
+        if self.riichi > 0:
             return False
         else:
             self.hand.fulu.append([pengpai] * 3)
@@ -1023,7 +1023,10 @@ class GameTable():
             # self.seats[self.turn].hand.new_tile.append(tmp)
 
             self.seats[self.turn].hand.new_tile = tmp
-            self.xun = int(self.xun + 1)
+            # self.xun = int(self.xun + 1)
+            if self.turn == self.oya:
+                self.xun += 1
+
             self.seats[self.turn].lingshang = False
             if self.turn !=0: self.on_hold()
             self.table_status = WAIT_FOR_DROP
@@ -1181,7 +1184,7 @@ class GameTable():
 
     def waitingResponse(self):
         return self.table_status == WAIT_FOR_RESPONSE
-        
+
     def action_respond(self, button_pressed):
         #TODO: not implementing chi, gang
         if button_pressed == 'peng':
@@ -1190,7 +1193,7 @@ class GameTable():
         elif button_pressed == 'cancel':
             self.table_status = WAIT_FOR_SERVE
         elif button_pressed == 'rong':
-            self.menu_rong(self.new_drop_tile, self.turn) 
+            self.menu_rong(self.new_drop_tile, self.turn)
             #TODO: implement for jiesuan when not closed
 
     def menu_respond(self, button_pressed):
@@ -1242,7 +1245,7 @@ class GameTable():
         raise NotImplementedError
 
     def tile_dropped_respond(self):
-        if Util.keyipeng(self.user.hand.in_hand, self.new_drop_tile) and self.user.riichi == 0 and self.turn != 0:    
+        if Util.keyipeng(self.user.hand.in_hand, self.new_drop_tile) and self.user.riichi == 0 and self.turn != 0:
             self.table_status = WAIT_FOR_RESPONSE
         else:
             self.table_status = NO_RESPONSE
