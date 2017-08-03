@@ -9,10 +9,11 @@ import time
 from Fanzhong import FanZhong, PingHe
 
 class Player(object):
-    def __init__(self):
+    def __init__(self, name='AI'):
         #need to be in Hand class
         #self.mopai = []
         #self.hand = []
+        self.name = name
         self.hand = Hand()
         self.chi = []
         self.peng = []
@@ -889,13 +890,15 @@ class Player(object):
         return True
 
 class AiPlayer(Player):
-    def __init__(self):
-        Player.__init__(self)
+    def __init__(self, name):
+        Player.__init__(self, name)
 
     #ai策略1：随机打出
     def dapai1(self):
         # print self.position
-        return self.drop(random.randint(0,len(self.hand.in_hand)))
+        # return self.drop(random.randint(0,len(self.hand.in_hand)))
+        # for debug
+        return self.drop(len(self.hand.in_hand))
 
 
 class GameTable():
@@ -908,10 +911,10 @@ class GameTable():
         self.player3 = Player()
         self.player4 = Player()
         '''
-        self.user = Player()
-        self.ai1 = AiPlayer()
-        self.ai2 = AiPlayer()
-        self.ai3 = AiPlayer()
+        self.user = Player('Player')
+        self.ai1 = AiPlayer('AI1')
+        self.ai2 = AiPlayer('AI2')
+        self.ai3 = AiPlayer('AI3')
         self.__create__()
         self.yama = [] # the remaining pai
         self.quan = -1 #0,1,2,3 represent east, north, west, north quan
@@ -1022,8 +1025,9 @@ class GameTable():
 
     def jiesuan(self, _pai, turn):
         # TODO: dedian like 8000,12000 etc are readable.
-        print _pai
-        print self.user.hand.in_hand
+        # print _pai
+        # print self.user.hand.in_hand
+        # print turn, self.user.position
         if turn == self.user.position:
             self.user.zimo = 1
         else:
@@ -1056,12 +1060,9 @@ class GameTable():
                 if self.xun - self.user.riichi == 1 and self.user.riichi > 0:
                     self.user.yi[0] += 1
                     self.user.fan[0] += [u'一發']
-                tmpk = 0
                 numdora = 0
                 for dora in self.dora:
                     numdora += tmp.count(Util.nextpai(self.yama[dora]))
-                    self.ura.append(dora - 1)
-                    tmpk += 2
                 self.user.yi[0] += numdora
                 if numdora != 0: self.user.fan[0] += ['Dora ' + str(numdora)]
                 if self.user.riichi > 0:
@@ -1074,28 +1075,27 @@ class GameTable():
                     self.user.fu[0] = int(math.ceil(self.user.fu[0] / 10.) * 10)
                 self.user.dedian = 0
                 jbd = self.user.fu[0] * 4 * pow(2, self.user.yi[0])
-                if self.user.yi[0] == 0:
-                    self.user.dedian = -8000
-                elif jbd < 2000:
-                    if self.user.position == self.oya:
-                        self.user.dedian = math.ceil(jbd * 6 / 100) * 100
-                    else:
-                        self.user.dedian = math.ceil(jbd * 4 / 100) * 100
-                else:
-                    if self.user.yi[0] <= 5:
-                        self.user.dedian = 8000
-                    elif self.user.yi[0] <= 7:
-                        self.user.dedian = 12000
-                    elif self.user.yi[0] <= 10:
-                        self.user.dedian = 16000
-                    elif self.user.yi[0] <= 12:
-                        self.user.dedian = 24000
-                    elif self.user.yi[0] >= 13:
-                        self.user.dedian = 32000
-                    if self.user.position == self.oya: self.user.dedian = self.user.dedian * 1.5
-            # self.user.money += int(self.user.dedian) + self.lizhibang * 1000
+            #     if self.user.yi[0] == 0:
+            #         self.user.dedian = -8000
+            #     elif jbd < 2000:
+            #         if self.user.position == self.oya:
+            #             self.user.dedian = math.ceil(jbd * 6 / 100) * 100
+            #         else:
+            #             self.user.dedian = math.ceil(jbd * 4 / 100) * 100
+            #     else:
+            #         if self.user.yi[0] <= 5:
+            #             self.user.dedian = 8000
+            #         elif self.user.yi[0] <= 7:
+            #             self.user.dedian = 12000
+            #         elif self.user.yi[0] <= 10:
+            #             self.user.dedian = 16000
+            #         elif self.user.yi[0] <= 12:
+            #             self.user.dedian = 24000
+            #         elif self.user.yi[0] >= 13:
+            #             self.user.dedian = 32000
+            #         if self.user.position == self.oya: self.user.dedian = self.user.dedian * 1.5
+            # # self.user.money += int(self.user.dedian) + self.lizhibang * 1000
             self.transfer_money(0, jbd)
-            self.lizhibang = 0
 
     def transfer_money(self, rong_player, jibendian):
         if self.seats[rong_player].yi[1] !=0:
@@ -1104,10 +1104,10 @@ class GameTable():
             jbd4 = jbd1 * 4
             jbd6 = jbd1 * 6
         elif jibendian < 2000:
-            jbd1 = math.ceil(jibendian * 1 / 100) * 100
-            jbd2 = math.ceil(jibendian * 2 / 100) * 100
-            jbd4 = math.ceil(jibendian * 4 / 100) * 100
-            jbd6 = math.ceil(jibendian * 6 / 100) * 100
+            jbd1 = int(math.ceil(jibendian * 1 / 100.0)) * 100
+            jbd2 = int(math.ceil(jibendian * 2 / 100.0)) * 100
+            jbd4 = int(math.ceil(jibendian * 4 / 100.0)) * 100
+            jbd6 = int(math.ceil(jibendian * 6 / 100.0)) * 100
         else:
             if self.seats[rong_player].yi[0] <=5:
                 jbd1 = 2000
@@ -1122,14 +1122,14 @@ class GameTable():
             jbd2 = jbd1 * 2
             jbd4 = jbd1 * 4
             jbd6 = jbd1 * 6
-
+        # print self.seats[rong_player].zimo
         if self.seats[rong_player].zimo:
             if self.oya == rong_player:
                 for player in self.seats:
                     if player.position != rong_player:
                         player.money -= jbd2
                     else:
-                        player.dedian = jbd2 * 3 + self.lizhibang * 1000
+                        player.dedian = jbd2 * 3
                         player.money += player.dedian
             else:
                 for player in self.seats:
@@ -1139,22 +1139,24 @@ class GameTable():
                         else:
                             player.money -= jbd1
                     else:
-                        player.dedian = jbd2 + jbd1*2 + self.lizhibang * 1000
+                        player.dedian = jbd2 + jbd1*2
                         player.money += player.dedian
         else:
             if rong_player == self.oya:
                 self.seats[self.turn].money -= jbd6
-                self.seats[rong_player].dedian = jbd6 + self.lizhibang * 1000
+                self.seats[rong_player].dedian = jbd6
                 self.seats[rong_player].money += self.seats[rong_player].dedian
             else:
                 self.seats[self.turn].money -= jbd4
-                self.seats[rong_player].dedian = jbd4 + self.lizhibang * 1000
+                self.seats[rong_player].dedian = jbd4
                 self.seats[rong_player].money += self.seats[rong_player].dedian
 
-        print self.turn
-        print rong_player
-        print self.seats[rong_player].dedian
-        print jibendian
+        self.seats[rong_player].money += 1000 * self.lizhibang
+        self.lizhibang = 0
+        # print self.turn
+        # print rong_player
+        # print self.seats[rong_player].dedian
+        # print jibendian
         #TODO: not implementing multiple rongs at the same time.
 
     def setComplete(self):
@@ -1174,6 +1176,8 @@ class GameTable():
             self.menu_gang()
         elif button_pressed == 'analysis':
             self.menu_analysis()
+        elif button_pressed == 'cheat':
+            self.menu_cheat()
 
     def tile_respond(self, tile_pressed):
         if self.user.riichi == WAIT_FOR_RIICHI_PAI:
@@ -1226,6 +1230,7 @@ class GameTable():
         self.user.rongTag = True
         self.user.analysisTag = False
         self.setTag = END_RONG
+        self.lastrongplayer = 0 # currently only allowing player rong.
         self.jiesuan(_pai, turn)
 
     def menu_riichi(self):
@@ -1243,6 +1248,17 @@ class GameTable():
     def menu_clear(self):
         self.user.rongTag = False
         self.user.gangTag = False
+
+    def menu_cheat(self):
+        if self.turn !=0: return
+        xiangtingshu, MINexp = self.user.hand.chaifen2(self.user.hand.in_hand)
+        yxz = MINexp[len(MINexp)]
+        random.shuffle(yxz)
+        for pai in yxz:
+            if pai in self.yama[14:]:
+                self.yama[self.yama.index(pai)] = self.user.hand.new_tile
+                self.user.hand.new_tile = pai
+                return
 
     def tagclear(self):
         self.user.rongTag = False

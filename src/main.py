@@ -18,7 +18,6 @@ class RiichiMahjong:
 
     def on_init(self):
         pygame.init()
-        # self._game = mahjong.MahjongGame()
         self._game = GameTable()
         self._screen = graphics.Screen(self._game)
         self._running = True
@@ -47,6 +46,9 @@ class RiichiMahjong:
                     self._game.tile_respond(tile_pressed)
                 else:
                     self._game.tagclear()
+        elif event.type == KEYDOWN:
+            if event.key == K_RCTRL or event.key == K_LCTRL:
+                self._game.next_step()
         else:
             pass
 

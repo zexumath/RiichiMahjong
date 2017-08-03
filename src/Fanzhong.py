@@ -169,3 +169,49 @@ class YiQi(FanZhong):
                 return True
 
         return False
+
+
+class YiBeiKou(FanZhong):
+    fanshu = [[0, 1], [0, 0]]
+    chinese_name = u'一盃口'
+
+    @classmethod
+    def judge(cls, _hand, _expression, is_close):
+        '''
+        :param _hand:
+        :param _expression: We assume that the _expression has already been re-formatted as a dictionary with 'kezi',
+        'shunzi' and 'quetou'. Otherwise it will lead to repeat of coding.
+        :return:
+        '''
+        if is_close:
+            if len(_expression['shunzi']) >= 2:
+                shunzi_start = [shunzi[0] for shunzi in _expression['shunzi']]
+                if len(set(shunzi_start)) < len(shunzi_start):
+                    if len(shunzi_start) == 4:
+                        if shunzi_start[0] == shunzi_start[1] and shunzi_start[2] == shunzi_start[3]:
+                            return False
+
+                    return True
+
+        return False
+
+
+class DaSiXi(FanZhong):
+    fanshu = [[2, 0], [2, 0]]
+    chinese_name = u'大四喜'
+
+    @classmethod
+    def judge(cls, _hand, _expression):
+        '''
+        :param _hand:
+        :param _expression: We assume that the _expression has already been re-formatted as a dictionary with 'kezi',
+        'shunzi' and 'quetou'. Otherwise it will lead to repeat of coding.
+        :return:
+        '''
+        if len(_expression['kezi']) == 4:
+            kezi_start = [kezi[0] for kezi in _expression['kezi']]
+            if set(kezi_start) == {41, 42, 43, 44}:
+                return True
+
+        return False
+

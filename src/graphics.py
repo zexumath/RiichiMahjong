@@ -4,35 +4,40 @@ import pygame
 import numpy as np
 from constants import *
 
-class Botton(object):
-    def __init__(self, image_filename, position):
+class Button(pygame.sprite.DirtySprite):
 
-        self.position = position
-        self.canpress = True
+    def __init__(self, image_filename, position):
+        """
+        This class generates one single rectangle showing one menu button.
+        :param image_filename: load button image.
+        :param position: the top-left corner of the menu button.
+        """
+
+        pygame.sprite.DirtySprite.__init__(self)
         if type(image_filename) == type(''):
             self.image = pygame.image.load(image_filename)
         else:
             self.image = image_filename
 
-    def render(self, surface):
-        x, y = self.position
-        w, h = self.image.get_size()
-        x -= w / 2
-        y -= h / 2
-        surface.blit(self.image, (x, y))
+        self.rect = self.image.get_rect()
+        self.rect.x, self.rect.y = position
+        self.canpress = True
+
+    # def render(self, surface):
+        # x, y = self.position
+        # w, h = self.image.get_size()
+        # x -= w / 2
+        # y -= h / 2
+        # surface.blit(self.image, (x, y))
 
     def is_over(self, point):
         # 如果point在自身范围内，返回True
         point_x, point_y = point
-        x, y = self.position
+        x, y = self.rect.x, self.rect.y
         w, h = self.image.get_size()
-        x -= w / 2
-        y -= h / 2
-
-        in_x = point_x >= x and point_x < x + w
-        in_y = point_y >= y and point_y < y + h
+        in_x = x <= point_x < x + w
+        in_y = y <= point_y < y + h
         return in_x and in_y
-
 
 class Screen(object):
     """
@@ -45,10 +50,11 @@ class Screen(object):
         self.font = pygame.font.Font('../res/simsun.ttc', FONT_SIZE)
         self.initMenu()
         self.initTiles()
-        self.allSprite = pygame.sprite.OrderedUpdates()
 
-        self.jiesuansprite = Jiesuan()
-        self.analysissprite = Analysis()
+        self.allSprite = pygame.sprite.OrderedUpdates()
+        self.statsprite = StatSprite()
+        self.jiesuansprite = JiesuanSprite()
+        self.analysissprite = AnalysisSprite()
         self.playerhandsprite = HandSprite()
         self.playerdropsprite = DropSprite()
         self.all_hand_sprite = [self.playerhandsprite]
@@ -61,7 +67,7 @@ class Screen(object):
         self._display_surf.fill(WHITE)
         self.genStat()
         self.genMenu()
-        self.genYama14()
+        # self.genYama14()
         self.genPlayer()
         self.genAI()
         self.genAnalysis()
@@ -75,10 +81,11 @@ class Screen(object):
         _h = FONT_SIZE_MENU  + MENU_GAP
 
         self.menu = {}
-        self.menu['rong']        = Botton(font.render(u'和', True, BLACK, GRAY), (MENU_POSx , MENU_POSy ))
-        self.menu['riichi']      = Botton(font.render(u'立', True, BLACK, GRAY), (MENU_POSx + _h, MENU_POSy ))
-        self.menu['gang']        = Botton(font.render(u'杠', True, BLACK, GRAY), (MENU_POSx + _h * 2, MENU_POSy ))
-        self.menu['analysis']    = Botton(font.render(u'理', True, BLACK, GRAY), (MENU_POSx + _h * 3, MENU_POSy ))
+        self.menu['cheat']       = Button(font.render(u'弊', True, BLACK, GRAY), (MENU_POSx - _h, MENU_POSy))
+        self.menu['rong']        = Button(font.render(u'和', True, BLACK, GRAY), (MENU_POSx , MENU_POSy ))
+        self.menu['riichi']      = Button(font.render(u'立', True, BLACK, GRAY), (MENU_POSx + _h, MENU_POSy ))
+        self.menu['gang']        = Button(font.render(u'杠', True, BLACK, GRAY), (MENU_POSx + _h * 2, MENU_POSy ))
+        self.menu['analysis']    = Button(font.render(u'理', True, BLACK, GRAY), (MENU_POSx + _h * 3, MENU_POSy ))
 
     def initTiles(self):
         self.tiles = {}
@@ -126,7 +133,7 @@ class Screen(object):
 
     def genMenu(self):
         for button in self.menu.values():
-            button.render(self._display_surf)
+            button.add(self.allSprite)
 
     def buttonPressed(self, event):
         button_pressed = None
@@ -151,44 +158,46 @@ class Screen(object):
         return tile_pressed
 
     def genStat(self):
-        changkuang = ''
-        tmp = self._game.quan % NUM_OF_SET_PER_QUAN
-        if tmp == 0:
-            changkuang += u'東'
-        elif tmp == 1:
-            changkuang += u'南'
-        elif tmp == 2:
-            changkuang += u'西'
-        else:
-            changkuang += u'北'
-        changkuang += str(self._game.ju + 1) + u'局0本场'
-        dianshu = u'玩家点数' + str(self._game.user.money)
-        ck = self.font.render(changkuang, True, BLACK)
-        ds = self.font.render(dianshu   , True, BLACK)
-        h_ck = ck.get_height()
-        self._display_surf.blit(ck, STAT_POS )
-        self._display_surf.blit(ds, (STAT_POS[0], STAT_POS[1] + h_ck) )
+        # changkuang = ''
+        # tmp = self._game.quan % NUM_OF_SET_PER_QUAN
+        # if tmp == 0:
+            # changkuang += u'東'
+        # elif tmp == 1:
+            # changkuang += u'南'
+        # elif tmp == 2:
+            # changkuang += u'西'
+        # else:
+            # changkuang += u'北'
+        # changkuang += str(self._game.ju + 1) + u'局0本场'
+        # dianshu = u'玩家点数' + str(self._game.user.money)
+        # ck = self.font.render(changkuang, True, BLACK)
+        # ds = self.font.render(dianshu   , True, BLACK)
+        # h_ck = ck.get_height()
+        # self._display_surf.blit(ck, STAT_POS )
+        # self._display_surf.blit(ds, (STAT_POS[0], STAT_POS[1] + h_ck) )
+        self.statsprite.update( (STAT_REGION_WIDTH, STAT_REGION_HEIGHT), self._game, self.font, self.tiles_small)
+        self.statsprite.add(self.allSprite)
 
-    def genYama14(self):
-        tile_backside = self.rotateTile(self.tiles_small[4][0], 180)
-        dora_number = len(self._game.dora)
-        for ind in range(6,-1,-1):
-            self._display_surf.blit(tile_backside, \
-                                    ( YAMA_POSx + ind * TILE_SIZE_SMALL[0], YAMA_POSy + TILE_SIZE_SMALL_BLANK ) )
-            if 5 - dora_number<= ind and ind <=4 :
-                pai_tmp = self._game.yama[self._game.dora[4 - ind]]
-                m, n = pai_tmp //10, pai_tmp % 10
-                self._display_surf.blit( self.rotateTile(self.tiles_small[m][n],180), \
-                                        ( YAMA_POSx + ind * TILE_SIZE_SMALL[0], YAMA_POSy ) )
-                if self._game.setTag == True:
-                    pai_tmp = self._game.yama[self._game.ura[4 - ind]]
-                    m, n = pai_tmp // 10, pai_tmp % 10
-                    self._display_surf.blit(self.rotateTile(self.tiles_small[m][n],180),
-                                            (YAMA_POSx + ind * TILE_SIZE_SMALL[0], YAMA_POSy + TILE_SIZE_SMALL[1] ) )
+    # def genYama14(self):
+        # tile_backside = self.rotateTile(self.tiles_small[4][0], 180)
+        # dora_number = len(self._game.dora)
+        # for ind in range(6,-1,-1):
+            # self._display_surf.blit(tile_backside, \
+                                    # ( YAMA_POSx + ind * TILE_SIZE_SMALL[0], YAMA_POSy + TILE_SIZE_SMALL_BLANK ) )
+            # if 5 - dora_number<= ind and ind <=4 :
+                # pai_tmp = self._game.yama[self._game.dora[4 - ind]]
+                # m, n = pai_tmp //10, pai_tmp % 10
+                # self._display_surf.blit( self.rotateTile(self.tiles_small[m][n],180), \
+                                        # ( YAMA_POSx + ind * TILE_SIZE_SMALL[0], YAMA_POSy ) )
+                # if self._game.setTag == True:
+                    # pai_tmp = self._game.yama[self._game.ura[4 - ind]]
+                    # m, n = pai_tmp // 10, pai_tmp % 10
+                    # self._display_surf.blit(self.rotateTile(self.tiles_small[m][n],180),
+                                            # (YAMA_POSx + ind * TILE_SIZE_SMALL[0], YAMA_POSy + TILE_SIZE_SMALL[1] ) )
 
-            else:
-                self._display_surf.blit( tile_backside, \
-                                        ( YAMA_POSx + ind * TILE_SIZE_SMALL[0], YAMA_POSy ) )
+            # else:
+                # self._display_surf.blit( tile_backside, \
+                                        # ( YAMA_POSx + ind * TILE_SIZE_SMALL[0], YAMA_POSy ) )
 
     def genPlayer(self):
         # _hand = self._game.user.hand.in_hand
@@ -295,29 +304,6 @@ class Screen(object):
             self.analysissprite.add(self.allSprite)
         else:
             self.analysissprite.remove(self.allSprite)
-    # def genJiesuan(self):
-        # if self._game.setTag == END_RONG:
-            # font = pygame.font.Font('../res/simsun.ttc', JIESUAN_FONT)
-            # index = 1
-            # if self._game.user.yi[1] == 0:
-                # index = 0
-                # ptstr = str(self._game.user.fu[0]) + u'符' + str(self._game.user.yi[0]) + u'番' + str(int(self._game.user.dedian)) + u'点'
-            # elif self._game.user.yi[1] == 1:
-                # ptstr = u'役满' + str(int(self._game.user.dedian)) + u'点'
-            # else:
-                # ptstr = str(self._game.user.yi[1]) + u'倍役满' + str(int(self._game.user.dedian)) + u'点'
-            # fufandian = font.render(ptstr, True, BLACK)
-            # h = fufandian.get_height()
-            # fanzhongcount = 0
-            # for s in self._game.user.fan[index]:
-                # self._display_surf.blit(font.render(s, True, BLACK), (JIESUAN_POSx, JIESUAN_POSy + h * fanzhongcount))
-                # fanzhongcount += 1
-            # self._display_surf.blit(fufandian, (JIESUAN_POSx, JIESUAN_POSy + h * fanzhongcount))
-        # elif self._game.setTag == END_LIUJU:
-            # self._game.user.analysisTag = False
-            # font = pygame.font.Font('../res/simsun.ttc', JIESUAN_FONT)
-            # self._display_surf.blit(font.render(u'流局', True, BLACK), JIESUAN_POS)
-
     def genJiesuan(self):
         if self._game.setTag==False:
             # self.jiesuansprite.dirty   = 2
@@ -330,7 +316,7 @@ class Screen(object):
     def clear(self):
         self.allSprite.empty()
 
-class Jiesuan(pygame.sprite.DirtySprite):
+class JiesuanSprite(pygame.sprite.DirtySprite):
 
     def __init__(self, size=(0,0), _game=None, _rong_player=0):
         """
@@ -374,7 +360,7 @@ class Jiesuan(pygame.sprite.DirtySprite):
             font = pygame.font.Font('../res/simsun.ttc', JIESUAN_FONT)
             self.image.blit(font.render(u'流局', True, WHITE), (0,0) )
 
-class Analysis(pygame.sprite.DirtySprite):
+class AnalysisSprite(pygame.sprite.DirtySprite):
 
     def __init__(self, size=(0,0), _game=None, font=None):
         """
@@ -421,7 +407,7 @@ class HandSprite(pygame.sprite.DirtySprite):
 
         pygame.sprite.DirtySprite.__init__(self)
         self.image = pygame.Surface(size)
-        self.image.set_alpha( ONE_FOURTH_TRANSPARENT )
+        self.image.set_alpha( NO_TRANSPARENT )
         self.rect = self.image.get_rect()
 
         if _user!=None:
@@ -462,7 +448,7 @@ class DropSprite(pygame.sprite.DirtySprite):
 
         pygame.sprite.DirtySprite.__init__(self)
         self.image = pygame.Surface(size)
-        self.image.set_alpha( ONE_FOURTH_TRANSPARENT )
+        self.image.set_alpha( NO_TRANSPARENT )
         self.rect = self.image.get_rect()
 
         if _user!=None:
@@ -497,4 +483,61 @@ class DropSprite(pygame.sprite.DirtySprite):
         if rotate_angle:
             self.image = pygame.transform.rotate(self.image, rotate_angle)
 
+class StatSprite(pygame.sprite.DirtySprite):
 
+    def __init__(self, size=(0,0), _game=None, font=None, tile=None):
+        """
+         This class generates one single rectangle showing the stats of players.
+         :param size: [width, height] of the rectangle.
+         :param _game: instance of a GameTable class recording game information.
+        """
+
+        pygame.sprite.DirtySprite.__init__(self)
+        self.image = pygame.Surface(size)
+        self.image.set_alpha( NO_TRANSPARENT )
+        self.rect = self.image.get_rect()
+
+        if _game!=None:
+            self.update(size, _game, font, tile)
+
+    def update(self, size, _game, font, tile):
+        self.image = pygame.Surface(size)
+        self.image.fill(WHITE)
+        self.rect = self.image.get_rect()
+        pygame.draw.rect(self.image, BLACK, self.rect, 1)
+
+        self.rect.x, self.rect.y = STAT_REGION_POS
+
+        changkuang = ''
+        tmp = _game.quan % NUM_OF_SET_PER_QUAN
+        changkuang += DONG_XI_NAN_BEI[tmp] + str(_game.ju+1) + u'局' + str(_game.benchang) + u'本场'
+        ck = font.render(changkuang, True, BLACK)
+        h  = ck.get_height()
+        self.image.blit(ck, (0, 0))
+        for player in _game.seats:
+            dianshu = player.name + ' ' + str(player.money)
+            ds = font.render(dianshu, True, BLACK)
+            self.image.blit(ds, (0, h * (player.position +1)))
+
+        tile_backside = pygame.transform.rotate( tile[4][0], 180 )
+        dora_number = len(_game.dora)
+        for ind in range(6,-1,-1):
+            self.image.blit(tile_backside, \
+                            ( YAMA_POSx + ind * TILE_SIZE_SMALL[0], YAMA_POSy + TILE_SIZE_SMALL_BLANK ) )
+            if 5 - dora_number<= ind and ind <=4 :
+                pai_tmp = _game.yama[_game.dora[4 - ind]]
+                m, n = pai_tmp //10, pai_tmp % 10
+                self.image.blit( pygame.transform.rotate(tile[m][n],180), \
+                                        ( YAMA_POSx + ind * TILE_SIZE_SMALL[0], YAMA_POSy ) )
+                if _game.setTag == True:
+                    pai_tmp = _game.yama[_game.ura[4 - ind]]
+                    m, n = pai_tmp // 10, pai_tmp % 10
+                    self.image.blit(pygame.transform.rotate(tile[m][n],180),
+                                            (YAMA_POSx + ind * TILE_SIZE_SMALL[0], YAMA_POSy + TILE_SIZE_SMALL[1] ) )
+
+            else:
+                self.image.blit( tile_backside, \
+                                ( YAMA_POSx + ind * TILE_SIZE_SMALL[0], YAMA_POSy ) )
+
+        self.image.blit(font.render(str(len(_game.yama) - MIN_TILES_IN_YAMA), True, BLACK),
+                        (YAMA_NUM_LEFT_POS, YAMA_POSy) )
