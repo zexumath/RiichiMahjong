@@ -307,19 +307,17 @@ class Util:
                 return _pai + 1
         else:
             return m * 10 + n % 9 + 1
-
-    '''		
+		
     @classmethod
     def keyichi(cls, _list, _pai):
-		chikou = []
-		if (_pai-2) in _list and (_pai-1) in _list:
-			chikou.append([_pai-2,_pai-1])
-		if (_pai-1) in _list and (_pai+1) in _list:
-			chikou.append([_pai-1,_pai+1])
-		if (_pai+1) in _list and (_pai+2) in _list:
-			chikou.append([_pai+1,_pai+2])
-		return chikou
-	'''	
+        chi_kouzi = []
+        if (_pai-2) in _list and (_pai-1) in _list:
+            chi_kouzi.append(_pai-2)
+        if (_pai-1) in _list and (_pai+1) in _list:
+            chi_kouzi.append(_pai-1)
+        if (_pai+1) in _list and (_pai+2) in _list:
+            chi_kouzi.append(_pai+1)
+        return chi_kouzi	
     
     @classmethod
     def keyipeng(cls, _list, _pai):
