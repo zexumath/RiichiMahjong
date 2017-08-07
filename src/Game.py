@@ -42,6 +42,8 @@ class Player(object):
         self.is_close = True
         self.kaimen = False
         self.chiTag = False
+        self.keyipengTag = False
+        self.keyichiTag = False
 
     def newset_init(self):
         #need to be in Hand class
@@ -71,6 +73,8 @@ class Player(object):
         self.is_close = True
         self.kaimen = False
         self.chiTag = False
+        self.keyipengTag = False
+        self.keyichiTag = False
 
     def drop(self, tileindex):
         #print(tileindex)
@@ -159,6 +163,7 @@ class Player(object):
                     self.hand.in_hand.remove(chipai)
                     self.hand.in_hand.remove(tile_right)
                     self.hand.in_hand.sort()
+                    self.keyichiTag = False
                     return True
                 else:
                     tile_left = self.hand.in_hand[tileindex]
@@ -170,6 +175,7 @@ class Player(object):
                         self.hand.in_hand.remove(chipai)
                         self.hand.in_hand.remove(tile_right)
                         self.hand.in_hand.sort()
+                        self.keyichiTag = False
                         return True
                     else:
                         return False
@@ -186,6 +192,7 @@ class Player(object):
             self.hand.in_hand.remove(pengpai)
             self.hand.in_hand.remove(pengpai)
             self.hand.in_hand.sort()
+            self.keyipengTag = False
             return True
 
     def calcfu(self, quan, oya):
@@ -1216,17 +1223,18 @@ class GameTable():
 
     def action_respond(self, button_pressed):
         #TODO: not implementing chi, gang
-        if button_pressed == 'peng':
+        if button_pressed == 'peng' and self.user.keyipengTag:
             self.menu_peng(self.new_drop_tile) #TODOXU
             self.table_status = WAIT_FOR_SERVE
-        elif button_pressed == 'chi':
+        elif button_pressed == 'chi' and self.user.keyichiTag:
             self.menu_chi() #TODOXU
             self.table_status = WAIT_FOR_CHOOSE       
         elif button_pressed == 'cancel':
+            self.user.keyipengTag = False
+            self.user.keyichiTag = False
             self.table_status = WAIT_FOR_SERVE
         elif button_pressed == 'rong':
             self.menu_rong(self.new_drop_tile, self.turn)
-            #TODO: implement for jiesuan when not closed
 
     def menu_respond(self, button_pressed):
         if button_pressed == 'rong':
@@ -1284,8 +1292,10 @@ class GameTable():
         
     def droppedNeedRespond(self):
         if Util.keyipeng(self.user.hand.in_hand, self.new_drop_tile) and self.user.riichi == 0 and self.turn != 0:
+            self.user.keyipengTag = True
             return True
         elif Util.keyichi(self.user.hand.in_hand, self.new_drop_tile) and self.user.riichi == 0 and self.turn == 3:
+            self.user.keyichiTag = True
             return True
         else:
             return False
