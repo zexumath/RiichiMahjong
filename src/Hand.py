@@ -32,7 +32,6 @@ class Hand:
         self.fulu4 = None
         self.fulu  = []
     '''
-
     def re_organize_expression(self):
         expressions = {}
         for k, v in self.exp.items():
@@ -220,3 +219,38 @@ class Hand:
             exp1[key].append([_danzhang])
             exp[len(exp) + 1] = exp1[key]
         return exp
+
+    def gen_fulu(self, name, tiles, tile_from_position=None, tile_from_other_index=None):
+        return self.fulu.append(Fulu(name, tiles, tile_from_position, tile_from_other_index))
+
+class Fulu(object):
+    '''
+    This class is a part of Hand, recording instances of fulu.
+    '''
+    def __init__(self, name, tiles, tile_from_position=None, tile_from_other_index=None):
+        self.name = name
+        self.tiles = tiles
+        self.tile_from_position = tile_from_position
+        self.tile_from_other_index = tile_from_other_index
+
+    def get_tiles(self):
+        return self.tiles
+
+    def get_tile_from_others(self):
+        if self.tile_from_other_index != None:
+            return self.tiles[sefl.tile_from_other_index]
+        else:
+            return None
+
+    def get_tile_from_whom(self):
+        if self.tile_from_other_index != None:
+            return self.tile_from_position
+        else:
+            return None
+
+    def chi_2_jiagang(self):
+        self.name = 'Jia_Gang'
+        self.tiles.append(self.tiles[0])
+        if self.tile_from_other_index == 2:
+            self.tile_from_other_index = 3
+

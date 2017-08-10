@@ -181,27 +181,6 @@ class Screen(object):
         self.statsprite.update( (STAT_REGION_WIDTH, STAT_REGION_HEIGHT), self._game, self.font, self.tiles_small)
         self.statsprite.add(self.allSprite)
 
-    # def genYama14(self):
-        # tile_backside = self.rotateTile(self.tiles_small[4][0], 180)
-        # dora_number = len(self._game.dora)
-        # for ind in range(6,-1,-1):
-            # self._display_surf.blit(tile_backside, \
-                                    # ( YAMA_POSx + ind * TILE_SIZE_SMALL[0], YAMA_POSy + TILE_SIZE_SMALL_BLANK ) )
-            # if 5 - dora_number<= ind and ind <=4 :
-                # pai_tmp = self._game.yama[self._game.dora[4 - ind]]
-                # m, n = pai_tmp //10, pai_tmp % 10
-                # self._display_surf.blit( self.rotateTile(self.tiles_small[m][n],180), \
-                                        # ( YAMA_POSx + ind * TILE_SIZE_SMALL[0], YAMA_POSy ) )
-                # if self._game.setTag == True:
-                    # pai_tmp = self._game.yama[self._game.ura[4 - ind]]
-                    # m, n = pai_tmp // 10, pai_tmp % 10
-                    # self._display_surf.blit(self.rotateTile(self.tiles_small[m][n],180),
-                                            # (YAMA_POSx + ind * TILE_SIZE_SMALL[0], YAMA_POSy + TILE_SIZE_SMALL[1] ) )
-
-            # else:
-                # self._display_surf.blit( tile_backside, \
-                                        # ( YAMA_POSx + ind * TILE_SIZE_SMALL[0], YAMA_POSy ) )
-
     def genPlayer(self):
         # _hand = self._game.user.hand.in_hand
         # _pai  = self._game.user.hand.new_tile
@@ -439,6 +418,13 @@ class HandSprite(pygame.sprite.DirtySprite):
         # print self.rect.x, self.rect.y
         if rotate_angle:
             self.image = pygame.transform.rotate(self.image, rotate_angle)
+
+    def update_fulu(_user, tiles):
+        rotate_angle = 90 * _user.position
+        # First rotate back to horizental position
+        if rotate_angle:
+            self.image = pygame.transform.rotate(self.image, 360 - rotate_angle)
+
 
 class DropSprite(pygame.sprite.DirtySprite):
 
