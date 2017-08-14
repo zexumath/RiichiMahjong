@@ -221,7 +221,7 @@ class Hand:
         return exp
 
     def gen_fulu(self, name, tiles, tile_from_position=None, tile_from_other_index=None):
-        return self.fulu.append(Fulu(name, tiles, tile_from_position, tile_from_other_index))
+        return self.fulu.append(Fulu(name, tiles, TILE_SIZE))
 
 class Fulu(object):
     '''
@@ -253,4 +253,13 @@ class Fulu(object):
         self.tiles.append(self.tiles[0])
         if self.tile_from_other_index == 2:
             self.tile_from_other_index = 3
+
+    def gen_image(self, tiles_figure):
+        tile_size_x, tile_size_y = tiles_figure[1][1].get_size()
+        if self.name == 'Peng':
+            image = pygame.Surface((tile_size_x * 3, tile_size_y))
+            for ind in range(3):
+                pai = self.tiles[ind]
+                m, n = pai // 10, pai % 10
+                image.blit(tiles_figure[m][n], (tile_size_x * ind, 0))
 

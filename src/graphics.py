@@ -425,6 +425,11 @@ class HandSprite(pygame.sprite.DirtySprite):
         if rotate_angle:
             self.image = pygame.transform.rotate(self.image, 360 - rotate_angle)
 
+        for fulu in _user.fulu:
+            img = fulu.gen_image()
+            #TODO:calc the size and draw img onto image
+
+
 
 class DropSprite(pygame.sprite.DirtySprite):
 
