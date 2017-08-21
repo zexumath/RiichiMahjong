@@ -1,5 +1,7 @@
 from constants import *
 from Util import Util
+import pygame
+from constants import *
 
 
 class Hand:
@@ -258,8 +260,9 @@ class Fulu(object):
         tile_size_x, tile_size_y = tiles_figure[1][1].get_size()
         if self.name == 'Peng':
             image = pygame.Surface((tile_size_x * 3, tile_size_y))
+            image.fill(WHITE)
             for ind in range(3):
                 pai = self.tiles[ind]
                 m, n = pai // 10, pai % 10
                 image.blit(tiles_figure[m][n], (tile_size_x * ind, 0))
-
+            return image

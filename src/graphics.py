@@ -419,17 +419,25 @@ class HandSprite(pygame.sprite.DirtySprite):
         if rotate_angle:
             self.image = pygame.transform.rotate(self.image, rotate_angle)
 
-    def update_fulu(_user, tiles):
+        self.update_fulu(_user, tiles)
+
+    def update_fulu(self, _user, tiles):
+        if _user.hand.fulu == []:
+            return
         rotate_angle = 90 * _user.position
         # First rotate back to horizental position
         if rotate_angle:
             self.image = pygame.transform.rotate(self.image, 360 - rotate_angle)
 
-        for fulu in _user.fulu:
-            img = fulu.gen_image()
-            #TODO:calc the size and draw img onto image
+        image_size = list(self.image.get_size())
+        for fulu in _user.hand.fulu:
+            img = fulu.gen_image(tiles)
+            img_size = img.get_size()
+            self.image.blit( img, (image_size[0] - img_size[0], image_size[1] - img_size[1]) )
+            image_size[0] -= img_size[0]
 
-
+        if rotate_angle:
+            self.image = pygame.transform.rotate(self.image, rotate_angle)
 
 class DropSprite(pygame.sprite.DirtySprite):
 
