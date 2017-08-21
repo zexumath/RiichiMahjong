@@ -157,7 +157,8 @@ class Player(object):
             if chikou:
                 if len(chikou) == 1:
                     tile_right = chikou[0]+2 if chikou[0] == chipai-1 else chikou[0]+1
-                    self.hand.fulu.append([chipai, chikou[0], tile_right])
+                    # self.hand.fulu.append([chipai, chikou[0], tile_right])
+                    self.hand.gen_fulu('Chi', [chipai, chikou[0], tile_right])
                     self.hand.in_hand.append(chipai)
                     self.hand.in_hand.remove(chikou[0])
                     self.hand.in_hand.remove(chipai)
@@ -169,7 +170,8 @@ class Player(object):
                     tile_left = self.hand.in_hand[tileindex]
                     if tile_left in chikou: #the tile pressed is in chi_kouzi
                         tile_right = tile_left+2 if tile_left == chipai-1 else tile_left+1
-                        self.hand.fulu.append([chipai, tile_left, tile_right])
+                        # self.hand.fulu.append([chipai, tile_left, tile_right])
+                        self.hand.gen_fulu('Chi', [chipai, tile_left, tile_right])
                         self.hand.in_hand.append(chipai)
                         self.hand.in_hand.remove(tile_left)
                         self.hand.in_hand.remove(chipai)

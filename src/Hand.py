@@ -258,7 +258,7 @@ class Fulu(object):
 
     def gen_image(self, tiles_figure):
         tile_size_x, tile_size_y = tiles_figure[1][1].get_size()
-        if self.name == 'Peng':
+        if self.name == 'Peng' or self.name == 'Chi':
             image = pygame.Surface((tile_size_x * 3, tile_size_y))
             image.fill(WHITE)
             for ind in range(3):
