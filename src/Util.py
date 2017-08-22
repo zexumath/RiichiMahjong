@@ -310,6 +310,8 @@ class Util:
 		
     @classmethod
     def keyichi(cls, _list, _pai):
+        if _pai>40: 
+            return None
         chi_kouzi = []
         if (_pai-2) in _list and (_pai-1) in _list:
             chi_kouzi.append(_pai-2)
@@ -322,6 +324,28 @@ class Util:
     @classmethod
     def keyipeng(cls, _list, _pai):
         if _list.count(_pai) >= 2:
+            return True
+        else:
+            return False
+            
+    @classmethod
+    def keyimgang(cls, _list, _pai):
+        if _list.count(_pai) >= 3:
+            return True
+        else:
+            return False
+            
+    @classmethod
+    def keyiagang(cls, _list, _mopai, _pai):
+        tmp = _list + [_mopai]
+        if tmp.count(_pai) == 4:
+            return True
+        else:
+            return False
+            
+    @classmethod
+    def keyijgang(cls, _list, _pai):
+        if _list.count(_pai) >= 3:
             return True
         else:
             return False

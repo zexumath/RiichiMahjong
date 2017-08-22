@@ -44,6 +44,7 @@ class Player(object):
         self.chiTag = False
         self.keyipengTag = False
         self.keyichiTag = False
+        self.keyigangTag = False
 
     def newset_init(self):
         #need to be in Hand class
@@ -75,6 +76,7 @@ class Player(object):
         self.chiTag = False
         self.keyipengTag = False
         self.keyichiTag = False
+        self.keyigangTag = False
 
     def drop(self, tileindex):
         #print(tileindex)
@@ -104,10 +106,11 @@ class Player(object):
                 return self.dropped[-1]
 
     def gang(self, tileindex):
+        #print(tileindex)
         if self.riichi > 0:
-            if tileindex == len(self.hand.in_hand) + 1:
-                if self.keyigang(self.hand.new_tile):
-                    self.hand.fulu.append([self.hand.new_tile] * 4)
+            if tileindex == len(self.hand.in_hand):
+                if Util.keyiagang(self.hand.in_hand, self.hand.new_tile, self.hand.new_tile):
+                    self.hand.gen_fulu('Gang', [self.hand.new_tile] * 4, 0)
                     self.hand.in_hand.remove(self.hand.new_tile)
                     self.hand.in_hand.remove(self.hand.new_tile)
                     self.hand.in_hand.remove(self.hand.new_tile)
@@ -119,18 +122,26 @@ class Player(object):
                 #      riichi is called is the new tile.
                 return False
         else:
-            if tileindex == len(self.hand.in_hand) + 1:
-                if self.keyigang(self.hand.new_tile):
-                    self.hand.fulu.append([self.hand.new_tile] * 4)
+            if tileindex == len(self.hand.in_hand):
+                if Util.keyiagang(self.hand.in_hand, self.hand.new_tile, self.hand.new_tile):
+                    self.hand.gen_fulu('Gang', [self.hand.new_tile] * 4, 0)
+                    for fulu in self.hand.fulu:
+                        if fulu.name == 'Gang':
+                            print(fulu.tile_from_position)
                     self.hand.in_hand.remove(self.hand.new_tile)
                     self.hand.in_hand.remove(self.hand.new_tile)
                     self.hand.in_hand.remove(self.hand.new_tile)
                     return True
                 else:
+                    for fulu in self.hand.fulu:
+                        if fulu.name == 'Peng':
+                            if Util.keyijgang(fulu.tiles, self.hand.new_tile):
+                                fulu.peng_2_jiagang()
+                                return True
                     return False
             else:
-                if self.keyigang(self.hand.in_hand[tileindex]):
-                    self.hand.fulu.append([self.hand.in_hand[tileindex]] * 4)
+                if Util.keyiagang(self.hand.in_hand, self.hand.new_tile, self.hand.in_hand[tileindex]):
+                    self.hand.gen_fulu('Gang', [self.hand.in_hand[tileindex]] * 4, 0)
                     gangpai = self.hand.in_hand[tileindex]
                     self.hand.in_hand.append(self.hand.new_tile)
                     self.hand.in_hand.remove(gangpai)
@@ -140,14 +151,22 @@ class Player(object):
                     self.hand.in_hand.sort()
                     return True
                 else:
+                    tmp = []
+                    for fulu in self.hand.fulu:
+                        if fulu.name == 'Peng':
+                            if Util.keyijgang(fulu.tiles, self.hand.in_hand[tileindex]):
+                                fulu.peng_2_jiagang()
+                                self.hand.in_hand.append(self.hand.new_tile)
+                                self.hand.in_hand.remove(self.hand.in_hand[tileindex])
+                                return True
                     return False
 
-    def keyigang(self, _pai):
-        tmp = self.hand.in_hand + [self.hand.new_tile]
-        if tmp.count(_pai) == 4:
-            return True
-        else:
-            return False
+    #def keyigang(self, _pai):
+        #tmp = self.hand.in_hand + [self.hand.new_tile]
+        #if tmp.count(_pai) == 4:
+            #return True
+        #else:
+            #return False
 
     def chipai(self, chipai, tileindex=0):
         if self.riichi > 0:
@@ -158,7 +177,7 @@ class Player(object):
                 if len(chikou) == 1:
                     tile_right = chikou[0]+2 if chikou[0] == chipai-1 else chikou[0]+1
                     # self.hand.fulu.append([chipai, chikou[0], tile_right])
-                    self.hand.gen_fulu('Chi', [chipai, chikou[0], tile_right])
+                    self.hand.gen_fulu('Chi', [chipai, chikou[0], tile_right], 3)
                     self.hand.in_hand.append(chipai)
                     self.hand.in_hand.remove(chikou[0])
                     self.hand.in_hand.remove(chipai)
@@ -171,7 +190,7 @@ class Player(object):
                     if tile_left in chikou: #the tile pressed is in chi_kouzi
                         tile_right = tile_left+2 if tile_left == chipai-1 else tile_left+1
                         # self.hand.fulu.append([chipai, tile_left, tile_right])
-                        self.hand.gen_fulu('Chi', [chipai, tile_left, tile_right])
+                        self.hand.gen_fulu('Chi', [chipai, tile_left, tile_right], 3)
                         self.hand.in_hand.append(chipai)
                         self.hand.in_hand.remove(tile_left)
                         self.hand.in_hand.remove(chipai)
@@ -184,16 +203,31 @@ class Player(object):
             else:
                 return False
 
-    def pengpai(self, pengpai):
+    def pengpai(self, pengpai, turn):
         if self.riichi > 0:
             return False
         else:
-            self.hand.gen_fulu('Peng', [pengpai] * 3) #TODO: append player who dropped pengpai
+            self.hand.gen_fulu('Peng', [pengpai] * 3, turn) #Done: append player who dropped pengpai
             self.hand.in_hand.append(pengpai)
             self.hand.in_hand.remove(pengpai)
             self.hand.in_hand.remove(pengpai)
             self.hand.in_hand.remove(pengpai)
             self.hand.in_hand.sort()
+            self.keyipengTag = False
+            return True
+            
+    def mgangpai(self, gangpai, turn):
+        if self.riichi > 0:
+            return False
+        else:
+            self.hand.gen_fulu('Gang', [gangpai] * 4, turn) #Done: append player who dropped gangpai
+            self.hand.in_hand.append(gangpai)
+            self.hand.in_hand.remove(gangpai)
+            self.hand.in_hand.remove(gangpai)
+            self.hand.in_hand.remove(gangpai)
+            self.hand.in_hand.remove(gangpai)
+            self.hand.in_hand.sort()
+            self.keyimgangTag = False
             self.keyipengTag = False
             return True
 
@@ -1228,6 +1262,9 @@ class GameTable():
         if button_pressed == 'peng' and self.user.keyipengTag:
             self.menu_peng(self.new_drop_tile) #TODOXU
             self.table_status = WAIT_FOR_SERVE
+        elif button_pressed == 'gang' and self.user.keyigangTag:
+            self.menu_gang(self.new_drop_tile) #TODOXU
+            self.table_status = WAIT_FOR_SERVE
         elif button_pressed == 'chi' and self.user.keyichiTag:
             self.menu_chi() #TODOXU
             self.table_status = WAIT_FOR_CHOOSE
@@ -1279,7 +1316,7 @@ class GameTable():
         else:
             gangtmp = self.user.gang(tile_pressed)
             if gangtmp:
-                self.tile_gang_respond()
+                #self.tile_gang_respond()
                 self.gangserve()
                 # self.tile_ai_drop()
             else:
@@ -1293,7 +1330,11 @@ class GameTable():
         raise NotImplementedError
 
     def droppedNeedRespond(self):
-        if Util.keyipeng(self.user.hand.in_hand, self.new_drop_tile) and self.user.riichi == 0 and self.turn != 0:
+        if Util.keyimgang(self.user.hand.in_hand, self.new_drop_tile) and self.user.riichi == 0 and self.turn != 0 and len(self.yama) > MIN_TILES_IN_YAMA:
+            self.user.keyigangTag = True
+            self.user.keyipengTag = True
+            return True
+        elif Util.keyipeng(self.user.hand.in_hand, self.new_drop_tile) and self.user.riichi == 0 and self.turn != 0:
             self.user.keyipengTag = True
             return True
         elif Util.keyichi(self.user.hand.in_hand, self.new_drop_tile) and self.user.riichi == 0 and self.turn == 3:
@@ -1334,8 +1375,16 @@ class GameTable():
             self.user.money -= 1000
             self.lizhibang += 1
 
-    def menu_gang(self):
-        if len(self.yama) > MIN_TILES_IN_YAMA: self.user.gangTag = True
+    def menu_gang(self, _pai=None):
+        if len(self.yama) > MIN_TILES_IN_YAMA: 
+            self.user.gangTag = True
+        if self.turn != 0:
+            self.user.mgangpai(_pai, self.turn)
+            self.user.is_close = False
+            self.turn = 0
+            self.gangserve()
+            self.seats[self.turn].dropped.pop() 
+        #self.user.pengpai(_pai) # currently only allowing user gang.      
 
     def menu_analysis(self):
         self.user.analysisTag = not self.user.analysisTag
@@ -1358,7 +1407,7 @@ class GameTable():
     def menu_peng(self, _pai, turn=0): #TODOXU
         self.user.kaimen = True
         self.user.is_close = False
-        self.user.pengpai(_pai) # currently only allowing user peng.
+        self.user.pengpai(_pai, self.turn) # currently only allowing user peng.
         self.seats[self.turn].dropped.pop()
         self.turn = 0
 
