@@ -150,14 +150,15 @@ class Player(object):
             return False
 
     def chipai(self, chipai, tileindex=0):
-        if self.riichi > 0: 
+        if self.riichi > 0:
             return False
         else:
             chikou = Util.keyichi(self.hand.in_hand, chipai)
             if chikou:
-                if len(chikou) == 1: 
+                if len(chikou) == 1:
                     tile_right = chikou[0]+2 if chikou[0] == chipai-1 else chikou[0]+1
-                    self.hand.fulu.append([chipai, chikou[0], tile_right])
+                    # self.hand.fulu.append([chipai, chikou[0], tile_right])
+                    self.hand.gen_fulu('Chi', [chipai, chikou[0], tile_right])
                     self.hand.in_hand.append(chipai)
                     self.hand.in_hand.remove(chikou[0])
                     self.hand.in_hand.remove(chipai)
@@ -169,7 +170,8 @@ class Player(object):
                     tile_left = self.hand.in_hand[tileindex]
                     if tile_left in chikou: #the tile pressed is in chi_kouzi
                         tile_right = tile_left+2 if tile_left == chipai-1 else tile_left+1
-                        self.hand.fulu.append([chipai, tile_left, tile_right])
+                        # self.hand.fulu.append([chipai, tile_left, tile_right])
+                        self.hand.gen_fulu('Chi', [chipai, tile_left, tile_right])
                         self.hand.in_hand.append(chipai)
                         self.hand.in_hand.remove(tile_left)
                         self.hand.in_hand.remove(chipai)
@@ -186,7 +188,7 @@ class Player(object):
         if self.riichi > 0:
             return False
         else:
-            self.hand.fulu.append([pengpai] * 3) #TODO: append player who dropped pengpai 
+            self.hand.gen_fulu('Peng', [pengpai] * 3) #TODO: append player who dropped pengpai
             self.hand.in_hand.append(pengpai)
             self.hand.in_hand.remove(pengpai)
             self.hand.in_hand.remove(pengpai)
@@ -774,7 +776,7 @@ class Player(object):
             return False
 
     def sananke(self, kezi, shunzi, quetou):
-        if self.isclose:
+        if self.is_close:
             if self.zimo > 0:
                 return True
             else:
@@ -1228,7 +1230,7 @@ class GameTable():
             self.table_status = WAIT_FOR_SERVE
         elif button_pressed == 'chi' and self.user.keyichiTag:
             self.menu_chi() #TODOXU
-            self.table_status = WAIT_FOR_CHOOSE       
+            self.table_status = WAIT_FOR_CHOOSE
         elif button_pressed == 'cancel':
             self.user.keyipengTag = False
             self.user.keyichiTag = False
@@ -1289,7 +1291,7 @@ class GameTable():
 
     def tile_gang_respond(self):
         raise NotImplementedError
-        
+
     def droppedNeedRespond(self):
         if Util.keyipeng(self.user.hand.in_hand, self.new_drop_tile) and self.user.riichi == 0 and self.turn != 0:
             self.user.keyipengTag = True
@@ -1299,9 +1301,9 @@ class GameTable():
             return True
         else:
             return False
-            
+
     def tile_dropped_respond(self):
-        if self.droppedNeedRespond():    
+        if self.droppedNeedRespond():
             self.table_status = WAIT_FOR_RESPONSE
         else:
             self.table_status = NO_RESPONSE
@@ -1359,7 +1361,7 @@ class GameTable():
         self.user.pengpai(_pai) # currently only allowing user peng.
         self.seats[self.turn].dropped.pop()
         self.turn = 0
-        
+
     def menu_chi(self): #TODOXU
         #if self.user.chipai(_pai, tile_pressed): # currently only allowing user peng.
         self.user.kaimen = True
