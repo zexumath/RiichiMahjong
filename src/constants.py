@@ -3,6 +3,7 @@ import random
 
 NUM_OF_SET_PER_QUAN = 4
 
+USER_POSITION = 0
 OYA_START = random.randint(0,3)
 
 # Constants for table status

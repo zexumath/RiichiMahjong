@@ -271,21 +271,23 @@ class Fulu(object):
                 m, n = pai // 10, pai % 10
                 image.blit(tiles_figure[m][n], (tile_size_x * ind, 0))
             return image
-        elif self.name == 'Gang':
+        elif self.name == 'An_Gang': 
             image = pygame.Surface((tile_size_x * 4, tile_size_y))
             image.fill(WHITE)
-            if self.tile_from_position != 0: #TODO: graphics for ming_gang
-                for ind in range(4):
-                    pai = self.tiles[ind]
-                    m, n = pai // 10, pai % 10
-                    image.blit(tiles_figure[m][n], (tile_size_x * ind, 0))
-            else:
-                image.blit(tiles_figure[4][0], (0, 0))
-                pai = self.tiles[0]
+            image.blit(tiles_figure[4][0], (0, 0))
+            pai = self.tiles[0]
+            m, n = pai // 10, pai % 10
+            image.blit(tiles_figure[m][n], (tile_size_x, 0))
+            image.blit(tiles_figure[m][n], (tile_size_x * 2, 0))
+            image.blit(tiles_figure[4][0], (tile_size_x * 3, 0))
+            return image
+        elif self.name == 'Ming_Gang': #TODO: graphics for ming_gang
+            image = pygame.Surface((tile_size_x * 4, tile_size_y))
+            image.fill(WHITE)
+            for ind in range(4):
+                pai = self.tiles[ind]
                 m, n = pai // 10, pai % 10
-                image.blit(tiles_figure[m][n], (tile_size_x, 0))
-                image.blit(tiles_figure[m][n], (tile_size_x * 2, 0))
-                image.blit(tiles_figure[4][0], (tile_size_x * 3, 0))
+                image.blit(tiles_figure[m][n], (tile_size_x * ind, 0))
             return image
         elif self.name == 'Jia_Gang': #TODO: graphics for jia_gang
             image = pygame.Surface((tile_size_x * 4, tile_size_y))
