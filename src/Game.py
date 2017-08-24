@@ -7,6 +7,7 @@ from Hand import Hand
 from Util import Util
 import time
 from Fanzhong import FanZhong, PingHe
+from Sound import Sound
 
 class Player(object):
     def __init__(self, name='AI'):
@@ -45,6 +46,11 @@ class Player(object):
         self.keyipengTag = False
         self.keyichiTag = False
         self.keyigangTag = False
+        
+        self.chi_sound  = Sound('../res/sound/chi.wav')
+        self.peng_sound = Sound('../res/sound/peng.wav')
+        self.gang_sound = Sound('../res/sound/gang.wav')
+        self.rong_sound = Sound('../res/sound/hu.wav')
 
     def newset_init(self):
         #need to be in Hand class
@@ -110,6 +116,7 @@ class Player(object):
         if self.riichi > 0:
             if tileindex == len(self.hand.in_hand):
                 if Util.keyiagang(self.hand.in_hand, self.hand.new_tile, self.hand.new_tile):
+                    self.gang_sound.play_sound()
                     self.hand.gen_fulu('An_Gang', [self.hand.new_tile] * 4, USER_POSITION)
                     self.hand.in_hand.remove(self.hand.new_tile)
                     self.hand.in_hand.remove(self.hand.new_tile)
@@ -124,6 +131,7 @@ class Player(object):
         else:
             if tileindex == len(self.hand.in_hand):
                 if Util.keyiagang(self.hand.in_hand, self.hand.new_tile, self.hand.new_tile):
+                    self.gang_sound.play_sound()
                     self.hand.gen_fulu('An_Gang', [self.hand.new_tile] * 4, USER_POSITION)
                     self.hand.in_hand.remove(self.hand.new_tile)
                     self.hand.in_hand.remove(self.hand.new_tile)
@@ -133,11 +141,13 @@ class Player(object):
                     for fulu in self.hand.fulu:
                         if fulu.name == 'Peng':
                             if Util.keyijgang(fulu.tiles, self.hand.new_tile):
+                                self.gang_sound.play_sound()
                                 fulu.peng_2_jiagang()
                                 return True
                     return False
             else:
                 if Util.keyiagang(self.hand.in_hand, self.hand.new_tile, self.hand.in_hand[tileindex]):
+                    self.gang_sound.play_sound()
                     self.hand.gen_fulu('An_Gang', [self.hand.in_hand[tileindex]] * 4, USER_POSITION)
                     gangpai = self.hand.in_hand[tileindex]
                     self.hand.in_hand.append(self.hand.new_tile)
@@ -148,10 +158,10 @@ class Player(object):
                     self.hand.in_hand.sort()
                     return True
                 else:
-                    tmp = []
                     for fulu in self.hand.fulu:
                         if fulu.name == 'Peng':
                             if Util.keyijgang(fulu.tiles, self.hand.in_hand[tileindex]):
+                                self.gang_sound.play_sound()
                                 fulu.peng_2_jiagang()
                                 self.hand.in_hand.append(self.hand.new_tile)
                                 self.hand.in_hand.remove(self.hand.in_hand[tileindex])
@@ -172,6 +182,7 @@ class Player(object):
             chikou = Util.keyichi(self.hand.in_hand, chipai)
             if chikou:
                 if len(chikou) == 1:
+                    self.chi_sound.play_sound()
                     tile_right = chikou[0]+2 if chikou[0] == chipai-1 else chikou[0]+1
                     # self.hand.fulu.append([chipai, chikou[0], tile_right])
                     self.hand.gen_fulu('Chi', [chipai, chikou[0], tile_right], 3)
@@ -185,6 +196,7 @@ class Player(object):
                 else:
                     tile_left = self.hand.in_hand[tileindex]
                     if tile_left in chikou: #the tile pressed is in chi_kouzi
+                        self.chi_sound.play_sound()
                         tile_right = tile_left+2 if tile_left == chipai-1 else tile_left+1
                         # self.hand.fulu.append([chipai, tile_left, tile_right])
                         self.hand.gen_fulu('Chi', [chipai, tile_left, tile_right], 3)
@@ -204,6 +216,7 @@ class Player(object):
         if self.riichi > 0:
             return False
         else:
+            self.peng_sound.play_sound()
             self.hand.gen_fulu('Peng', [pengpai] * 3, turn) #Done: append player who dropped pengpai
             self.hand.in_hand.append(pengpai)
             self.hand.in_hand.remove(pengpai)
@@ -217,6 +230,7 @@ class Player(object):
         if self.riichi > 0:
             return False
         else:
+            self.gang_sound.play_sound()
             self.hand.gen_fulu('Ming_Gang', [gangpai] * 4, turn) #Done: append player who dropped gangpai
             self.hand.in_hand.append(gangpai)
             self.hand.in_hand.remove(gangpai)
@@ -522,6 +536,7 @@ class Player(object):
                     self.yi[k][0].append(u'立直')
 
     def rong(self, _pai, quan, oya):
+        self.rong_sound.play_sound()
         self.rongpai = _pai
         _hand = self.hand.in_hand + [_pai]
         _hand.sort()
@@ -1261,14 +1276,14 @@ class GameTable():
     def action_respond(self, button_pressed):
         #TODO: not implementing chi, gang
         if button_pressed == 'peng' and self.user.keyipengTag:
+            self.table_status = WAIT_FOR_SERVE
             self.menu_peng(self.new_drop_tile) #TODOXU
-            self.table_status = WAIT_FOR_SERVE
         elif button_pressed == 'gang' and self.user.keyigangTag:
-            self.menu_gang(self.new_drop_tile) #TODOXU
             self.table_status = WAIT_FOR_SERVE
+            self.menu_gang(self.new_drop_tile) #TODOXU
         elif button_pressed == 'chi' and self.user.keyichiTag:
-            self.menu_chi() #TODOXU
             self.table_status = WAIT_FOR_CHOOSE
+            self.menu_chi(self.new_drop_tile) #TODOXU
         elif button_pressed == 'cancel':
             self.user.keyipengTag = False
             self.user.keyichiTag = False
@@ -1376,7 +1391,7 @@ class GameTable():
             self.lizhibang += 1
 
     def menu_gang(self, _pai=None):
-        if len(self.yama) > MIN_TILES_IN_YAMA: 
+        if len(self.yama) > MIN_TILES_IN_YAMA and self.table_status != WAIT_FOR_SERVE:  #can't gang after chi, peng
             self.user.gangTag = True
         if self.turn != USER_POSITION:
             self.user.mgangpai(_pai, self.turn)
@@ -1411,13 +1426,13 @@ class GameTable():
         self.seats[self.turn].dropped.pop()
         self.turn = USER_POSITION
 
-    def menu_chi(self): #TODOXU
+    def menu_chi(self, _pai): #TODOXU
         #if self.user.chipai(_pai, tile_pressed): # currently only allowing user peng.
         self.user.kaimen = True
         self.user.is_close = False
         self.user.chiTag = True
-        if len(Util.keyichi(self.user.hand.in_hand, self.new_drop_tile)) == 1:
-            self.user.chipai(self.new_drop_tile)
+        if len(Util.keyichi(self.user.hand.in_hand, _pai)) == 1:
+            self.user.chipai(_pai)
             self.seats[self.turn].dropped.pop()
             self.table_status = WAIT_FOR_SERVE
             self.user.chiTag = False

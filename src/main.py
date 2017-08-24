@@ -18,6 +18,7 @@ class RiichiMahjong:
 
     def on_init(self):
         pygame.init()
+        pygame.mixer.init()
         self._game = GameTable()
         self._screen = graphics.Screen(self._game)
         self._running = True
