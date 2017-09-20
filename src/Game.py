@@ -46,7 +46,7 @@ class Player(object):
         self.keyipengTag = False
         self.keyichiTag = False
         self.keyigangTag = False
-        
+
         self.chi_sound  = Sound('../res/sound/chi.wav')
         self.peng_sound = Sound('../res/sound/peng.wav')
         self.gang_sound = Sound('../res/sound/gang.wav')
@@ -225,7 +225,7 @@ class Player(object):
             self.hand.in_hand.sort()
             self.kaimentag_clear()
             return True
-            
+
     def mgangpai(self, gangpai, turn):
         if self.riichi > 0:
             return False
@@ -240,7 +240,7 @@ class Player(object):
             self.hand.in_hand.sort()
             self.kaimentag_clear()
             return True
-            
+
     def kaimentag_clear(self):
         self.keyigangTag = False
         self.keyipengTag = False
@@ -263,7 +263,7 @@ class Player(object):
                     res += 2
             # gang
             for a in self.hand.fulu:
-                tmp = a[0]
+                tmp = a.get_tiles()[0]
                 if Util.isyao(tmp):
                     res += 32
                 else:
@@ -1398,8 +1398,8 @@ class GameTable():
             self.user.is_close = False
             self.turn = USER_POSITION
             self.gangserve()
-            self.seats[self.turn].dropped.pop() 
-        #self.user.pengpai(_pai) # currently only allowing user gang.      
+            self.seats[self.turn].dropped.pop()
+        #self.user.pengpai(_pai) # currently only allowing user gang.
 
     def menu_analysis(self):
         self.user.analysisTag = not self.user.analysisTag
