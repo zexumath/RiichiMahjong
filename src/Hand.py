@@ -256,7 +256,7 @@ class Fulu(object):
         self.tiles.append(self.tiles[0])
         if self.tile_from_other_index == 2:
             self.tile_from_other_index = 3
-            
+
     def peng_2_jiagang(self):
         self.name = 'Jia_Gang'
         self.tiles.append(self.tiles[0])
@@ -271,7 +271,7 @@ class Fulu(object):
                 m, n = pai // 10, pai % 10
                 image.blit(tiles_figure[m][n], (tile_size_x * ind, 0))
             return image
-        elif self.name == 'An_Gang': 
+        elif self.name == 'An_Gang':
             image = pygame.Surface((tile_size_x * 4, tile_size_y))
             image.fill(WHITE)
             image.blit(tiles_figure[4][0], (0, 0))
