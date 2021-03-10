@@ -8,6 +8,7 @@ import mahjong
 from Game import GameTable
 import graphics
 from constants import *
+import argparse
 
 class RiichiMahjong:
 
@@ -85,4 +86,7 @@ class RiichiMahjong:
 if __name__ == "__main__" :
     riichiMahjong = RiichiMahjong()
     riichiMahjong.on_execute()
-
+    
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--two_people', action='store_value', default=4, 
+                    help='option to play 2 people mahjong.')

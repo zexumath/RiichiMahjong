@@ -26,7 +26,7 @@ class FanZhong:
         raise NotImplementedError
 
     @abc.abstractmethod
-    def judge(cls, _hand, _expression, is_close, is_zimo):
+    def judge(cls, _hand, _expression, is_close, is_zimo, _fu=20):
         """
         Judge whether the provided hand set satisfy the Fanzhong.
         :param _hand: Hand Class Object
@@ -34,6 +34,7 @@ class FanZhong:
         'shunzi' and 'quetou'. Otherwise it will lead to repeat of coding.
         :return:
         """
+
 
 
 class GuoShi(FanZhong):

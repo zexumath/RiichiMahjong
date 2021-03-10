@@ -51,7 +51,11 @@ class Player(object):
         self.peng_sound = Sound('../res/sound/peng.wav')
         self.gang_sound = Sound('../res/sound/gang.wav')
         self.rong_sound = Sound('../res/sound/hu.wav')
-
+        
+    def get_tile(self, tile_number, yama):
+        yama, tmp = yama[:-tile_number], yama[-tile_number:]
+        self.hand.in_hand += tmp
+        
     def newset_init(self):
         #need to be in Hand class
         #self.mopai = []
@@ -293,7 +297,7 @@ class Player(object):
                     if len(zuhe) == 2:
                         continue
                     elif zuhe[1] == zuhe[0]:
-                        if self.zimo > 0 or self.rongpai != zuhe[0]:
+                        if self.zimo  or self.rongpai != zuhe[0]:
                             if Util.isyao(zuhe[0]):
                                 self.fu[k] += 8
                             else:
@@ -327,7 +331,7 @@ class Player(object):
                                 tag = 1
                     if tag == 0:
                         self.fu[k] = 22
-                    if self.zimo == 0:
+                    if self.zimo :
                         self.fu[k] += 10
                     elif self.fu[k] != 20:
                         self.fu[k] += 2
@@ -342,7 +346,7 @@ class Player(object):
                             else:
                                 self.fu[k] += 2
                                 break
-                    if self.zimo != 0:
+                    if self.zimo :
                         self.fu[k] += 2
                     elif self.is_close:
                         self.fu[k] += 10
@@ -399,7 +403,7 @@ class Player(object):
                         if shunzi[1] == shunzi[0] and shunzi[3] == shunzi[2]:
                             self.yi[k][0][0] += 3
                             self.yi[k][0].append(u'两盃口')
-                        if PingHe.judge(self.hand, v, self.zimo, self.fu[k]):
+                        if PingHe.judge(self.hand, v, self.is_close, self.zimo, self.fu[k]):
                             self.yi[k][0][0] += 1
                             self.yi[k][0].append(u'平和')
                         # if self.fu[k] == 20 and self.zimo > 0:
@@ -545,7 +549,9 @@ class Player(object):
             return ([0, 0], [0, 0], [u'诈和', 0])
         else:
             self.calcfu(quan, oya)
+            print(self.__dict__)
             self.calcyi(quan, oya)
+            print(self.__dict__)
             maxk, maxyi, maxfan = [0, 0], [0, 0], [0, 0]
             for k, v in self.yi.items():
                 for i in range(2):
@@ -1007,7 +1013,7 @@ class AiPlayer(Player):
 
 
 class GameTable():
-    def __init__(self):
+    def __init__(self, player_number=4):
         self.pai = [] #all of the pai
         self.seats = []
         '''
@@ -1017,9 +1023,13 @@ class GameTable():
         self.player4 = Player()
         '''
         self.user = Player('Player')
+        
         self.ai1 = AiPlayer('AI1')
-        self.ai2 = AiPlayer('AI2')
-        self.ai3 = AiPlayer('AI3')
+        self.player_number = player_number
+        if player_number==4:
+            self.ai2 = AiPlayer('AI2')
+            self.ai3 = AiPlayer('AI3')
+        
         self.__create__()
         self.yama = [] # the remaining pai
         self.quan = -1 #0,1,2,3 represent east, north, west, north quan
@@ -1039,17 +1049,31 @@ class GameTable():
         self.table_status = WAIT_FOR_SERVE
 
     def __create__(self):
-        for i in range(4):
-            start = 10
-            #for j in range(TILE_START + 1, TILE_START + TILE_RANGE):
-            for j in range(start + 1, start + 30):
-                if j % 10 != 0: self.pai.append(j)
-            for k in range(41, 48):
-                self.pai.append(k)
+        if self.player_number == 4:
+            for i in range(4):
+                start = 10
+                #for j in range(TILE_START + 1, TILE_START + TILE_RANGE):
+                for j in range(start + 1, start + 30):
+                    if j % 10 != 0: self.pai.append(j)
+                for k in range(41, 48):
+                    self.pai.append(k)
+        elif self.player_number == 2:
+            for i in range(3, 4):
+                start = 10
+                #for j in range(TILE_START + 1, TILE_START + TILE_RANGE):
+                for j in range(start + 1, start + 30):
+                    if j % 10 != 0: self.pai.append(j)
+                for k in range(41, 48):
+                    self.pai.append(k)
+        else:
+            raise NotImplementedError
         #self.seats = [self.player1, self.player2, self.player3, self.player4]
-        self.seats = [self.user, self.ai1, self.ai2, self.ai3]
+        if self.player_number == 4:
+            self.seats = [self.user, self.ai1, self.ai2, self.ai3]
+        elif self.player_number == 2:
+            self.seats = [self.user, self.ai1]
         #random.shuffle(self.seats) #judge the seats: east north west north, seats[0] to call the player seating east
-        for i in range(4): #seats position set for players
+        for i in range(self.player_number): #seats position set for players
             self.seats[i].position = i
 
     def judge_benchang(self): #判断是否是下一本场, 否则切换亲家
@@ -1094,6 +1118,18 @@ class GameTable():
 
             #self.seats[tmp].hand.new_set_init(self.yama, tmp, self.oya)
         self.yama = self.yama[:-52]
+#         for player in self.seats[self.oya-self.player_number: self.oya]:
+#             player.newset_init()
+            
+#         for get_tile_round in range(3):
+#             for player in self.seats[self.oya-self.player_number: self.oya]:
+#                 player.get_tile(4, self.yama)
+#         for get_tile_round in range(3):
+#             for player in self.seats[self.oya-self.player_number: self.oya]:
+#                 player.get_tile(1, self.yama)
+#                 player.hand.in_hand.sort()
+        
+        
         self.turn = self.oya #draw tiles from oya
         self.setTag = 0 #reset setTag
         self.on_hold_flag = False
@@ -1137,9 +1173,9 @@ class GameTable():
         # print self.user.hand.in_hand
         # print turn, self.user.position
         if turn == self.user.position:
-            self.user.zimo = 1
+            self.user.zimo = True
         else:
-            self.user.zimo = 0
+            self.user.zimo = False
         self.user.fu, self.user.yi, self.user.fan = self.user.rong(_pai, self.quan, self.oya)
         if self.user.fu == [0, 0]:
             self.user.dedian = 0
@@ -1153,11 +1189,13 @@ class GameTable():
                 self.user.yi[0] += 1
                 self.user.fan[0] += [u'河底捞鱼']
         if self.user.yi != [0, 0]:
+            
             if self.user.yi[1] != 0:
                 if self.user.position == self.oya:
                     self.user.dedian = 48000 * self.user.yi[1]
                 else:
                     self.user.dedian = 32000 * self.user.yi[1]
+                self.transfer_money(0, 0, yakuman=True)
             else:
                 tmp = self.user.hand.in_hand + [self.user.rongpai]
                 for gang in self.user.agang:
@@ -1203,9 +1241,9 @@ class GameTable():
             #             self.user.dedian = 32000
             #         if self.user.position == self.oya: self.user.dedian = self.user.dedian * 1.5
             # # self.user.money += int(self.user.dedian) + self.lizhibang * 1000
-            self.transfer_money(0, jbd)
+                self.transfer_money(0, jbd, yakuman=False)
 
-    def transfer_money(self, rong_player, jibendian):
+    def transfer_money(self, rong_player, jibendian, yakuman=False):
         if self.seats[rong_player].yi[1] !=0:
             jbd1 = 8000  * self.seats[rong_player].yi[1]
             jbd2 = jbd1 * 2
